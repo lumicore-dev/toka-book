@@ -16,10 +16,7 @@ The PAL Checker analyzes the usage of hat sigils (`*`, `^`, `~`) across your cod
 The `^` hat enforces exclusive ownership. Ownership can be transferred via *move*:
 
 ```toka
-auto ^p = new i32(val=42)
-auto ^q = ^p     // Ownership moves to q
-println(str(q))  // OK — q owns the value
-// println(str(p))  // ERROR — p is no longer valid
+{{#include ../../examples/memory_safety.tk:no_use_after_move}}
 ```
 
 The compiler tracks the flow of ownership and rejects any code that accesses a value after its ownership has been transferred.
@@ -29,48 +26,45 @@ The compiler tracks the flow of ownership and rejects any code that accesses a v
 Raw pointers require explicit `unsafe` blocks:
 
 ```toka
-auto *p# = unsafe alloc i32(val=100)
-p = 99             // Modify via soul (implicit dereference)
-unsafe free(p)     // Manual free in unsafe
+{{#include ../../examples/memory_safety.tk:unsafe_ops}}
 ```
 
 The `unsafe` keyword signals to the PAL Checker that you are taking manual responsibility for memory safety.
 
 ## Shared Pointers (`~`) — Reference Counting
 
-Shared pointers use runtime reference counting but are still safe:
+Shared pointers use runtime reference counting but are still safe. Support is planned for an upcoming release.
 
 ```toka
-auto ~p = shared i32(val=42)
-let ~q = p
-// Both p and q can access the value
-// Freed when the last reference goes out of scope
+// Not yet implemented in v0.9.6 — coming soon
 ```
 
 ## Borrowing Safety
 
-Implicit borrowing (in-place capture) is the default:
+Toka uses **implicit borrow** (in-place capture) as the default for function parameters. Values of simple types like `i32` are passed by value (copied), while complex types would be borrowed:
 
 ```toka
-fn read(data: Buffer) {
-    println(str(data.len))
+fn read(data: i32) {
+    println("data: {}", data)
 }
 
-let buf = create_buffer(1024)
-read(buf)        // Immutable borrow — buf is still valid here
-println(str(buf.len))  // OK
+fn main() -> i32 {
+    auto val = 10
+    read(val)        // Immutable borrow — val is still valid here
+    println("val: {}", val)
+    return 0
+}
 ```
 
-Mutable borrowing requires `#`:
+For **mutable access**, use `#` on local variable declarations:
 
 ```toka
-fn write(data#: Buffer) {
-    data.append("world")
+fn main() -> i32 {
+    auto data# = 42
+    data = 99        // Mutate via `#` declared variable
+    println("data: {}", data)
+    return 0
 }
-
-let buf# = create_buffer(1024)
-write(buf#)      // Mutable borrow — exclusive access
-// buf is still valid here
 ```
 
 ## The PAL Checker's Guarantees at a Glance

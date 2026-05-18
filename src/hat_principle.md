@@ -10,7 +10,7 @@ A **hat** is a sigil (symbol) attached to an identifier that tells both the prog
 |-----|------|---------|
 | `*` | Raw Pointer | Low-level pointer, requires `unsafe` / `alloc` |
 | `^` | Unique Pointer | Exclusive ownership of a heap-allocated resource (like `Box` in Rust) |
-| `~` | Shared Pointer | Reference-counted shared ownership |
+| `~` | Shared Pointer | Reference-counted shared ownership (planned) |
 
 ## Handle vs. Soul
 
@@ -22,10 +22,7 @@ One of Toka's most elegant design features is the **Handle vs. Soul** distinctio
 When you want to read or modify the value a pointer points to, you simply operate on the **soul** directly — no dereference token needed:
 
 ```toka
-auto *p# = unsafe alloc i32(val=100)
-// p (without *) refers to the underlying value
-p = 200          // Modifies the allocated integer directly
-let val = p      // Reads the value without explicit dereference
+{{#include ../../examples/ownership.tk:raw_ptr}}
 ```
 
 This is a major quality-of-life improvement over C's `*p = 200` or Rust's `*p = 200`. Toka's approach makes pointer-heavy code much more readable.

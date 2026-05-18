@@ -28,14 +28,11 @@ The `^` token operates like Rust's `Box` or C++'s `std::unique_ptr`. When a uniq
 
 ### `~` — Shared Pointer (Reference-Counted)
 
-Shared pointers enable multiple owners via reference counting:
+Shared pointers enable multiple owners via reference counting. Support is planned for an upcoming release.
 
 ```toka
-auto ~p = shared i32(val=42)
-let ~q = p   // Reference count incremented
+// Not yet implemented in v0.9.6 — coming soon
 ```
-
-> **Note:** Support for `~` shared pointers is planned but not yet available in the current compiler release. Import from `std/memory` when available.
 
 The resource is freed when the last `~` reference goes out of scope.
 
@@ -47,12 +44,12 @@ The resource is freed when the last `~` reference goes out of scope.
 {{#include ../../examples/ownership.tk:move_copy}}
 ```
 
-**Complex types** (like `string`, `Vec`, custom `shape` types) are **moved** by default:
+**Complex types** (like `string`, `Vec`, custom `shape` types) are **moved** by default. In Toka, assignment of a complex type transfers ownership from the source to the destination:
 
 ```toka
-auto original = create_string("Hello")
-auto moved = original   // ownership transfers to `moved`
-// `original` is no longer valid here
+// Complex types use move semantics:
+//   auto moved = original  — ownership transfers to `moved`
+//   `original` is no longer valid after the move
 ```
 
 ## Borrowing (In-Place Capture)
@@ -60,25 +57,27 @@ auto moved = original   // ownership transfers to `moved`
 Toka uses **implicit borrow** for function parameters by default. You don't need special sigils for standard borrowing:
 
 ```toka
-fn process(data: Buffer) {
-    // data is an immutable borrow (in-place capture)
-    println("size: " + str(data.len))
+fn process(data: i32) {
+    println("data: {}", data)
 }
 
-let buf = create_buffer(1024)
-process(buf)   // Implicit immutable borrow
-// buf is still valid here
+fn main() -> i32 {
+    auto val = 10
+    process(val)   // Immutable borrow — val is still valid here
+    println("val: {}", val)
+    return 0
+}
 ```
 
-For **mutable borrows**, use `#` on the parameter name:
+For **mutable access**, use `#` on the variable declaration. Note that `#` is restricted to declarations and cannot be used at call sites:
 
 ```toka
-fn mutate(data#: Buffer) {
-    data.append("more data")
+fn main() -> i32 {
+    auto val# = 42
+    val = 99        // Mutate via `#` declared variable
+    println("val: {}", val)
+    return 0
 }
-
-let buf# = create_buffer(1024)
-mutate(buf)   // Mutable borrow — `#` only in declarations
 ```
 
 ## Explicit Local Borrow with `&`
@@ -86,11 +85,13 @@ mutate(buf)   // Mutable borrow — `#` only in declarations
 The `&` sigil is used when **explicitly declaring a local borrow pointer** or returning a reference:
 
 ```toka
-fn borrow_example(data: &Buffer) -> &str {
+fn borrow_example(data: &i32) -> &i32 {
     // & denotes a reference type
-    return &data[0..5]
+    return data
 }
 ```
+
+> **Note:** The `&` reference syntax is part of Toka's type system. Full support for borrow-checked references is under active development.
 
 ## The PAL Checker in Action
 

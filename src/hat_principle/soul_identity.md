@@ -14,9 +14,7 @@ Every pointer in Toka has two aspects:
 Toka's killer feature is **implicit dereferencing**: you never need a `*` or `->` operator to access the data behind a pointer. Just use the soul directly:
 
 ```toka
-auto ^p = new Point(x: 10, y: 20)
-p.x = 30       // No dereference operator needed!
-let sum = p.x + p.y
+{{#include ../../examples/soul_identity.tk:handle_soul}}
 ```
 
 This is a massive ergonomic improvement over C (`p->x = 30`) or Rust (`(*p).x = 30`).
@@ -29,25 +27,21 @@ Each hat sigil carries different ownership semantics:
 Low-level, unsafe pointer. Requires `unsafe` keyword or explicit `alloc`:
 
 ```toka
-auto *p# = unsafe alloc i32(val=42)
-p = 100           // Modify soul directly
-unsafe free(p)    // Manual cleanup
+{{#include ../../examples/soul_identity.tk:raw_pointer}}
 ```
 
 ### `^` — Unique Pointer
 Exclusive ownership of a heap-allocated resource. Created with `new`:
 
 ```toka
-auto ^p = new i32(val=42)
-auto ^q = ^p      // Ownership moves to q
-// p is now invalid — use after move is a compile error
+{{#include ../../examples/soul_identity.tk:unique_pointer}}
 ```
 
 ### `~` — Shared Pointer
-Reference-counted, shared ownership:
+Reference-counted, shared ownership is planned for an upcoming release.
 
 ```toka
-auto ~p = shared i32(val=42)
+// Not yet implemented in v0.9.6 — coming soon
 ```
 
 ## Identity and Address
