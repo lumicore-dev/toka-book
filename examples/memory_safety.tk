@@ -1,21 +1,47 @@
 import std/io::{println}
 
 // ANCHOR: no_use_after_move
-fn main() -> i32 {
+fn no_use_after_move_example() {
     auto ^p = new i32(42)
     auto ^q = ^p
-    // p is no longer valid after move
     println("q: {}", q)
+}
+// ANCHOR_END: no_use_after_move
 
-    // ANCHOR_END: no_use_after_move
-
-    // ANCHOR: unsafe_ops
+// ANCHOR: unsafe_ops
+fn unsafe_ops_example() {
     unsafe {
         auto *p# = alloc i32
         p = 99
         println("val: {}", p)
     }
-    // ANCHOR_END: unsafe_ops
+}
+// ANCHOR_END: unsafe_ops
 
+// ANCHOR: borrowing_safe
+fn show(x: i32) {
+    println("x: {}", x)
+}
+
+fn borrowing_safe_example() {
+    auto val = 10
+    show(val)
+    println("val: {}", val)
+}
+// ANCHOR_END: borrowing_safe
+
+// ANCHOR: mutable_local
+fn mutable_local_example() {
+    auto x# = 42
+    x = 99
+    println("x: {}", x)
+}
+// ANCHOR_END: mutable_local
+
+fn main() -> i32 {
+    no_use_after_move_example()
+    unsafe_ops_example()
+    borrowing_safe_example()
+    mutable_local_example()
     return 0
 }

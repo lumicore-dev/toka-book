@@ -57,27 +57,13 @@ The resource is freed when the last `~` reference goes out of scope.
 Toka uses **implicit borrow** for function parameters by default. You don't need special sigils for standard borrowing:
 
 ```toka
-fn process(data: i32) {
-    println("data: {}", data)
-}
-
-fn main() -> i32 {
-    auto val = 10
-    process(val)   // Immutable borrow — val is still valid here
-    println("val: {}", val)
-    return 0
-}
+{{#include ../../examples/ownership.tk:borrow_func}}
 ```
 
 For **mutable access**, use `#` on the variable declaration. Note that `#` is restricted to declarations and cannot be used at call sites:
 
 ```toka
-fn main() -> i32 {
-    auto val# = 42
-    val = 99        // Mutate via `#` declared variable
-    println("val: {}", val)
-    return 0
-}
+{{#include ../../examples/ownership.tk:mutable_local}}
 ```
 
 ## Explicit Local Borrow with `&`
@@ -91,7 +77,7 @@ fn borrow_example(data: &i32) -> &i32 {
 }
 ```
 
-> **Note:** The `&` reference syntax is part of Toka's type system. Full support for borrow-checked references is under active development.
+> **Note:** The `&` reference syntax is part of Toka's type system. Support for borrow-checked references is under active development.
 
 ## The PAL Checker in Action
 

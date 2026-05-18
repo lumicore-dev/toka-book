@@ -49,8 +49,7 @@ Reference-counted, shared ownership is planned for an upcoming release.
 To get the raw memory address of a local variable, use the `*(expr)` syntax:
 
 ```toka
-auto a# = 42
-auto *raw_ptr = *(a)  // Get the physical address of `a`
+{{#include ../../examples/soul_identity.tk:address_of}}
 ```
 
 The hat (`^`) does **not** mean "address of". It specifically denotes the unique pointer container.

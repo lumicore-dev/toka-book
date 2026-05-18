@@ -44,27 +44,13 @@ Shared pointers use runtime reference counting but are still safe. Support is pl
 Toka uses **implicit borrow** (in-place capture) as the default for function parameters. Values of simple types like `i32` are passed by value (copied), while complex types would be borrowed:
 
 ```toka
-fn read(data: i32) {
-    println("data: {}", data)
-}
-
-fn main() -> i32 {
-    auto val = 10
-    read(val)        // Immutable borrow — val is still valid here
-    println("val: {}", val)
-    return 0
-}
+{{#include ../../examples/memory_safety.tk:borrowing_safe}}
 ```
 
 For **mutable access**, use `#` on local variable declarations:
 
 ```toka
-fn main() -> i32 {
-    auto data# = 42
-    data = 99        // Mutate via `#` declared variable
-    println("data: {}", data)
-    return 0
-}
+{{#include ../../examples/memory_safety.tk:mutable_local}}
 ```
 
 ## The PAL Checker's Guarantees at a Glance

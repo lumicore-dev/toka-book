@@ -27,9 +27,31 @@ fn move_copy_example() {
 }
 // ANCHOR_END: move_copy
 
+// ANCHOR: borrow_func
+fn process(data: i32) {
+    println("data: {}", data)
+}
+
+fn borrow_func_example() {
+    auto val = 10
+    process(val)
+    println("val: {}", val)
+}
+// ANCHOR_END: borrow_func
+
+// ANCHOR: mutable_local
+fn mutable_local_example() {
+    auto val# = 42
+    val = 99
+    println("val: {}", val)
+}
+// ANCHOR_END: mutable_local
+
 fn main() -> i32 {
     raw_ptr_example()
     unique_ptr_example()
     move_copy_example()
+    borrow_func_example()
+    mutable_local_example()
     return 0
 }
