@@ -12,13 +12,16 @@ A Thompson NFA compiles a regex pattern into a state machine that can match stri
 
 ## Basic Usage
 
-```toka
+```tokalang
 import regex::{Regex}
+
+import std/io::println
+import std/string::String
 
 fn example() {
     auto re = Regex::new("hello|world")
     
-    if re.test("hello world") {
+    if re.test(String::from("hello world")) {
         println("Match found!")
     }
 }
@@ -41,21 +44,32 @@ The engine supports standard regex patterns:
 
 ## Matching
 
-```toka
-auto re = Regex::new("\\d+")  // One or more digits
+```tokalang
+import std/io::println
+import std/string::String
+import core/option::Option
 
-match re.find("Order #42") {
-    Some(m) => println("Found: " + m.text),
-    None => println("No match")
+fn example() {
+    auto re = Regex::new("\\d+")  // One or more digits
+    
+    match re.find(String::from("Order #42")) {
+        auto Option::Some(m) => println("Found: {}", m.text.c_str()),
+        auto Option::None => println("No match")
+    }
 }
 ```
 
 ## Replacing
 
-```toka
-auto re = Regex::new("\\s+")
-auto result = re.replace("hello    world", " ")
-println(result)  // "hello world"
+```tokalang
+import std/io::println
+import std/string::String
+
+fn example() {
+    auto re = Regex::new("\\s+")
+    auto result = re.replace(String::from("hello    world"), String::from(" "))
+    println("{}", result.c_str())  // "hello world"
+}
 ```
 
 ## The Engine Architecture

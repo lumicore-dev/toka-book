@@ -13,7 +13,7 @@ cd my-cli
 
 Add the `toka-cli` dependency to your `Project.tk`:
 
-```toka
+```tokalang
 build::Executable
 
 deps = [
@@ -23,8 +23,10 @@ deps = [
 
 ## Defining Arguments
 
-```toka
+```tokalang
 import cli::{App, Arg, Command}
+
+import std/string::String
 
 fn main() -> i32 {
     auto app = App::new("my-cli")
@@ -40,8 +42,8 @@ fn main() -> i32 {
         
     app.parse_args()
     
-    auto who = name.value() or "World"
-    println("Hello, " + who + "!")
+    auto who = name.value().unwrap_or(String::from("World"))
+    println("Hello, {}!", who.c_str())
     
     if verbose.present() {
         println("[Verbose] Running with debug output")
@@ -66,7 +68,7 @@ toka run -- -n Toka -v
 
 Build more complex CLIs with subcommands:
 
-```toka
+```tokalang
 auto cmd = app.subcommand("serve")
     .about("Start the server")
     .option("-p", "--port")

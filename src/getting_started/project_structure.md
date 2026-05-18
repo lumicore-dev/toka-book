@@ -22,7 +22,7 @@ Run with: `toka run hello.tk`
 
 For larger projects, use `Project.tk`:
 
-```toka
+```tokalang
 // Project.tk
 build::Executable
 
@@ -47,7 +47,7 @@ my-project/
 
 For reusable libraries:
 
-```toka
+```tokalang
 // Project.tk
 build::Library
 
@@ -56,7 +56,7 @@ name = "my-lib"
 
 ## Import System
 
-```toka
+```tokalang
 // Import from standard library
 import std/io::println
 

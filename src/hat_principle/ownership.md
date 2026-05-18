@@ -70,7 +70,7 @@ For **mutable access**, use `#` on the variable declaration. Note that `#` is re
 
 The `&` sigil is used when **explicitly declaring a local borrow pointer** or returning a reference:
 
-```toka
+```tokalang
 fn borrow_example(data: &i32) -> &i32 {
     // & denotes a reference type
     return data

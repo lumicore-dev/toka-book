@@ -4,14 +4,14 @@ Build a fully-functional HTTP server using Toka's built-in networking.
 
 ## Basic Server
 
-```toka
+```tokalang
 import std/net_http
 
 fn main() -> i32 {
     auto server = net_http::Server::new()
 
-    server.get("/", fn(req) -> Response {
-        return Response::html("<h1>Hello, Toka!</h1>")
+    server.get("/", |req| => {
+        return HttpResponse::html(String::from("<h1>Hello, Toka!</h1>"))
     })
 
     println("Server running on http://localhost:8080")
@@ -22,7 +22,7 @@ fn main() -> i32 {
 
 ## API with JSON Responses
 
-```toka
+```tokalang
 import std/net_http
 import std/serde/json
 
@@ -33,38 +33,39 @@ pub shape Message(
 
 auto server = net_http::Server::new()
 
-server.get("/api/status", fn(req) -> Response {
-    auto msg = Message(text = "Server is running", status = "ok")
-    return Response::json(json::encode(msg))
+server.get("/api/status", |req| => {
+    auto msg = Message(text = String::from("Server is running"), status = String::from("ok"))
+    return HttpResponse::json(json::to_json(msg))
 })
 ```
 
 ## Route Parameters
 
-```toka
-server.get("/api/users/:id", fn(req) -> Response {
+```tokalang
+server.get("/api/users/:id", |req| => {
     auto user_id = req.param("id")
-    auto body = "User ID: " + user_id
-    return Response::text(body)
+    auto body# = String::from("User ID: ")
+    body#.push_str(user_id.c_str())
+    return HttpResponse::text(body)
 })
 ```
 
 ## Middleware
 
-```toka
-server.use(fn(req, next) -> Response {
-    println("Request: " + req.method + " " + req.path)
-    auto start = time::now()
+```tokalang
+server.use(|req, next| => {
+    println("Request: {} {}", req.method, req.path)
+    auto start = time::Instant::now()
     auto res = next(req)
-    auto elapsed = time::now() - start
-    println("Completed in " + str(elapsed.ms()) + "ms")
+    auto elapsed = start.elapsed()
+    println("Completed in {}ms", elapsed.as_millis())
     return res
 })
 ```
 
 ## Static Files
 
-```toka
+```tokalang
 server.serve_static("/static", "./public")
 // Serves files from ./public at /static/filename
 ```
@@ -73,24 +74,24 @@ server.serve_static("/static", "./public")
 
 A complete CRUD server:
 
-```toka
+```tokalang
 fn main() -> i32 {
     auto server = net_http::Server::new()
     auto db = SharedDb::new()
 
-    server.get("/items", fn(req) {
-        return Response::json(db.list_all())
+    server.get("/items", |req| => {
+        return HttpResponse::json(db.list_all())
     })
 
-    server.post("/items", fn(req) {
-        auto body: CreateItem = json::decode(req.body)?
-        auto item = db.create(body)
-        return Response::json(json::encode(item))
+    server.post("/items", |req| => {
+        auto body_res = json::deserialize_shape<CreateItem>(req.body)
+        auto item = db.create(body_res.unwrap())
+        return HttpResponse::json(json::to_json(item))
     })
 
-    server.delete("/items/:id", fn(req) {
+    server.delete("/items/:id", |req| => {
         db.delete(req.param("id"))
-        return Response::status(204)
+        return HttpResponse::status(204)
     })
 
     server.listen(8080)?

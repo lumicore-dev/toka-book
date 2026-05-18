@@ -19,7 +19,7 @@ auto y = identity("hello") // Works with strings
 
 Constrain generics with traits:
 
-```toka
+```tokalang
 fn max<'T @PartialOrd>(a: 'T, b: 'T) -> 'T {
     if a > b {
         return a
@@ -57,7 +57,7 @@ impl<'A, 'B> Pair<'A, 'B> {
 
 Toka can infer generic types in most cases, so you rarely need to specify them explicitly:
 
-```toka
+```tokalang
 fn pair<'A, 'B>(a: 'A, b: 'B) -> Pair<'A, 'B> {
     return Pair::new(a, b)
 }
