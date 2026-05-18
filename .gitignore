@@ -1,0 +1,7 @@
+book/
+book/*.html
+book/*.js
+book/*.css
+book/fonts/
+book/*.png
+book/*.svg
