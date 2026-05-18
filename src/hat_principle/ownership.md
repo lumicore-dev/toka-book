@@ -70,14 +70,27 @@ For **mutable access**, use `#` on the variable declaration. Note that `#` is re
 
 The `&` sigil is used when **explicitly declaring a local borrow pointer** or returning a reference:
 
-```tokalang
-fn borrow_example(data: &i32) -> &i32 {
-    // & denotes a reference type
-    return data
+```toka
+shape Container(val: i32)
+fn borrow_example(c: Container) -> &i32 <- c {
+    return &(c.val)
+}
+fn main() -> i32 {
+    auto c = Container(val = 10)
+    auto &y = borrow_example(c)
+    return 0
 }
 ```
 
-> **Note:** The `&` reference syntax is part of Toka's type system. Support for borrow-checked references is under active development.
+### Lifetime Dependency Annotation
+
+In the example above, the syntax `-> &i32 <- c` introduces Toka's **Lifetime Dependency Annotation**. 
+
+When a function returns a reference derived from its parameters, the PAL Checker requires you to explicitly declare this relationship. The `<- c` notation tells the compiler: *"The returned reference is strictly bound to the lifetime of `c`"*. 
+
+If you omit this annotation, Toka will proactively block compilation (`error[E0454]`) to prevent accidental dangling pointers. This achieves the same rigorous memory safety as Rust's lifetime parameters (`<'a>`), but with a much lighter and more intuitive syntax.
+
+> **Note:** This relationship can also be expressed using Toka's **effects** annotation style. Support for advanced borrow-checked references continues to evolve.
 
 ## The PAL Checker in Action
 
