@@ -3,9 +3,12 @@ hljs.registerLanguage('toka', function(hljs) {
     name: 'Toka',
     aliases: ['tk'],
     keywords: {
-      keyword: 'fn auto shape impl import guard cede new unsafe alloc free null none effects return if else while loop for match in break continue as pub async await',
-      type: 'i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 bool char void String Vec Result Option Data Buffer Node Point',
-      literal: 'true false null none'
+      keyword:
+        'fn auto shape impl import guard cede new unsafe alloc free null none effects return if else while loop for match in break continue as pub async await',
+      type:
+        'i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 bool char void String Vec Result Option Data Buffer Node Point',
+      literal:
+        'true false null none'
     },
     contains: [
       hljs.C_LINE_COMMENT_MODE,
@@ -13,7 +16,8 @@ hljs.registerLanguage('toka', function(hljs) {
       hljs.QUOTE_STRING_MODE,
       {
         className: 'string',
-        begin: 's"', end: '"',
+        begin: 's"',
+        end: '"',
         contains: [hljs.BACKSLASH_ESCAPE]
       },
       {
@@ -28,12 +32,16 @@ hljs.registerLanguage('toka', function(hljs) {
       },
       {
         className: 'function',
-        beginKeywords: 'fn', end: '(\\(|<)', excludeEnd: true,
+        beginKeywords: 'fn',
+        end: '(\\(|<)',
+        excludeEnd: true,
         contains: [hljs.UNDERSCORE_TITLE_MODE]
       },
       {
         className: 'class',
-        beginKeywords: 'shape impl', end: /\{/, excludeEnd: true,
+        beginKeywords: 'shape impl',
+        end: /\{/,
+        excludeEnd: true,
         contains: [hljs.UNDERSCORE_TITLE_MODE]
       },
       {
@@ -43,3 +51,8 @@ hljs.registerLanguage('toka', function(hljs) {
     ]
   };
 });
+
+// Trigger re-scan after registering the custom language
+if (typeof hljs !== 'undefined') {
+  hljs.highlightAll();
+}
