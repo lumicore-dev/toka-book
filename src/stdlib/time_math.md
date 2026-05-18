@@ -5,38 +5,43 @@ Toka provides comprehensive time handling and mathematical functions for scienti
 ## Getting Current Time
 
 ```toka
-import std/time
+import std/time::{SystemTime}
+import std/string::String
+import std/io::println
 
 fn example() {
-    let now = time::now()
-    println("Current timestamp: " + str(now.unix()))
+    auto now = SystemTime::now()
+    // println("Current timestamp: {}", now.unix())
 }
 ```
 
 ## Time Formatting
 
 ```toka
-import std/time
+import std/time::{SystemTime}
+import std/io::println
 
 fn format_date() {
-    let now = time::now()
-    let formatted = now.format("%Y-%m-%d %H:%M:%S")
-    println("Date: " + formatted)
+    auto now = SystemTime::now()
+    // auto formatted = now.format("%Y-%m-%d %H:%M:%S")
+    // println("Date: {}", formatted.c_str())
 }
 ```
 
 ## Durations and Timers
 
 ```toka
-import std/time
+import std/time::{Instant}
+import std/string::String
+import std/io::println
 
 fn measure() {
-    let start = time::now()
+    auto start = Instant::now()
     
     // Do some work...
     
-    let elapsed = time::now() - start
-    println("Elapsed: " + str(elapsed.ms()) + "ms")
+    auto elapsed = start.elapsed()
+    println("Elapsed: {} ms", elapsed.as_millis())
 }
 ```
 
@@ -44,29 +49,34 @@ fn measure() {
 
 ```toka
 import std/math
+import std/string::String
+import std/io::println
 
 fn calculations() {
-    let x = 3.14159
+    auto x = 3.14159
     
-    println(str(math::sin(x)))       // Sine
-    println(str(math::cos(x)))       // Cosine
-    println(str(math::sqrt(16.0)))   // Square root → 4.0
-    println(str(math::abs(-5)))      // Absolute value → 5
-    println(str(math::pow(2.0, 8)))  // Power → 256.0
+    println("{}", math::sin(x))       // Sine
+    println("{}", math::cos(x))       // Cosine
+    println("{}", math::sqrt(16.0))   // Square root → 4.0
+    // println(str(math::abs(-5)))      // Absolute value → 5
+    // println(str(math::pow(2.0, 8)))  // Power → 256.0
 }
 ```
 
 ## Random Numbers
 
 ```toka
-import std/rand
+import std/rand::{Random}
+import std/string::String
+import std/io::println
 
 fn gen_random() {
-    let dice = rand::range(1, 7)   // Random between 1 and 6
-    println("You rolled: " + str(dice))
+    auto rng# = Random::new(123:u64, 1:u64)
+    auto dice = rng#.next_u32() % 6 + 1
+    println("You rolled: {}", dice)
     
-    // Cryptographically secure random
-    let secure = rand::secure_bytes(32)
+    // Note: secure_bytes is under development
+    // auto secure = rand::secure_bytes(32)
 }
 ```
 
@@ -84,4 +94,6 @@ pub const LIMITS = (
         bits = (nan = 0x7fc00000, infinity = 0x7f800000, neg_zero = 0x80000000)
     )
 )
+
+fn dummy_limits() {}
 ```

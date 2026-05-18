@@ -27,20 +27,20 @@ deps = [
 import cli::{App, Arg, Command}
 
 fn main() -> i32 {
-    let app = App::new("my-cli")
+    auto app = App::new("my-cli")
         .version("1.0.0")
         .about("A sample CLI tool built with Toka")
         
-    let name = app.option("-n", "--name")
+    auto name = app.option("-n", "--name")
         .help("Your name")
         .required(true)
         
-    let verbose = app.flag("-v", "--verbose")
+    auto verbose = app.flag("-v", "--verbose")
         .help("Enable verbose output")
         
     app.parse_args()
     
-    let who = name.value() or "World"
+    auto who = name.value() or "World"
     println("Hello, " + who + "!")
     
     if verbose.present() {
@@ -67,7 +67,7 @@ toka run -- -n Toka -v
 Build more complex CLIs with subcommands:
 
 ```toka
-let cmd = app.subcommand("serve")
+auto cmd = app.subcommand("serve")
     .about("Start the server")
     .option("-p", "--port")
     .help("Port number")

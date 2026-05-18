@@ -7,20 +7,22 @@ Toka provides lightweight concurrency through tasks and message passing, enablin
 Spawn concurrent tasks with the `task` module:
 
 ```toka
-import std/task
+import std/io::println
+import std/thread::thread_spawn
 
-fn worker(id: i32) {
-    println("Worker " + str(id) + " started")
+fn worker(id: i32) -> i32 {
+    println("Worker {} started", id)
     // Do work...
-    println("Worker " + str(id) + " done")
+    println("Worker {} done", id)
+    return 0
 }
 
 fn main() -> i32 {
-    auto t1 = task::spawn(worker, [1])
-    auto t2 = task::spawn(worker, [2])
+    auto t1# = thread_spawn<i32>({ => return cede worker(1) })
+    auto t2# = thread_spawn<i32>({ => return cede worker(2) })
     
-    task::join(t1)
-    task::join(t2)
+    t1#.join()
+    t2#.join()
     return 0
 }
 ```
@@ -30,31 +32,28 @@ fn main() -> i32 {
 Communicate between tasks using MPSC (Multi-Producer, Single-Consumer) channels:
 
 ```toka
-import std/mpsc
+import std/mpsc::channel
+import std/thread::thread_spawn
+import std/io::println
 
 fn main() -> i32 {
-    auto (tx, rx) = mpsc::channel<i32>(16)
+    auto pair# = channel<i32>()
     
-    task::spawn(producer, [tx])
-    task::spawn(consumer, [rx])
+    auto tx# = cede pair.tx
+    auto rx# = cede pair.rx
+    
+    thread_spawn<i32>({ [cede tx] => 
+        tx#.send(cede 42)
+        return cede 0
+    })
+    
+    thread_spawn<i32>({ [cede rx] =>
+        auto res_opt = rx#.recv()
+        println("Got a message!")
+        return cede 0
+    })
     
     return 0
-}
-
-fn producer(tx: mpsc::Sender<i32>) {
-    for i in 0..10 {
-        tx.send(i)
-    }
-}
-
-fn consumer(rx: mpsc::Receiver<i32>) {
-    while true {
-        auto msg = rx.recv()
-        match msg {
-            Some(value) => println("Got: " + str(value)),
-            None => break
-        }
-    }
 }
 ```
 
@@ -63,12 +62,12 @@ fn consumer(rx: mpsc::Receiver<i32>) {
 Use atomic types for lock-free concurrent access:
 
 ```toka
-import std/atomic
+import std/atomic::*
 
-auto counter = atomic::AtomicI32(0)
-
-fn increment() {
-    counter.fetch_add(1)
+fn main() -> i32 {
+    auto counter = AtomicI32::new(0)
+    counter.fetch_add(1, Ordering::SeqCst)
+    return 0
 }
 ```
 
@@ -77,14 +76,15 @@ fn increment() {
 For shared mutable state:
 
 ```toka
-import std/sync
+import std/sync::Mutex
 
-auto lock = sync::Mutex::new()
-
-fn access_shared() {
-    let guard = lock.lock()
+fn main() -> i32 {
+    auto lock# = Mutex<i32>::new(0:i32)
+    
+    auto g = lock#.lock().unwrap()
     // Access shared data safely
-    // guard released automatically when it goes out of scope
+    // g released automatically when it goes out of scope
+    return 0
 }
 ```
 

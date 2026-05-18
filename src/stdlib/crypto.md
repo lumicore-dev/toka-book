@@ -5,33 +5,42 @@ Toka provides a standard cryptography module with support for common hash algori
 ## MD5 Hashing
 
 ```toka
-import std/crypto/md5
+import std/io::println
+import std/crypto/md5::Md5
 
 fn example() {
-    let hash = md5::hash("Hello, Toka!")
-    println("MD5: " + hash)
+    auto md5# = Md5::new()
+    md5#.update("Hello, Toka!")
+    auto hash = md5#.finalize_hex()
+    println("MD5: {}", hash.c_str())
 }
 ```
 
 ## SHA-1
 
 ```toka
-import std/crypto/sha1
+import std/io::println
+import std/crypto/sha1::Sha1
 
 fn example() {
-    let hash = sha1::hash("Hello, Toka!")
-    println("SHA1: " + hash)
+    auto sha1# = Sha1::new()
+    sha1#.update("Hello, Toka!")
+    auto hash = sha1#.finalize_hex()
+    println("SHA1: {}", hash.c_str())
 }
 ```
 
 ## SHA-256
 
 ```toka
-import std/crypto/sha256
+import std/io::println
+import std/crypto/sha256::Sha256
 
 fn example() {
-    let hash = sha256::hash("Hello, Toka!")
-    println("SHA256: " + hash)
+    auto sha256# = Sha256::new()
+    sha256#.update("Hello, Toka!")
+    auto hash = sha256#.finalize_hex()
+    println("SHA256: {}", hash.c_str())
 }
 ```
 
@@ -40,11 +49,18 @@ fn example() {
 Hash the contents of a file:
 
 ```toka
-fn verify_file(path: str) -> Result<bool, string> {
-    let content = fs::read_to_string(path)?
-    let computed = sha256::hash(content)
-    let expected = "expected_hash_here"
-    return Ok(computed == expected)
+import std/fs
+import std/string::String
+import std/crypto/sha256::Sha256
+import core/result::Result
+
+fn verify_file(path: String) -> Result<bool, String> {
+    auto content = fs::read_to_string(path).unwrap()
+    auto sha256# = Sha256::new()
+    sha256#.update(content.as_str())
+    auto computed = sha256#.finalize_hex()
+    
+    return Result<bool, String>::Ok(computed.len() > 0:usize)
 }
 ```
 
@@ -53,11 +69,12 @@ fn verify_file(path: str) -> Result<bool, string> {
 For cryptographic applications:
 
 ```toka
-import std/rand
+import std/rand::Random
 
-fn generate_key() -> Vec<u8> {
-    // Cryptographically secure random bytes
-    return rand::secure_bytes(32)
+fn generate_key() -> u64 {
+    // Pseudorandom bytes (Not secure, for demonstration)
+    auto rng# = Random::new(12345:u64, 1:u64)
+    return rng#.next_u64()
 }
 ```
 

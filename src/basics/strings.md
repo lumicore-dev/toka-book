@@ -25,6 +25,8 @@ auto name = "World"
 Toka supports `\x` escape sequences in string literals, making ANSI color codes clean:
 
 ```toka
+import std/io::println
+
 auto red = "\x1b[31m"
 auto green = "\x1b[32m"
 auto reset = "\x1b[0m"
@@ -37,6 +39,8 @@ println("{}{}Success!{}", green, "Build complete", reset)
 Use `{}` placeholders with `println` for clean formatting:
 
 ```toka
+import std/io::println
+
 auto name = "Toka"
 auto version = "0.9.6"
 println("Welcome to {} version {}!", name, version)
@@ -47,7 +51,10 @@ println("Welcome to {} version {}!", name, version)
 Strings can be concatenated with `+`:
 
 ```toka
-auto full = "Hello, " + "World!"
+import std/string::String
+
+auto full# = String::from("Hello, ")
+full#.push_str("World!")
 ```
 
 ## Conversion to String
@@ -55,8 +62,10 @@ auto full = "Hello, " + "World!"
 Convert other types to string with `str()`:
 
 ```toka
+import std/io::println
+
 auto n = 42
-auto msg = "The answer is " + str(n)
+println("The answer is {}", n)
 ```
 
 ## Character Types
@@ -72,7 +81,7 @@ auto msg = "The answer is " + str(n)
 
 ```toka
 auto ch: char = 'A'
-auto unicode: Char32 = '世'
+auto unicode: u32 = 0x4E16:u32
 ```
 
 The string system is defined in `lib/core/str.tk` and `lib/core/utf8.tk` for UTF-8 handling.

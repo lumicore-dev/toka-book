@@ -18,7 +18,7 @@ You can specify the type explicitly with a colon:
 
 ```toka
 auto x: u64 = 10
-auto y: f32 = 3.14
+auto y: f32 = 3.14:f32
 auto flag: bool = true
 ```
 
@@ -80,16 +80,26 @@ Variables are **immutable by default**. Use the `#` suffix to make them mutable.
 2. **Before a mutable method call** — to present the guard on the variable
 
 ```toka
-auto x = 10        // immutable
-auto x# = 10       // mutable — # at declaration
+import std/io::println
 
-// Reading and assignment don't need #
-x = 20             // OK — plain assignment
-println(str(x))    // OK — plain read
+pub shape List(data: i32)
+impl List {
+    pub fn sort(self#) {}
+    pub fn push(self#, val: i32) {}
+}
 
-// Calling a mutable method requires # on the variable
-x#.sort()          // OK — # on variable before .method()
-x#.push(5)         // OK
+fn main() {
+    auto y = List(data = 10)  // immutable
+    auto x# = List(data = 10) // mutable — # at declaration
+
+    // Reading and assignment don't need #
+    x = List(data = 20)       // OK — plain assignment
+    println("{}", x.data)     // OK — plain read
+
+    // Calling a mutable method requires # on the variable
+    x#.sort()                 // OK — # on variable before .method()
+    x#.push(5)                // OK
+}
 ```
 
 This is an example of Toka's **Attribute Token System** — the `#` suffix denotes soul mutability and is placed on the variable itself when declaring it or calling its mutable methods.

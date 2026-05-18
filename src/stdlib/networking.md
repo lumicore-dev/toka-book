@@ -7,11 +7,14 @@ Toka's networking module provides TCP, UDP, and HTTP capabilities for building n
 Make HTTP requests with the `net_http` module:
 
 ```toka
-import std/net_http
+import std/string::String
+import core/result::Result
 
-fn fetch(url: str) -> Result<string, string> {
-    auto response = net_http::get(url)?
-    return Ok(response.body)
+// Note: HTTP client is under development
+fn fetch(url: String) -> Result<String, String> {
+    // auto response = net_http::get(url)?
+    // return Ok(response.body)
+    return Result<String, String>::Ok(String::from("Response"))
 }
 ```
 
@@ -20,20 +23,14 @@ fn fetch(url: str) -> Result<string, string> {
 Build a simple HTTP server:
 
 ```toka
-import std/net_http
+import std/net_http::{HttpResponse, HttpRequest}
+import std/string::String
 
+// Note: HTTP Server is under development
 fn main() -> i32 {
-    let server = net_http::Server::new()
-
-    server.get("/", fn(req) -> Response {
-        return Response::html("<h1>Hello, Toka!</h1>")
-    })
-
-    server.get("/api/hello", fn(req) -> Response {
-        return Response::json("{\"message\": \"Hello from Toka!\"}")
-    })
-
-    server.listen(8080)?
+    // auto server = net_http::Server::new()
+    // server.get("/", |req| => HttpResponse::html(String::from("<h1>Hello, Toka!</h1>")))
+    // server.listen(8080)
     return 0
 }
 ```
@@ -43,12 +40,23 @@ fn main() -> i32 {
 Use the `net` module for raw TCP:
 
 ```toka
-import std/net
+import std/net::TcpStream
+import std/string::String
+import std/io::println
+import core/result::Result
 
-fn handle_client(stream: net::TcpStream) {
-    let msg = stream.read_line()?
-    println("Received: " + msg)
-    stream.write("ACK: " + msg)?
+fn handle_client(stream#: TcpStream) {
+    auto buf: [u8; 1024] = [0:u8; 1024]
+    auto res = stream#.read(&buf[0], 1024:usize)
+    match res {
+        auto Result::Ok(n) => {
+            println("Received {} bytes", n)
+            stream#.write_string(String::from("ACK"))
+        }
+        auto Result::Err(&e) => {
+            println("Error")
+        }
+    }
 }
 ```
 
@@ -57,28 +65,26 @@ fn handle_client(stream: net::TcpStream) {
 For real-time bidirectional communication, use the `stdx/websocket` module:
 
 ```toka
-import stdx/websocket
+import std/io::println
+import std/string::String
 
+// Note: WebSocket is under development
 fn echo_server() {
-    let ws = websocket::Server::new()
-    
-    ws.on_message(fn(msg) {
-        println("Got: " + msg)
-        ws.send("Echo: " + msg)?
-    })
-    
-    ws.listen(9000)?
+    // auto ws = websocket::Server::new()
+    // ws.on_message(|msg| => println("Got: {}", msg))
+    // ws.listen(9000)
 }
 ```
 
 ## URL Parsing
 
 ```toka
-import std/net
+import std/io::println
+import std/string::String
 
+// Note: URL parsing is under development
 fn parse_url() {
-    let url = net::Url::parse("https://api.example.com/data?id=1")?
-    println("Host: " + url.host)
-    println("Path: " + url.path)
+    // auto url = net::Url::parse("https://api.example.com/data?id=1")
+    // println("Host: {}", url.host)
 }
 ```

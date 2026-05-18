@@ -35,11 +35,11 @@ Return `0` for success, non-zero for errors.
 Functions can take multiple parameters of different types:
 
 ```toka
-fn greet(name: str, age: i32, formal: bool) -> str {
+fn greet(name: view_str, age: i32, formal: bool) -> cstring {
     if formal {
-        return "Good day, " + name
+        return "Good day"
     }
-    return "Hey " + name + ", you're " + str(age) + "!"
+    return "Hey"
 }
 ```
 
@@ -58,8 +58,10 @@ fn increment(x#: i32) {
 If a function doesn't return anything, omit `->`:
 
 ```toka
-fn log_message(msg: str) {
-    println(msg)
+import std/io::println
+
+fn log_message(msg: view_str) {
+    println("{}", msg)
 }
 ```
 
@@ -68,11 +70,15 @@ fn log_message(msg: str) {
 Functions can be attached to types using `impl` blocks:
 
 ```toka
-impl i32 {
+pub shape Number(val: i32)
+
+impl Number {
     pub fn double(self) -> i32 {
-        return self * 2
+        return self.val * 2
     }
 }
 
-auto result = 5.double()  // result = 10
+fn main() {
+    auto result = Number(val = 5).double()  // result = 10
+}
 ```

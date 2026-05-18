@@ -15,10 +15,12 @@ print("No newline here")       // Prints without trailing newline
 
 ```toka
 import std/fs
+import std/string::String
+import core/result::Result
+import std/io::IoStringResult
 
-fn read_config(path: str) -> Result<string, string> {
-    auto content = fs::read_to_string(path)?
-    return Ok(content)
+fn read_config(path: String) -> IoStringResult {
+    return fs::read_to_string(path)
 }
 ```
 
@@ -26,10 +28,11 @@ fn read_config(path: str) -> Result<string, string> {
 
 ```toka
 import std/fs
+import std/string::String
+import core/result::Result
 
-fn save_data(path: str, data: str) -> Result<void, string> {
-    fs::write(path, data)?
-    return Ok(())
+fn save_data(path: String, data: String) -> Result<bool, String> {
+    return fs::write_string(path, data)
 }
 ```
 
@@ -39,20 +42,23 @@ The `fs` module provides standard file operations:
 
 ```toka
 import std/fs
+import std/string::String
+import std/io::println
+import core/option::Option
 
 fn manage_files() {
-    // Check if a file exists
-    if fs::exists("data.txt") {
-        // Delete a file
-        fs::remove_file("data.txt")
+    auto path = String::from("output")
+    if fs::exists(path.clone()) {
+        fs::remove_dir(path)
     }
     
-    // Create a directory
-    fs::create_dir("output")?
+    fs::create_dir(String::from("output"))
     
-    // List directory contents
-    for entry in fs::read_dir(".") {
-        println(entry.name)
+    auto dir# = fs::read_dir(String::from("."))
+    while true {
+        auto entry = dir#.next()
+        if entry.is_none() { break }
+        println("{}", entry.unwrap().c_str())
     }
 }
 ```
@@ -60,29 +66,35 @@ fn manage_files() {
 ## Working with Paths
 
 ```toka
+import std/io::println
 import std/path
+import std/string::String
 
 fn example() {
-    let full = path::join("dir", "subdir", "file.txt")
-    println(full)  // "dir/subdir/file.txt"
+    auto full = path::join(String::from("dir"), String::from("file.txt"))
+    println("{}", full.c_str())
     
-    let ext = path::extension("data.json")
-    println(ext)  // "json"
+    auto ext = path::extension(String::from("data.json"))
+    println("{}", ext.c_str())
     
-    let stem = path::stem("data.json")
-    println(stem) // "data"
+    auto stem = path::file_stem(String::from("data.json"))
+    println("{}", stem.c_str())
 }
 ```
 
 ## Environment Variables
 
 ```toka
+import std/io::println
 import std/env
+import std/string::String
+import core/option::Option
 
 fn example() {
-    let home = env::var("HOME") or "/tmp"
-    println("Home directory: " + home)
+    auto home_opt = env::var(String::from("HOME"))
+    auto home = home_opt.unwrap_or(String::from("/tmp"))
+    println("Home directory: {}", home.c_str())
     
-    env::set_var("MY_APP_DEBUG", "true")
+    env::set_var(String::from("MY_APP_DEBUG"), String::from("true"))
 }
 ```

@@ -16,7 +16,7 @@ A Thompson NFA compiles a regex pattern into a state machine that can match stri
 import regex::{Regex}
 
 fn example() {
-    let re = Regex::new("hello|world")
+    auto re = Regex::new("hello|world")
     
     if re.test("hello world") {
         println("Match found!")
@@ -42,7 +42,7 @@ The engine supports standard regex patterns:
 ## Matching
 
 ```toka
-let re = Regex::new("\\d+")  // One or more digits
+auto re = Regex::new("\\d+")  // One or more digits
 
 match re.find("Order #42") {
     Some(m) => println("Found: " + m.text),
@@ -53,8 +53,8 @@ match re.find("Order #42") {
 ## Replacing
 
 ```toka
-let re = Regex::new("\\s+")
-let result = re.replace("hello    world", " ")
+auto re = Regex::new("\\s+")
+auto result = re.replace("hello    world", " ")
 println(result)  // "hello world"
 ```
 
