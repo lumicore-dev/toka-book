@@ -28,11 +28,15 @@ def prepare_code(code):
     has_fn_main = False
     has_any_fn = False
     
+    global_prefixes = ('shape ', 'struct ', 'impl ', 'alias ', 'type ', 'const ')
+    pub_global_prefixes = tuple('pub ' + p for p in global_prefixes)
+    all_global_prefixes = global_prefixes + pub_global_prefixes
+    
     for line in lines:
         stripped = line.strip()
         if stripped.startswith('import '):
             imports.append(line)
-        elif stripped.startswith('shape ') or stripped.startswith('struct ') or stripped.startswith('pub shape ') or stripped.startswith('impl '):
+        elif stripped.startswith(all_global_prefixes):
             shapes_or_globals.append(line)
         else:
             if re.match(r'^(pub\s+)?fn\s+main\b', stripped):
@@ -82,8 +86,12 @@ def main():
             test_file.write_text(code, encoding='utf-8')
             
             env = os.environ.copy()
-            # Try to resolve relative to tokac binary if possible, or use current lib
-            env['TOKA_LIB'] = os.path.abspath(os.path.join(os.path.dirname(subprocess.run(['which', 'tokac'], capture_output=True, text=True).stdout.strip()), '../../lib'))
+            # If TOKA_LIB is not provided, try to guess based on tokac path
+            if 'TOKA_LIB' not in env:
+                tokac_path = subprocess.run(['which', 'tokac'], capture_output=True, text=True).stdout.strip()
+                if tokac_path:
+                    # typical install: ~/.toka/bin/tokac -> ~/.toka/lib
+                    env['TOKA_LIB'] = os.path.abspath(os.path.join(os.path.dirname(tokac_path), '../lib'))
             
             result = subprocess.run(['tokac', str(test_file)], capture_output=True, text=True, env=env)
             if result.returncode != 0:
