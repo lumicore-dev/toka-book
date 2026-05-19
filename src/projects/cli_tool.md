@@ -43,7 +43,7 @@ fn main() -> i32 {
     app.parse_args()
     
     auto who = name.value().unwrap_or(String::from("World"))
-    println("Hello, {}!", who.c_str())
+    println("Hello, {}!", who)
     
     if verbose.present() {
         println("[Verbose] Running with debug output")

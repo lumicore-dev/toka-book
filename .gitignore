@@ -5,3 +5,4 @@ book/*.css
 book/fonts/
 book/*.png
 book/*.svg
+*.log

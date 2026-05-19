@@ -18,7 +18,7 @@ fn find_user(id: i32) -> Maybe<String> {
 
 auto result = find_user(1)
 match result {
-    auto Maybe::Some(name) => println("Found: {}", name.c_str()),
+    auto Maybe::Some(&name) => println("Found: {}", name),
     auto Maybe::None => println("User not found")
 }
 ```
@@ -47,7 +47,7 @@ The Result type is generic over two parameters:
 ```tokalang
 match divide(10.0, 2.0) {
     auto Okay::Ok(value) => println("Result: {}", value),
-    auto Okay::Err(&msg) => println("Error: {}", msg.c_str())
+    auto Okay::Err(&msg) => println("Error: {}", msg)
 }
 ```
 

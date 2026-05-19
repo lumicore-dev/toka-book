@@ -24,7 +24,7 @@ import std/io::println
 fn format_date() {
     auto now = SystemTime::now()
     // auto formatted = now.format("%Y-%m-%d %H:%M:%S")
-    // println("Date: {}", formatted.c_str())
+    // println("Date: {}", formatted)
 }
 ```
 

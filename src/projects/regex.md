@@ -53,7 +53,7 @@ fn example() {
     auto re = Regex::new("\\d+")  // One or more digits
     
     match re.find(String::from("Order #42")) {
-        auto Option::Some(m) => println("Found: {}", m.text.c_str()),
+        auto Option::Some(m) => println("Found: {}", m.text),
         auto Option::None => println("No match")
     }
 }
@@ -68,7 +68,7 @@ import std/string::String
 fn example() {
     auto re = Regex::new("\\s+")
     auto result = re.replace(String::from("hello    world"), String::from(" "))
-    println("{}", result.c_str())  // "hello world"
+    println("{}", result)  // "hello world"
 }
 ```
 

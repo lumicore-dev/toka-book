@@ -58,7 +58,7 @@ fn manage_files() {
     while true {
         auto entry = dir#.next()
         if entry.is_none() { break }
-        println("{}", entry.unwrap().c_str())
+        println("{}", entry.unwrap())
     }
 }
 ```
@@ -93,7 +93,7 @@ import core/option::Option
 fn example() {
     auto home_opt = env::var(String::from("HOME"))
     auto home = home_opt.unwrap_or(String::from("/tmp"))
-    println("Home directory: {}", home.c_str())
+    println("Home directory: {}", home)
     
     env::set_var(String::from("MY_APP_DEBUG"), String::from("true"))
 }

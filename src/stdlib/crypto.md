@@ -12,7 +12,7 @@ fn example() {
     auto md5# = Md5::new()
     md5#.update("Hello, Toka!")
     auto hash = md5#.finalize_hex()
-    println("MD5: {}", hash.c_str())
+    println("MD5: {}", hash)
 }
 ```
 
@@ -26,7 +26,7 @@ fn example() {
     auto sha1# = Sha1::new()
     sha1#.update("Hello, Toka!")
     auto hash = sha1#.finalize_hex()
-    println("SHA1: {}", hash.c_str())
+    println("SHA1: {}", hash)
 }
 ```
 
@@ -40,7 +40,7 @@ fn example() {
     auto sha256# = Sha256::new()
     sha256#.update("Hello, Toka!")
     auto hash = sha256#.finalize_hex()
-    println("SHA256: {}", hash.c_str())
+    println("SHA256: {}", hash)
 }
 ```
 
@@ -57,7 +57,7 @@ import core/result::Result
 fn verify_file(path: String) -> Result<bool, String> {
     auto content = fs::read_to_string(path).unwrap()
     auto sha256# = Sha256::new()
-    sha256#.update(content.as_str())
+    sha256#.update(content)
     auto computed = sha256#.finalize_hex()
     
     return Result<bool, String>::Ok(computed.len() > 0:usize)
