@@ -46,7 +46,7 @@ Migrating from other languages to Toka? Here's what you need to know.
 
 **Build:**
 - C: Makefile / CMakeLists.txt
-- Toka: Project.tk (declarative)
+- Toka: package.tk (declarative)
 
 ## From Python
 

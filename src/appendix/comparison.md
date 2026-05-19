@@ -40,4 +40,4 @@ How does Toka compare to other languages in the systems programming space?
 | Memory | Manual (allocator passed) | Automatic (compile-time tracking) |
 | Metaprogramming | `comptime` | Compile-time features |
 | Error handling | Error union types | Result/Option with `?` operator |
-| Build system | Built-in | Project.tk (declarative) |
+| Build system | Built-in | package.tk (declarative) |
