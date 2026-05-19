@@ -5,5 +5,4 @@ language = "en"
 
 [output.html]
 git-repository-url = "https://github.com/tokalang/toka"
-git-repository-icon = "fa-github"
 additional-js = ["theme/toka.js"]
