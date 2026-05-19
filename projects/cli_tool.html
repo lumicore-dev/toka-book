@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-9a4575e7.js";
+            window.path_to_searchindex_js = "../searchindex-08a393d4.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-43407921.js"></script>
@@ -181,13 +181,10 @@
 <pre><code class="language-bash">toka init my-cli
 cd my-cli
 </code></pre>
-<p>Add the <code>toka-cli</code> dependency to your <code>Project.tk</code>:</p>
-<pre><code class="language-tokalang">build::Executable
-
-deps = [
-    "toka-cli"
-]
+<p>Add the <code>toka-cli</code> dependency using the Toka package manager:</p>
+<pre><code class="language-bash">toka add toka-cli
 </code></pre>
+<p>This updates your <code>package.tk</code> dependencies automatically.</p>
 <h2 id="defining-arguments"><a class="header" href="#defining-arguments">Defining Arguments</a></h2>
 <pre><code class="language-tokalang">import cli::{App, Arg, Command}
 

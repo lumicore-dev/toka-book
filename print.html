@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-9a4575e7.js";
+            window.path_to_searchindex_js = "searchindex-08a393d4.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-43407921.js"></script>
@@ -178,7 +178,7 @@
                         <h1 id="foreword"><a class="header" href="#foreword">Foreword</a></h1>
 <p>Welcome to <strong>The Toka Programming Language Guide</strong>.</p>
 <p>This book is a comprehensive guide to learning <strong>Toka</strong> — a modern systems programming language designed for safety, simplicity, and performance.</p>
-<p>Toka is created by <a href="https://github.com/zhyi-dp">YiZhonghua</a>. The official language repository is at <strong><a href="https://github.com/zhyi-dp/tokalang">github.com/zhyi-dp/tokalang</a></strong> — visit it to explore the compiler, standard library, and more.</p>
+<p>Toka is created by <a href="https://github.com/zhyi-dp">YiZhonghua</a>. The official language repository is at <strong><a href="https://github.com/tokalang/toka">github.com/tokalang/toka</a></strong> — visit it to explore the compiler, standard library, and more.</p>
 <h2 id="who-this-book-is-for"><a class="header" href="#who-this-book-is-for">Who This Book Is For</a></h2>
 <ul>
 <li><strong>Beginners</strong> who want to learn their first systems programming language</li>
@@ -266,7 +266,7 @@ toka run hello.tk
 </code></pre>
 <h2 id="building-from-source"><a class="header" href="#building-from-source">Building from Source</a></h2>
 <p>For the latest development version:</p>
-<pre><code class="language-bash">git clone https://github.com/zhyi-dp/tokalang.git
+<pre><code class="language-bash">git clone https://github.com/tokalang/toka.git
 cd tokalang
 ./rebuild.sh
 </code></pre>
@@ -1887,13 +1887,10 @@ fn generate_key() -&gt; u64 {
 <pre><code class="language-bash">toka init my-cli
 cd my-cli
 </code></pre>
-<p>Add the <code>toka-cli</code> dependency to your <code>Project.tk</code>:</p>
-<pre><code class="language-tokalang">build::Executable
-
-deps = [
-    "toka-cli"
-]
+<p>Add the <code>toka-cli</code> dependency using the Toka package manager:</p>
+<pre><code class="language-bash">toka add toka-cli
 </code></pre>
+<p>This updates your <code>package.tk</code> dependencies automatically.</p>
 <h2 id="defining-arguments"><a class="header" href="#defining-arguments">Defining Arguments</a></h2>
 <pre><code class="language-tokalang">import cli::{App, Arg, Command}
 
@@ -2272,7 +2269,7 @@ fn example() {
 <p><strong>Q: Where can I find more examples?</strong></p>
 <p>Check out the <code>examples/</code> directory in the Toka repository and the <code>tokalibs</code> collection of community libraries.</p>
 <p><strong>Q: Is there a community or forum?</strong></p>
-<p>Join the Toka community on GitHub Discussions at github.com/zhyi-dp/tokalang.</p>
+<p>Join the Toka community on GitHub Discussions at github.com/tokalang/toka.</p>
 <h2 id="technical"><a class="header" href="#technical">Technical</a></h2>
 <p><strong>Q: How fast is Toka?</strong></p>
 <p>Toka compiles at approximately 80,000 lines of code per second (Clang backend) and produces optimized native binaries via LLVM 20. Performance is comparable to C for equivalent code.</p>
