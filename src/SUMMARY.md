@@ -1,6 +1,6 @@
 # The Toka Programming Language Guide
 
-[🏠 Return to tokalang.dev](https://tokalang.dev/)
+[🏠 Return to tokalang.dev](return_to_website.md)
 [Foreword](foreword.md)
 
 - [Getting Started](./getting_started.md)
