@@ -40,7 +40,7 @@ Check out the `examples/` directory in the Toka repository and the `tokalibs` co
 
 **Q: Is there a community or forum?**
 
-Join the Toka community on GitHub Discussions at github.com/zhyi-dp/tokalang.
+Join the Toka community on GitHub Discussions at github.com/tokalang/toka.
 
 ## Technical
 

@@ -11,15 +11,13 @@ toka init my-cli
 cd my-cli
 ```
 
-Add the `toka-cli` dependency to your `Project.tk`:
+Add the `toka-cli` dependency using the Toka package manager:
 
-```tokalang
-build::Executable
-
-deps = [
-    "toka-cli"
-]
+```bash
+toka add toka-cli
 ```
+
+This updates your `package.tk` dependencies automatically.
 
 ## Defining Arguments
 

@@ -69,7 +69,7 @@ Hello, Toka!
 For the latest development version:
 
 ```bash
-git clone https://github.com/zhyi-dp/tokalang.git
+git clone https://github.com/tokalang/toka.git
 cd tokalang
 ./rebuild.sh
 ```
