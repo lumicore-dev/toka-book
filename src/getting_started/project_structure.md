@@ -20,20 +20,22 @@ Run with: `toka run hello.tk`
 
 ## Multi-File Projects
 
-For larger projects, use `Project.tk`:
+For larger projects, initialize a project using `toka init`. This creates a `package.tk` file:
 
 ```tokalang
-// Project.tk
-build::Executable
-
-deps = []
+// package.tk
+pub const PACKAGE = (
+    name = "my_project",
+    version = "0.1.0",
+    dependencies = ()
+)
 ```
 
 Directory layout:
 
 ```
 my-project/
-├── Project.tk      # Project configuration
+├── package.tk      # Project configuration and dependencies
 ├── src/
 │   ├── main.tk     # Entry point
 │   ├── utils.tk    # Utility functions
@@ -43,16 +45,33 @@ my-project/
     └── helpers.tk  # Helper functions
 ```
 
-## Library Projects
+## Adding Dependencies
 
-For reusable libraries:
+You can easily add third-party packages to your project using the `toka add` command:
+
+```bash
+toka add toka-ink
+```
+
+This will automatically query the Toka Registry, resolve the package to its GitHub repository and version tag, and update your `package.tk`:
 
 ```tokalang
-// Project.tk
-build::Library
-
-name = "my-lib"
+// package.tk
+pub const PACKAGE = (
+    name = "my_project",
+    version = "0.1.0",
+    dependencies = (
+        toka-ink = "github.com/lumicore-dev/toka-ink:v0.2.1",
+    )
+)
 ```
+
+During `toka build`, the compiler will automatically fetch these dependencies into your `.toka/packages` directory.
+
+
+## Library Projects
+
+For reusable libraries, `toka new my-lib --lib` generates a library structure without a `main.tk` executable entry point. The configuration format remains the same in `package.tk`.
 
 ## Import System
 

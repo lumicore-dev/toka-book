@@ -84,7 +84,7 @@ fn gen_random() {
 
 ```toka
 // Mathematical limits (from lib/core/types.tk)
-pub const LIMITS = (
+pub const MY_LIMITS = (
     u8 = (min = 0, max = 255, bits = 8),
     i32 = (min = -2147483648, max = 2147483647, bits = 32),
     u64 = (min = 0, max = 18446744073709551615, bits = 64),

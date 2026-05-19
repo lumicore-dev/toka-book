@@ -12,6 +12,23 @@ auto y = 3.14        // f64 (default float type)
 auto name = "Toka"   // str (string slice)
 ```
 
+## Kebab-case Identifiers
+
+Since Toka v0.9.7, variable and function names natively support **Kebab-case** (hyphens), allowing for more readable and modern naming conventions:
+
+```toka
+import std/io::println
+
+fn main() {
+    auto max-size = 1024
+    auto user-name = "Toka"
+    
+    // Warning: Subtraction operator must have spaces around it to avoid ambiguity!
+    auto result = max-size - 100 // Correct
+    // auto error = max-size-100 // Error: "max-size-100" is treated as one identifier
+}
+```
+
 ## Explicit Type Annotations
 
 You can specify the type explicitly with a colon:
