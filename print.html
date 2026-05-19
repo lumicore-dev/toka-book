@@ -1,0 +1,2334 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>The Toka Programming Language Guide</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-2459343d.css">
+        <link rel="stylesheet" href="css/chrome-ae938929.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-23836a93.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-43407921.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">The Toka Programming Language Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="foreword"><a class="header" href="#foreword">Foreword</a></h1>
+<p>Welcome to <strong>The Toka Programming Language Guide</strong>.</p>
+<p>This book is a comprehensive guide to learning <strong>Toka</strong> — a modern systems programming language designed for safety, simplicity, and performance.</p>
+<p>Toka is created by <a href="https://github.com/zhyi-dp">YiZhonghua</a>. The official language repository is at <strong><a href="https://github.com/zhyi-dp/tokalang">github.com/zhyi-dp/tokalang</a></strong> — visit it to explore the compiler, standard library, and more.</p>
+<h2 id="who-this-book-is-for"><a class="header" href="#who-this-book-is-for">Who This Book Is For</a></h2>
+<ul>
+<li><strong>Beginners</strong> who want to learn their first systems programming language</li>
+<li><strong>Experienced developers</strong> coming from C, Rust, Go, or other languages</li>
+<li><strong>Language enthusiasts</strong> curious about the Hat Principle and PAL Checker</li>
+</ul>
+<h2 id="what-youll-learn"><a class="header" href="#what-youll-learn">What You’ll Learn</a></h2>
+<ol>
+<li><strong>Getting started</strong> — Install Toka and write your first program</li>
+<li><strong>Language basics</strong> — Variables, types, functions, control flow</li>
+<li><strong>The Hat Principle</strong> — Toka’s unique approach to memory safety</li>
+<li><strong>Advanced features</strong> — Generics, error handling, concurrency</li>
+<li><strong>Standard library tours</strong> — Strings, collections, IO, networking, and more</li>
+<li><strong>Hands-on projects</strong> — Build CLI tools, HTTP servers, and regex engines</li>
+</ol>
+<h2 id="how-to-use-this-book"><a class="header" href="#how-to-use-this-book">How to Use This Book</a></h2>
+<p>If you’re new to Toka, start from the beginning and work your way through. Each chapter builds on the previous one.</p>
+<p>If you’re an experienced developer, feel free to jump to specific topics using the sidebar navigation.</p>
+<h2 id="a-note-from-the-author"><a class="header" href="#a-note-from-the-author">A Note From the Author</a></h2>
+<p>Toka is a young but ambitious language. This guide was written alongside the language’s development to help early adopters get started. As Toka evolves, this book will evolve with it.</p>
+<p>Happy coding!</p>
+<p><em>— The Toka Documentation Team</em></p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
+<p>Welcome to Toka! This chapter will guide you through installing Toka, writing your first program, and understanding the project structure.</p>
+<h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
+<p>Toka provides pre-compiled binaries for Linux, macOS, and Windows. The easiest way to install is via the quick install script:</p>
+<pre><code class="language-bash">curl -fsSL https://tokalang.dev/install.sh | bash
+</code></pre>
+<p>This script will automatically detect your operating system and CPU architecture, download the latest stable release to <code>~/.toka/</code>, and configure your environment.</p>
+<h3 id="setting-up-environment-variables"><a class="header" href="#setting-up-environment-variables">Setting Up Environment Variables</a></h3>
+<p>After installation, you need to set up two environment variables to use Toka from any directory:</p>
+<pre><code class="language-bash">export PATH="$HOME/.toka/bin:$PATH"
+export TOKA_LIB="$HOME/.toka/lib"
+</code></pre>
+<p>Add these lines to your <code>~/.bashrc</code> or <code>~/.zshrc</code> to make them permanent.</p>
+<h3 id="verify-installation"><a class="header" href="#verify-installation">Verify Installation</a></h3>
+<p>Run the following command to confirm everything is working:</p>
+<pre><code class="language-bash">tokac --version
+</code></pre>
+<p>You should see output similar to:</p>
+<pre><code>toka version 0.9.6 (Built: May 17 2026 13:53:33)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="installation-1"><a class="header" href="#installation-1">Installation</a></h1>
+<p>Getting Toka on your system takes just a few seconds.</p>
+<h2 id="quick-install"><a class="header" href="#quick-install">Quick Install</a></h2>
+<p>The easiest way to install Toka is via the official install script:</p>
+<pre><code class="language-bash">curl -fsSL https://tokalang.dev/install.sh | bash
+</code></pre>
+<p>This script will:</p>
+<ol>
+<li>Detect your operating system and CPU architecture</li>
+<li>Download the latest stable release</li>
+<li>Install to <code>~/.toka/bin/</code></li>
+<li>Configure environment variables</li>
+</ol>
+<h2 id="setting-up-environment"><a class="header" href="#setting-up-environment">Setting Up Environment</a></h2>
+<p>After installation, add these to your <code>~/.bashrc</code> or <code>~/.zshrc</code>:</p>
+<pre><code class="language-bash">export PATH="$HOME/.toka/bin:$PATH"
+export TOKA_LIB="$HOME/.toka/lib"
+</code></pre>
+<p>Reload your shell:</p>
+<pre><code class="language-bash">source ~/.bashrc
+</code></pre>
+<h2 id="verify-installation-1"><a class="header" href="#verify-installation-1">Verify Installation</a></h2>
+<pre><code class="language-bash">tokac --version
+</code></pre>
+<p>You should see output similar to:</p>
+<pre><code>toka version 0.9.6 (Built: May 17 2026)
+</code></pre>
+<h2 id="hello-toka"><a class="header" href="#hello-toka">Hello, Toka!</a></h2>
+<p>Create your first program:</p>
+<pre><code class="language-bash">echo 'import std/io::println
+
+fn main() -&gt; i32 {
+    println("Hello, Toka!")
+    return 0
+}' &gt; hello.tk
+
+toka run hello.tk
+</code></pre>
+<p>Expected output:</p>
+<pre><code>Hello, Toka!
+</code></pre>
+<h2 id="building-from-source"><a class="header" href="#building-from-source">Building from Source</a></h2>
+<p>For the latest development version:</p>
+<pre><code class="language-bash">git clone https://github.com/zhyi-dp/tokalang.git
+cd tokalang
+./rebuild.sh
+</code></pre>
+<h2 id="supported-platforms"><a class="header" href="#supported-platforms">Supported Platforms</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Platform</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td>Linux (x86_64)</td><td>✅ Primary</td></tr>
+<tr><td>macOS (Apple Silicon)</td><td>✅ Supported</td></tr>
+<tr><td>macOS (Intel)</td><td>✅ Supported</td></tr>
+<tr><td>Windows (x86_64)</td><td>✅ Supported</td></tr>
+<tr><td>Linux (ARM64)</td><td>⚠️ Experimental</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="hello-toka-1"><a class="header" href="#hello-toka-1">Hello, Toka!</a></h1>
+<p>Let’s write your first Toka program. Create a file called <code>hello.tk</code>:</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() -&gt; i32 {
+    println("Hello, Toka!")
+    return 0
+}
+</code></pre>
+<h3 id="running-the-program"><a class="header" href="#running-the-program">Running the Program</a></h3>
+<p>Toka provides two ways to run your code:</p>
+<p><strong>Option 1: One-step run</strong></p>
+<pre><code class="language-bash">toka run hello.tk
+</code></pre>
+<p>This compiles and executes your program in a single command.</p>
+<p><strong>Option 2: Build then run</strong></p>
+<pre><code class="language-bash">tokac build hello.tk -o hello
+./hello
+</code></pre>
+<p>This gives you a standalone binary that you can distribute.</p>
+<h3 id="expected-output"><a class="header" href="#expected-output">Expected Output</a></h3>
+<pre><code>Hello, Toka!
+</code></pre>
+<h2 id="understanding-the-code"><a class="header" href="#understanding-the-code">Understanding the Code</a></h2>
+<p>Let’s break down what each part does:</p>
+<ul>
+<li><code>import std/io::println</code> — Brings the <code>println</code> function from the standard library’s IO module into scope.</li>
+<li><code>fn main() -&gt; i32</code> — Declares the entry point of your program. Every Toka executable needs a <code>main</code> function. The <code>-&gt; i32</code> means it returns an integer (the exit code).</li>
+<li><code>println("Hello, Toka!")</code> — Prints the string to standard output.</li>
+<li><code>return 0</code> — Returns exit code 0, indicating success.</li>
+</ul>
+<h3 id="quick-one-liner"><a class="header" href="#quick-one-liner">Quick One-Liner</a></h3>
+<p>For a quick test without creating a file, you can also use:</p>
+<pre><code class="language-bash">echo 'import std/io::{println} fn main() { println("Hello, Toka World!") }' &gt; hello.tk
+toka run hello.tk
+</code></pre>
+<h2 id="whats-next"><a class="header" href="#whats-next">What’s Next?</a></h2>
+<p>In the next section, we’ll explore the standard project structure and how to organize larger Toka projects.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="project-structure"><a class="header" href="#project-structure">Project Structure</a></h1>
+<p>Understanding Toka’s project structure helps you organize your code effectively.</p>
+<h2 id="single-file-programs"><a class="header" href="#single-file-programs">Single-File Programs</a></h2>
+<p>For simple programs, a single <code>.tk</code> file is all you need:</p>
+<pre><code class="language-toka">// hello.tk
+import std/io::println
+
+fn main() -&gt; i32 {
+    println("Hello, Toka!")
+    return 0
+}
+</code></pre>
+<p>Run with: <code>toka run hello.tk</code></p>
+<h2 id="multi-file-projects"><a class="header" href="#multi-file-projects">Multi-File Projects</a></h2>
+<p>For larger projects, initialize a project using <code>toka init</code>. This creates a <code>package.tk</code> file:</p>
+<pre><code class="language-tokalang">// package.tk
+pub const PACKAGE = (
+    name = "my_project",
+    version = "0.1.0",
+    dependencies = ()
+)
+</code></pre>
+<p>Directory layout:</p>
+<pre><code>my-project/
+├── package.tk      # Project configuration and dependencies
+├── src/
+│   ├── main.tk     # Entry point
+│   ├── utils.tk    # Utility functions
+│   └── models.tk   # Data models
+└── lib/
+    ├── config.tk   # Library config
+    └── helpers.tk  # Helper functions
+</code></pre>
+<h2 id="adding-dependencies"><a class="header" href="#adding-dependencies">Adding Dependencies</a></h2>
+<p>You can easily add third-party packages to your project using the <code>toka add</code> command:</p>
+<pre><code class="language-bash">toka add toka-ink
+</code></pre>
+<p>This will automatically query the Toka Registry, resolve the package to its GitHub repository and version tag, and update your <code>package.tk</code>:</p>
+<pre><code class="language-tokalang">// package.tk
+pub const PACKAGE = (
+    name = "my_project",
+    version = "0.1.0",
+    dependencies = (
+        toka-ink = "github.com/lumicore-dev/toka-ink:v0.2.1",
+    )
+)
+</code></pre>
+<p>During <code>toka build</code>, the compiler will automatically fetch these dependencies into your <code>.toka/packages</code> directory.</p>
+<h2 id="library-projects"><a class="header" href="#library-projects">Library Projects</a></h2>
+<p>For reusable libraries, <code>toka new my-lib --lib</code> generates a library structure without a <code>main.tk</code> executable entry point. The configuration format remains the same in <code>package.tk</code>.</p>
+<h2 id="import-system"><a class="header" href="#import-system">Import System</a></h2>
+<pre><code class="language-tokalang">// Import from standard library
+import std/io::println
+
+// Import from project source
+import src/utils::{helper_fn}
+
+// Import from local library
+import lib/config::{Config}
+
+// Import with alias
+import std/time as time_lib
+</code></pre>
+<h2 id="build-output"><a class="header" href="#build-output">Build Output</a></h2>
+<p>Running <code>toka run</code> or <code>tokac build</code> produces:</p>
+<pre><code>my-project/
+└── target/
+    ├── debug/
+    │   └── my-project    # Debug binary
+    └── release/
+        └── my-project    # Release binary (with --release)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="language-basics"><a class="header" href="#language-basics">Language Basics</a></h1>
+<p>Now that you have Toka installed and have written your first program, let’s dive into the core concepts of the language.</p>
+<h2 id="hello-world-revisited"><a class="header" href="#hello-world-revisited">Hello World Revisited</a></h2>
+<p>The simplest Toka program needs two things: an <code>import</code> for the standard library, and a <code>main</code> function:</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() -&gt; i32 {
+    println("Hello, Toka!")
+    return 0
+}
+</code></pre>
+<p>Run it with:</p>
+<pre><code class="language-bash">toka run hello.tk
+</code></pre>
+<h2 id="key-principles"><a class="header" href="#key-principles">Key Principles</a></h2>
+<p>Toka is designed around a few core principles:</p>
+<ol>
+<li><strong>Safety by default</strong> — Variables are immutable unless explicitly marked.</li>
+<li><strong>No hidden runtime</strong> — What you write is what gets executed. No garbage collector, no VM.</li>
+<li><strong>C-like performance</strong> — Built on LLVM 20, Toka generates optimized native code.</li>
+<li><strong>Modern syntax</strong> — Clean, readable, with powerful pattern matching and error handling.</li>
+</ol>
+<h2 id="comment-syntax"><a class="header" href="#comment-syntax">Comment Syntax</a></h2>
+<p>Comments in Toka use the standard <code>//</code> syntax:</p>
+<pre><code class="language-toka">// This is a single-line comment
+
+/* This is a
+   multi-line comment */
+</code></pre>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<p>In the following sections, we’ll explore variables, types, functions, and control flow in detail.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="variables--types"><a class="header" href="#variables--types">Variables &amp; Types</a></h1>
+<p>Toka is a statically-typed language with a rich type system. Let’s explore how variables and types work.</p>
+<h2 id="variable-declaration"><a class="header" href="#variable-declaration">Variable Declaration</a></h2>
+<p>Use the <code>auto</code> keyword to declare variables:</p>
+<pre><code class="language-toka">auto x = 10          // i32 (default integer type)
+auto y = 3.14        // f64 (default float type)
+auto name = "Toka"   // str (string slice)
+</code></pre>
+<h2 id="kebab-case-identifiers"><a class="header" href="#kebab-case-identifiers">Kebab-case Identifiers</a></h2>
+<p>Since Toka v0.9.7, variable and function names natively support <strong>Kebab-case</strong> (hyphens), allowing for more readable and modern naming conventions:</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() {
+    auto max-size = 1024
+    auto user-name = "Toka"
+    
+    // Warning: Subtraction operator must have spaces around it to avoid ambiguity!
+    auto result = max-size - 100 // Correct
+    // auto error = max-size-100 // Error: "max-size-100" is treated as one identifier
+}
+</code></pre>
+<h2 id="explicit-type-annotations"><a class="header" href="#explicit-type-annotations">Explicit Type Annotations</a></h2>
+<p>You can specify the type explicitly with a colon:</p>
+<pre><code class="language-toka">auto x: u64 = 10
+auto y: f32 = 3.14:f32
+auto flag: bool = true
+</code></pre>
+<h2 id="primitive-types"><a class="header" href="#primitive-types">Primitive Types</a></h2>
+<p>Toka’s type system is defined in <code>lib/core/types.tk</code> and includes:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Type</th><th>Description</th><th>Size</th></tr>
+</thead>
+<tbody>
+<tr><td><code>i8</code>, <code>i16</code>, <code>i32</code>, <code>i64</code></td><td>Signed integers</td><td>1-8 bytes</td></tr>
+<tr><td><code>u8</code>, <code>u16</code>, <code>u32</code>, <code>u64</code></td><td>Unsigned integers</td><td>1-8 bytes</td></tr>
+<tr><td><code>f32</code>, <code>f64</code></td><td>Floating point (IEEE 754)</td><td>4-8 bytes</td></tr>
+<tr><td><code>bool</code></td><td>Boolean (<code>true</code> / <code>false</code>)</td><td>1 byte</td></tr>
+<tr><td><code>char</code></td><td>C-style character (<code>i8</code>)</td><td>1 byte</td></tr>
+<tr><td><code>byte</code></td><td>Raw byte (<code>u8</code>)</td><td>1 byte</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="platform-dependent-types"><a class="header" href="#platform-dependent-types">Platform-Dependent Types</a></h2>
+<pre><code class="language-toka">pub alias usize = u64   // Pointer-sized unsigned integer
+pub alias isize = i64   // Pointer-sized signed integer
+</code></pre>
+<p>On 64-bit systems, <code>usize</code> is <code>u64</code>; on 32-bit systems, it would be <code>u32</code>.</p>
+<h2 id="type-aliases"><a class="header" href="#type-aliases">Type Aliases</a></h2>
+<p>Toka supports two kinds of type aliases:</p>
+<p><strong>Weak alias</strong> — Semantically identical, transparent to the compiler:</p>
+<pre><code class="language-toka">pub alias usize = u64
+</code></pre>
+<p><strong>Strong type</strong> — Same memory layout, but requires explicit conversion:</p>
+<pre><code class="language-toka">pub type Addr = u64
+pub type OAddr = u64
+</code></pre>
+<h2 id="constants"><a class="header" href="#constants">Constants</a></h2>
+<p>Use <code>const</code> for compile-time constant values:</p>
+<pre><code class="language-toka">pub const MAX_SIZE = 1024:u64
+pub const NAME = "Toka"
+</code></pre>
+<p>Constants are inlined at compile time — no memory is allocated and their address cannot be taken.</p>
+<h2 id="mutability"><a class="header" href="#mutability">Mutability</a></h2>
+<p>Variables are <strong>immutable by default</strong>. Use the <code>#</code> suffix to make them mutable. The <code>#</code> token is only needed in two places:</p>
+<ol>
+<li><strong>At declaration</strong> — to mark the variable as mutable</li>
+<li><strong>Before a mutable method call</strong> — to present the guard on the variable</li>
+</ol>
+<pre><code class="language-toka">import std/io::println
+
+pub shape List(data: i32)
+impl List {
+    pub fn sort(self#) {}
+    pub fn push(self#, val: i32) {}
+}
+
+fn main() {
+    auto y = List(data = 10)  // immutable
+    auto x# = List(data = 10) // mutable — # at declaration
+
+    // Reading and assignment don't need #
+    x = List(data = 20)       // OK — plain assignment
+    println("{}", x.data)     // OK — plain read
+
+    // Calling a mutable method requires # on the variable
+    x#.sort()                 // OK — # on variable before .method()
+    x#.push(5)                // OK
+}
+</code></pre>
+<p>This is an example of Toka’s <strong>Attribute Token System</strong> — the <code>#</code> suffix denotes soul mutability and is placed on the variable itself when declaring it or calling its mutable methods.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="functions"><a class="header" href="#functions">Functions</a></h1>
+<p>Functions in Toka are first-class citizens. They follow a clean, readable syntax.</p>
+<h2 id="basic-function-syntax"><a class="header" href="#basic-function-syntax">Basic Function Syntax</a></h2>
+<pre><code class="language-toka">fn add(x: i32, y: i32) -&gt; i32 {
+    return x + y
+}
+</code></pre>
+<ul>
+<li><code>fn</code> keyword declares a function</li>
+<li>Parameters are typed with <code>name: Type</code> syntax</li>
+<li>Return type follows <code>-&gt;</code></li>
+<li>The function body is wrapped in <code>{ }</code></li>
+</ul>
+<h2 id="entry-point-main"><a class="header" href="#entry-point-main">Entry Point: <code>main</code></a></h2>
+<p>Every Toka executable needs a <code>main</code> function that returns an exit code:</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() -&gt; i32 {
+    println("Hello, Toka!")
+    return 0
+}
+</code></pre>
+<p>Return <code>0</code> for success, non-zero for errors.</p>
+<h2 id="multiple-parameters"><a class="header" href="#multiple-parameters">Multiple Parameters</a></h2>
+<p>Functions can take multiple parameters of different types:</p>
+<pre><code class="language-toka">fn greet(name: view_str, age: i32, formal: bool) -&gt; cstring {
+    if formal {
+        return "Good day"
+    }
+    return "Hey"
+}
+</code></pre>
+<h2 id="mutable-parameters"><a class="header" href="#mutable-parameters">Mutable Parameters</a></h2>
+<p>Parameters are immutable by default. Use the <code>#</code> token at declaration for mutable parameters. Inside the function body, you access the parameter without <code>#</code>:</p>
+<pre><code class="language-toka">fn increment(x#: i32) {
+    x = x + 1       // Inside the body, no # needed
+}
+</code></pre>
+<h2 id="functions-with-no-return"><a class="header" href="#functions-with-no-return">Functions with No Return</a></h2>
+<p>If a function doesn’t return anything, omit <code>-&gt;</code>:</p>
+<pre><code class="language-toka">import std/io::println
+
+fn log_message(msg: view_str) {
+    println("{}", msg)
+}
+</code></pre>
+<h2 id="method-syntax"><a class="header" href="#method-syntax">Method Syntax</a></h2>
+<p>Functions can be attached to types using <code>impl</code> blocks:</p>
+<pre><code class="language-toka">pub shape Number(val: i32)
+
+impl Number {
+    pub fn double(self) -&gt; i32 {
+        return self.val * 2
+    }
+}
+
+fn main() {
+    auto result = Number(val = 5).double()  // result = 10
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="control-flow"><a class="header" href="#control-flow">Control Flow</a></h1>
+<p>Toka provides modern control flow constructs for building clear, expressive programs.</p>
+<h2 id="if--else"><a class="header" href="#if--else">If / Else</a></h2>
+<pre><code class="language-toka">import std/io::println
+
+fn check_temp(temp: i32) {
+    if temp &gt; 35 {
+        println("It's hot!")
+    } else if temp &lt; 10 {
+        println("It's cold!")
+    } else {
+        println("It's mild.")
+    }
+}
+</code></pre>
+<h2 id="while-loops"><a class="header" href="#while-loops">While Loops</a></h2>
+<pre><code class="language-toka">import std/io::println
+
+auto count# = 0
+while count &lt; 5 {
+    println("Count: {}", count)
+    count = count + 1
+}
+</code></pre>
+<h2 id="for-loops-with-ranges"><a class="header" href="#for-loops-with-ranges">For Loops with Ranges</a></h2>
+<p>Toka supports range-based iteration:</p>
+<pre><code class="language-toka">import std/io::println
+
+for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
+    println("{}", i)
+}
+</code></pre>
+<p>The <code>0..10</code> range is exclusive on the end — it iterates <code>0, 1, 2, ..., 9</code>.</p>
+<h2 id="iterating-collections"><a class="header" href="#iterating-collections">Iterating Collections</a></h2>
+<pre><code class="language-toka">import std/io::println
+
+auto items = ["apple", "banana", "cherry"]
+for auto item in items {
+    println("{}", item)
+}
+</code></pre>
+<p>With index:</p>
+<pre><code class="language-toka">import std/io::println
+
+auto items2 = ["apple", "banana", "cherry"]
+auto i# = 0
+for auto item in items2 {
+    println("{}: {}", i, item)
+    i = i + 1
+}
+</code></pre>
+<h2 id="break-and-continue"><a class="header" href="#break-and-continue">Break and Continue</a></h2>
+<p>Control loop flow with standard keywords:</p>
+<pre><code class="language-toka">import std/io::println
+
+auto iter# = 0
+while iter &lt; 100 {
+    if iter == 50 {
+        break        // Exit the loop completely
+    }
+    if iter % 2 == 0 {
+        iter = iter + 1
+        continue     // Skip to next iteration
+    }
+    println("{}", iter)  // Prints odd numbers: 1, 3, 5, ..., 49
+    iter = iter + 1
+}
+</code></pre>
+<h2 id="match-pattern-matching"><a class="header" href="#match-pattern-matching">Match (Pattern Matching)</a></h2>
+<p>Toka provides powerful pattern matching with the <code>match</code> expression:</p>
+<pre><code class="language-toka">fn describe(value: i32) -&gt; cstring {
+    return match value {
+        0 =&gt; pass "zero"
+        1 =&gt; pass "one"
+        auto v if v &gt;= 2 &amp;&amp; v &lt;= 10 =&gt; pass "small"
+        auto v if v &gt;= 11 &amp;&amp; v &lt;= 100 =&gt; pass "medium"
+        _ =&gt; pass "large"
+    }
+}
+</code></pre>
+<p>The <code>_</code> wildcard matches any value, serving as the default case.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="strings"><a class="header" href="#strings">Strings</a></h1>
+<p>Toka provides a flexible string system designed for both systems programming and text processing.</p>
+<h2 id="string-types"><a class="header" href="#string-types">String Types</a></h2>
+<p>Toka defines several string types for different encoding needs:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>str</code></td><td>String slice (like Rust <code>&amp;str</code> or C++ <code>string_view</code>) — immutable, borrowed</td></tr>
+<tr><td><code>string</code></td><td>Owned mutable string (UTF-8 by default)</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="string-literals"><a class="header" href="#string-literals">String Literals</a></h2>
+<p>Double-quoted strings are the standard:</p>
+<pre><code class="language-toka">auto greeting = "Hello, Toka!"
+auto name = "World"
+</code></pre>
+<h2 id="escape-sequences"><a class="header" href="#escape-sequences">Escape Sequences</a></h2>
+<p>Toka supports <code>\x</code> escape sequences in string literals, making ANSI color codes clean:</p>
+<pre><code class="language-toka">import std/io::println
+
+auto red = "\x1b[31m"
+auto green = "\x1b[32m"
+auto reset = "\x1b[0m"
+
+println("{}{}Success!{}", green, "Build complete", reset)
+</code></pre>
+<h2 id="string-interpolation"><a class="header" href="#string-interpolation">String Interpolation</a></h2>
+<p>Use <code>{}</code> placeholders with <code>println</code> for clean formatting:</p>
+<pre><code class="language-toka">import std/io::println
+
+auto name = "Toka"
+auto version = "0.9.6"
+println("Welcome to {} version {}!", name, version)
+</code></pre>
+<h2 id="string-concatenation"><a class="header" href="#string-concatenation">String Concatenation</a></h2>
+<p>Strings can be concatenated with <code>+</code>:</p>
+<pre><code class="language-toka">import std/string::String
+
+auto full# = String::from("Hello, ")
+full#.push_str("World!")
+</code></pre>
+<h2 id="conversion-to-string"><a class="header" href="#conversion-to-string">Conversion to String</a></h2>
+<p>Convert other types to string with <code>str()</code>:</p>
+<pre><code class="language-toka">import std/io::println
+
+auto n = 42
+println("The answer is {}", n)
+</code></pre>
+<h2 id="character-types"><a class="header" href="#character-types">Character Types</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>char</code></td><td>Single byte character (<code>i8</code>), C-style</td></tr>
+<tr><td><code>Char16</code></td><td>UTF-16 code point (<code>u16</code>)</td></tr>
+<tr><td><code>Char32</code></td><td>UTF-32 code point (<code>u32</code>)</td></tr>
+<tr><td><code>Char</code></td><td>Alias for <code>Char32</code>, the default Unicode character</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="working-with-characters"><a class="header" href="#working-with-characters">Working with Characters</a></h2>
+<pre><code class="language-toka">auto ch: char = 'A'
+auto unicode: u32 = 0x4E16:u32
+</code></pre>
+<p>The string system is defined in <code>lib/core/str.tk</code> and <code>lib/core/utf8.tk</code> for UTF-8 handling.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="the-hat-principle"><a class="header" href="#the-hat-principle">The Hat Principle</a></h1>
+<p>The <strong>Hat Principle</strong> is the core concept behind Toka’s memory safety model. Instead of requiring developers to annotate lifetimes or manually manage memory, Toka uses visible syntactic tokens called “hats” to track ownership and memory semantics at compile time.</p>
+<h2 id="what-is-a-hat"><a class="header" href="#what-is-a-hat">What is a Hat?</a></h2>
+<p>A <strong>hat</strong> is a sigil (symbol) attached to an identifier that tells both the programmer and the compiler how that value is stored, owned, and accessed. Toka has three hat types:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Hat</th><th>Name</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code>*</code></td><td>Raw Pointer</td><td>Low-level pointer, requires <code>unsafe</code> / <code>alloc</code></td></tr>
+<tr><td><code>^</code></td><td>Unique Pointer</td><td>Exclusive ownership of a heap-allocated resource (like <code>Box</code> in Rust)</td></tr>
+<tr><td><code>~</code></td><td>Shared Pointer</td><td>Reference-counted shared ownership (planned)</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="handle-vs-soul"><a class="header" href="#handle-vs-soul">Handle vs. Soul</a></h2>
+<p>One of Toka’s most elegant design features is the <strong>Handle vs. Soul</strong> distinction. It eliminates the need for explicit dereferencing operators:</p>
+<ul>
+<li><strong>Handle (The Hat)</strong>: Identifiers <strong>with</strong> a sigil (<code>^p</code>, <code>*p</code>, <code>~p</code>) represent the <em>pointer container</em> itself.</li>
+<li><strong>Soul (The Data)</strong>: Identifiers <strong>without</strong> a sigil (<code>p</code>) represent the <em>underlying data</em>.</li>
+</ul>
+<p>When you want to read or modify the value a pointer points to, you simply operate on the <strong>soul</strong> directly — no dereference token needed:</p>
+<pre><code class="language-toka">{{#include ../../examples/ownership.tk:raw_ptr}}
+</code></pre>
+<p>This is a major quality-of-life improvement over C’s <code>*p = 200</code> or Rust’s <code>*p = 200</code>. Toka’s approach makes pointer-heavy code much more readable.</p>
+<h2 id="how-the-pal-checker-uses-hats"><a class="header" href="#how-the-pal-checker-uses-hats">How the PAL Checker Uses Hats</a></h2>
+<p>The PAL (Pointer Analysis Layer) Checker analyzes hat usage at compile time to enforce the same guarantees a borrow checker provides, but without lifetime annotations:</p>
+<ol>
+<li><strong>No use after move</strong> — A <code>^</code> value cannot be used after ownership has been transferred</li>
+<li><strong>No dangling references</strong> — References cannot outlive their referent</li>
+<li><strong>No double-free</strong> — Each owned value is freed exactly once</li>
+<li><strong>No data races</strong> — Mutable access is exclusive; shared access is read-only</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="soul--identity"><a class="header" href="#soul--identity">Soul &amp; Identity</a></h1>
+<p>Toka’s Hat Principle introduces a clear distinction between a pointer’s <strong>handle</strong> (the container) and its <strong>soul</strong> (the underlying data). Understanding this split is key to mastering Toka’s memory model.</p>
+<h2 id="handle-vs-soul-1"><a class="header" href="#handle-vs-soul-1">Handle vs. Soul</a></h2>
+<p>Every pointer in Toka has two aspects:</p>
+<ul>
+<li><strong>Handle (The Hat)</strong>: The identifier <em>with</em> its sigil (<code>^p</code>, <code>*p</code>, <code>~p</code>). This represents the pointer container itself — the memory location that holds the address.</li>
+<li><strong>Soul (The Data)</strong>: The identifier <em>without</em> the sigil (<code>p</code>). This represents the underlying value being pointed to.</li>
+</ul>
+<h2 id="implicit-dereferencing"><a class="header" href="#implicit-dereferencing">Implicit Dereferencing</a></h2>
+<p>Toka’s killer feature is <strong>implicit dereferencing</strong>: you never need a <code>*</code> or <code>-&gt;</code> operator to access the data behind a pointer. Just use the soul directly:</p>
+<pre><code class="language-toka">fn handle_soul_example() {
+    auto ^p# = new Point(x=10, y=20)
+    p.x = 30
+    auto sum = p.x + p.y
+    println("sum: {}", sum)
+}
+</code></pre>
+<p>This is a massive ergonomic improvement over C (<code>p-&gt;x = 30</code>) or Rust (<code>(*p).x = 30</code>).</p>
+<h2 id="the-three-hats"><a class="header" href="#the-three-hats">The Three Hats</a></h2>
+<p>Each hat sigil carries different ownership semantics:</p>
+<h3 id="--raw-pointer"><a class="header" href="#--raw-pointer"><code>*</code> — Raw Pointer</a></h3>
+<p>Low-level, unsafe pointer. Requires <code>unsafe</code> keyword or explicit <code>alloc</code>:</p>
+<pre><code class="language-toka">fn raw_pointer_example() {
+    unsafe {
+        auto *p# = alloc i32
+        p = 42
+        println("raw: {}", p)
+    }
+}
+</code></pre>
+<h3 id="--unique-pointer"><a class="header" href="#--unique-pointer"><code>^</code> — Unique Pointer</a></h3>
+<p>Exclusive ownership of a heap-allocated resource. Created with <code>new</code>:</p>
+<pre><code class="language-toka">fn unique_pointer_example() {
+    auto ^p = new i32(42)
+    auto ^q = ^p
+    println("unique: {}", q)
+}
+</code></pre>
+<h3 id="--shared-pointer"><a class="header" href="#--shared-pointer"><code>~</code> — Shared Pointer</a></h3>
+<p>Reference-counted, shared ownership is planned for an upcoming release.</p>
+<pre><code class="language-toka">// Not yet implemented in v0.9.6 — coming soon
+</code></pre>
+<h2 id="identity-and-address"><a class="header" href="#identity-and-address">Identity and Address</a></h2>
+<p>To get the raw memory address of a local variable, use the <code>*(expr)</code> syntax:</p>
+<pre><code class="language-toka">fn address_of_example() {
+    auto a# = 42
+    auto *raw_ptr = *(a)
+    println("addr: {}", raw_ptr)
+}
+</code></pre>
+<p>The hat (<code>^</code>) does <strong>not</strong> mean “address of”. It specifically denotes the unique pointer container.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="ownership--hats"><a class="header" href="#ownership--hats">Ownership &amp; Hats</a></h1>
+<p>Ownership in Toka is governed by the Hat Principle. Each hat sigil communicates a different ownership model directly through syntax.</p>
+<h2 id="three-ownership-models"><a class="header" href="#three-ownership-models">Three Ownership Models</a></h2>
+<p>Toka defines three pointer types, each with distinct ownership semantics:</p>
+<h3 id="--raw-pointer-unsafe"><a class="header" href="#--raw-pointer-unsafe"><code>*</code> — Raw Pointer (Unsafe)</a></h3>
+<p>Raw pointers require explicit <code>unsafe</code> or <code>alloc</code> to create and manage:</p>
+<pre><code class="language-toka">fn raw_ptr_example() {
+    unsafe {
+        auto *p# = alloc i32
+        p = 99
+        println("raw: {}", p)
+    }
+}
+</code></pre>
+<p>Raw pointers are used when interfacing with C code or implementing low-level data structures.</p>
+<h3 id="--unique-pointer-move-semantics"><a class="header" href="#--unique-pointer-move-semantics"><code>^</code> — Unique Pointer (Move Semantics)</a></h3>
+<p>Unique pointers provide exclusive ownership. Only one <code>^</code> can point to a given resource at any time. Ownership is transferred via <strong>move</strong>:</p>
+<pre><code class="language-toka">fn unique_ptr_example() {
+    auto ^p = new i32(42)
+    auto ^q = ^p
+    println("unique: {}", q)
+}
+</code></pre>
+<p>The <code>^</code> token operates like Rust’s <code>Box</code> or C++’s <code>std::unique_ptr</code>. When a unique pointer goes out of scope, its resource is automatically freed.</p>
+<h3 id="--shared-pointer-reference-counted"><a class="header" href="#--shared-pointer-reference-counted"><code>~</code> — Shared Pointer (Reference-Counted)</a></h3>
+<p>Shared pointers enable multiple owners via reference counting. Support is planned for an upcoming release.</p>
+<pre><code class="language-toka">// Not yet implemented in v0.9.6 — coming soon
+</code></pre>
+<p>The resource is freed when the last <code>~</code> reference goes out of scope.</p>
+<h2 id="moving-vs-copying"><a class="header" href="#moving-vs-copying">Moving vs Copying</a></h2>
+<p><strong>Simple types</strong> (like <code>i32</code>, <code>f64</code>, <code>bool</code>) are <strong>copied</strong> by default:</p>
+<pre><code class="language-toka">fn move_copy_example() {
+    auto a# = 42
+    auto b = a
+    a = 99
+    println("a: {}, b: {}", a, b)
+}
+</code></pre>
+<p><strong>Complex types</strong> (like <code>string</code>, <code>Vec</code>, custom <code>shape</code> types) are <strong>moved</strong> by default. In Toka, assignment of a complex type transfers ownership from the source to the destination:</p>
+<pre><code class="language-toka">// Complex types use move semantics:
+//   auto moved = original  — ownership transfers to `moved`
+//   `original` is no longer valid after the move
+</code></pre>
+<h2 id="borrowing-in-place-capture"><a class="header" href="#borrowing-in-place-capture">Borrowing (In-Place Capture)</a></h2>
+<p>Toka uses <strong>implicit borrow</strong> for function parameters by default. You don’t need special sigils for standard borrowing:</p>
+<pre><code class="language-toka">fn process(data: i32) {
+    println("data: {}", data)
+}
+
+fn borrow_func_example() {
+    auto val = 10
+    process(val)
+    println("val: {}", val)
+}
+</code></pre>
+<p>For <strong>mutable access</strong>, use <code>#</code> on the variable declaration. Note that <code>#</code> is restricted to declarations and cannot be used at call sites:</p>
+<pre><code class="language-toka">fn mutable_local_example() {
+    auto val# = 42
+    val = 99
+    println("val: {}", val)
+}
+</code></pre>
+<h2 id="explicit-local-borrow-with-"><a class="header" href="#explicit-local-borrow-with-">Explicit Local Borrow with <code>&amp;</code></a></h2>
+<p>The <code>&amp;</code> sigil is used when <strong>explicitly declaring a local borrow pointer</strong> or returning a reference:</p>
+<pre><code class="language-toka">shape Container(val: i32)
+fn borrow_example(c: Container) -&gt; &amp;i32 &lt;- c {
+    return &amp;(c.val)
+}
+fn main() -&gt; i32 {
+    auto c = Container(val = 10)
+    auto &amp;y = borrow_example(c)
+    return 0
+}
+</code></pre>
+<h3 id="lifetime-dependency-annotation"><a class="header" href="#lifetime-dependency-annotation">Lifetime Dependency Annotation</a></h3>
+<p>In the example above, the syntax <code>-&gt; &amp;i32 &lt;- c</code> introduces Toka’s <strong>Lifetime Dependency Annotation</strong>.</p>
+<p>When a function returns a reference derived from its parameters, the PAL Checker requires you to explicitly declare this relationship. The <code>&lt;- c</code> notation tells the compiler: <em>“The returned reference is strictly bound to the lifetime of <code>c</code>”</em>.</p>
+<p>If you omit this annotation, Toka will proactively block compilation (<code>error[E0454]</code>) to prevent accidental dangling pointers. This achieves the same rigorous memory safety as Rust’s lifetime parameters (<code>&lt;'a&gt;</code>), but with a much lighter and more intuitive syntax.</p>
+<blockquote>
+<p><strong>Note:</strong> This relationship can also be expressed using Toka’s <strong>effects</strong> annotation style. Support for advanced borrow-checked references continues to evolve.</p>
+</blockquote>
+<h2 id="the-pal-checker-in-action"><a class="header" href="#the-pal-checker-in-action">The PAL Checker in Action</a></h2>
+<p>The PAL Checker verifies at compile time that:</p>
+<ol>
+<li><strong>No use after move</strong> — A <code>^</code> value cannot be accessed after ownership transfer</li>
+<li><strong>No dangling references</strong> — Borrowed references cannot outlive the borrowed value</li>
+<li><strong>No double-free</strong> — Each value is freed exactly once</li>
+<li><strong>No data races</strong> — Mutable access is exclusive; shared access is read-only</li>
+</ol>
+<p>All of this happens <strong>without any lifetime annotations</strong>. The Hat Principle makes ownership visible in the syntax itself.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="memory-safety"><a class="header" href="#memory-safety">Memory Safety</a></h1>
+<p>Toka achieves memory safety at compile time through the <strong>PAL Checker</strong> (Pointer Analysis Layer), without needing a garbage collector, runtime overhead, or explicit lifetime annotations.</p>
+<h2 id="how-pal-works"><a class="header" href="#how-pal-works">How PAL Works</a></h2>
+<p>The PAL Checker analyzes the usage of hat sigils (<code>*</code>, <code>^</code>, <code>~</code>) across your code to enforce ownership and borrowing rules. It runs at compile time and guarantees:</p>
+<ol>
+<li><strong>No dangling pointers</strong> — You cannot access memory after it has been freed</li>
+<li><strong>No double-free</strong> — Each allocation is freed exactly once</li>
+<li><strong>No use after move</strong> — A moved-from <code>^</code> (unique) pointer cannot be accessed</li>
+<li><strong>No data races</strong> — Mutable access is exclusive; shared access is read-only</li>
+</ol>
+<h2 id="unique-pointers---no-use-after-move"><a class="header" href="#unique-pointers---no-use-after-move">Unique Pointers (<code>^</code>) — No Use After Move</a></h2>
+<p>The <code>^</code> hat enforces exclusive ownership. Ownership can be transferred via <em>move</em>:</p>
+<pre><code class="language-toka">fn no_use_after_move_example() {
+    auto ^p = new i32(42)
+    auto ^q = ^p
+    println("q: {}", q)
+}
+</code></pre>
+<p>The compiler tracks the flow of ownership and rejects any code that accesses a value after its ownership has been transferred.</p>
+<h2 id="raw-pointers---unsafe-operations"><a class="header" href="#raw-pointers---unsafe-operations">Raw Pointers (<code>*</code>) — Unsafe Operations</a></h2>
+<p>Raw pointers require explicit <code>unsafe</code> blocks:</p>
+<pre><code class="language-toka">fn unsafe_ops_example() {
+    unsafe {
+        auto *p# = alloc i32
+        p = 99
+        println("val: {}", p)
+    }
+}
+</code></pre>
+<p>The <code>unsafe</code> keyword signals to the PAL Checker that you are taking manual responsibility for memory safety.</p>
+<h2 id="shared-pointers---reference-counting"><a class="header" href="#shared-pointers---reference-counting">Shared Pointers (<code>~</code>) — Reference Counting</a></h2>
+<p>Shared pointers use runtime reference counting but are still safe. Support is planned for an upcoming release.</p>
+<pre><code class="language-toka">// Not yet implemented in v0.9.6 — coming soon
+</code></pre>
+<h2 id="borrowing-safety"><a class="header" href="#borrowing-safety">Borrowing Safety</a></h2>
+<p>Toka uses <strong>implicit borrow</strong> (in-place capture) as the default for function parameters. Values of simple types like <code>i32</code> are passed by value (copied), while complex types would be borrowed:</p>
+<pre><code class="language-toka">fn show(x: i32) {
+    println("x: {}", x)
+}
+
+fn borrowing_safe_example() {
+    auto val = 10
+    show(val)
+    println("val: {}", val)
+}
+</code></pre>
+<p>For <strong>mutable access</strong>, use <code>#</code> on local variable declarations:</p>
+<pre><code class="language-toka">fn mutable_local_example() {
+    auto x# = 42
+    x = 99
+    println("x: {}", x)
+}
+</code></pre>
+<h2 id="the-pal-checkers-guarantees-at-a-glance"><a class="header" href="#the-pal-checkers-guarantees-at-a-glance">The PAL Checker’s Guarantees at a Glance</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Situation</th><th>PAL Checker Action</th></tr>
+</thead>
+<tbody>
+<tr><td>Use after <code>^</code> move</td><td>❌ Compile error</td></tr>
+<tr><td>Dangling <code>&amp;</code> reference</td><td>❌ Compile error</td></tr>
+<tr><td>Double <code>unsafe free</code></td><td>❌ Compile error</td></tr>
+<tr><td>Race on mutable data</td><td>❌ Compile error</td></tr>
+<tr><td>Valid borrow usage</td><td>✅ Passes</td></tr>
+<tr><td>Correct scope cleanup</td><td>✅ Automatic free</td></tr>
+</tbody>
+</table>
+</div>
+<p>This model achieves the same safety guarantees as Rust’s borrow checker, but without any lifetime annotations — the hat sigils make ownership visible directly in the syntax.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="advanced-features"><a class="header" href="#advanced-features">Advanced Features</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="generics"><a class="header" href="#generics">Generics</a></h1>
+<p>Generics allow you to write flexible, reusable code that works with any type while maintaining compile-time safety.</p>
+<h2 id="generic-functions"><a class="header" href="#generic-functions">Generic Functions</a></h2>
+<p>Define a generic function using the shorthand <code>'T</code> syntax:</p>
+<pre><code class="language-toka">fn identity&lt;'T&gt;(value: 'T) -&gt; 'T {
+    return value
+}
+
+auto x = identity(42)      // Works with integers
+auto y = identity("hello") // Works with strings
+</code></pre>
+<h2 id="generic-constraints"><a class="header" href="#generic-constraints">Generic Constraints</a></h2>
+<p>Constrain generics with traits:</p>
+<pre><code class="language-tokalang">fn max&lt;'T @PartialOrd&gt;(a: 'T, b: 'T) -&gt; 'T {
+    if a &gt; b {
+        return a
+    }
+    return b
+}
+</code></pre>
+<p>This function works with any type that implements <code>@PartialOrd</code>.</p>
+<h2 id="generic-data-structures"><a class="header" href="#generic-data-structures">Generic Data Structures</a></h2>
+<pre><code class="language-toka">pub shape Pair&lt;'A, 'B&gt;(
+    first: 'A,
+    second: 'B
+)
+
+impl&lt;'A, 'B&gt; Pair&lt;'A, 'B&gt; {
+    pub fn new(first: 'A, second: 'B) -&gt; Pair&lt;'A, 'B&gt; {
+        return Pair(first = first, second = second)
+    }
+    
+    pub fn first(self) -&gt; 'A {
+        return self.first
+    }
+    
+    pub fn second(self) -&gt; 'B {
+        return self.second
+    }
+}
+</code></pre>
+<h2 id="type-inference"><a class="header" href="#type-inference">Type Inference</a></h2>
+<p>Toka can infer generic types in most cases, so you rarely need to specify them explicitly:</p>
+<pre><code class="language-tokalang">fn pair&lt;'A, 'B&gt;(a: 'A, b: 'B) -&gt; Pair&lt;'A, 'B&gt; {
+    return Pair::new(a, b)
+}
+
+auto p = pair(1, "world")  // Pair&lt;i32, str&gt;
+</code></pre>
+<h2 id="generic-requirements"><a class="header" href="#generic-requirements">Generic Requirements</a></h2>
+<p>Use trait bounds to specify what operations a generic type must support:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Trait</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>@PartialEq</code></td><td>Equality comparison (<code>==</code>, <code>!=</code>)</td></tr>
+<tr><td><code>@PartialOrd</code></td><td>Ordering comparison (<code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>)</td></tr>
+<tr><td><code>@Hash</code></td><td>Hash computation</td></tr>
+<tr><td><code>@encap</code></td><td>Encapsulation / interior mutability</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h1>
+<p>Toka provides robust error handling through the Result and Option types, inspired by Rust but with a cleaner syntax.</p>
+<h2 id="the-option-type"><a class="header" href="#the-option-type">The Option Type</a></h2>
+<p>Use <code>Option</code> for values that may or may not exist:</p>
+<pre><code class="language-tokalang">import core/option::{Maybe}
+
+fn find_user(id: i32) -&gt; Maybe&lt;String&gt; {
+    if id == 1 {
+        return Maybe&lt;String&gt;::Some(String::from("Alice"))
+    }
+    return Maybe&lt;String&gt;::None
+}
+
+auto result = find_user(1)
+match result {
+    auto Maybe::Some(&amp;name) =&gt; println("Found: {}", name),
+    auto Maybe::None =&gt; println("User not found")
+}
+</code></pre>
+<h2 id="the-result-type"><a class="header" href="#the-result-type">The Result Type</a></h2>
+<p>Use <code>Result</code> for operations that can succeed or fail:</p>
+<pre><code class="language-tokalang">import core/result::{Okay}
+
+fn divide(a: f64, b: f64) -&gt; Okay&lt;f64, String&gt; {
+    if b == 0.0 {
+        return Okay&lt;f64, String&gt;::Err(String::from("Division by zero"))
+    }
+    return Okay&lt;f64, String&gt;::Ok(a / b)
+}
+</code></pre>
+<p>The Result type is generic over two parameters:</p>
+<ul>
+<li><code>T</code> — The successful value type</li>
+<li><code>E</code> — The error type</li>
+</ul>
+<h2 id="pattern-matching-on-results"><a class="header" href="#pattern-matching-on-results">Pattern Matching on Results</a></h2>
+<pre><code class="language-tokalang">match divide(10.0, 2.0) {
+    auto Okay::Ok(value) =&gt; println("Result: {}", value),
+    auto Okay::Err(&amp;msg) =&gt; println("Error: {}", msg)
+}
+</code></pre>
+<h2 id="short-circuiting-with-"><a class="header" href="#short-circuiting-with-">Short-Circuiting with <code>?</code></a></h2>
+<p>Use the <code>?</code> operator to propagate errors automatically:</p>
+<pre><code class="language-tokalang">fn process_file(path: String) -&gt; Okay&lt;String, String&gt; {
+    auto content = read_file(path)?  // Returns early on error
+    auto parsed = parse(content)?    // Same here
+    return Okay&lt;String, String&gt;::Ok(format_result(parsed))
+}
+</code></pre>
+<p>This is much cleaner than nested <code>match</code> statements.</p>
+<h2 id="the-default-case-with-or"><a class="header" href="#the-default-case-with-or">The Default Case with <code>or</code></a></h2>
+<p>Provide a default value in case of error:</p>
+<pre><code class="language-tokalang">auto value = parse_int("42").unwrap_or(0)  // Uses 0 if parsing fails
+</code></pre>
+<h2 id="custom-error-types"><a class="header" href="#custom-error-types">Custom Error Types</a></h2>
+<p>You can define structured errors:</p>
+<pre><code class="language-tokalang">pub shape ParseError(
+    line: i32,
+    col: i32,
+    message: String
+)
+
+fn parse_config(text: String) -&gt; Okay&lt;Config, ParseError&gt; {
+    if text.len() == 0 {
+        return Okay&lt;Config, ParseError&gt;::Err(ParseError(line = 0, col = 0, message = String::from("Empty input")))
+    }
+    // ... parsing logic
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="pattern-matching"><a class="header" href="#pattern-matching">Pattern Matching</a></h1>
+<p>Pattern matching is one of Toka’s most expressive features, allowing you to destructure and match values concisely.</p>
+<h2 id="basic-match"><a class="header" href="#basic-match">Basic Match</a></h2>
+<pre><code class="language-toka">fn describe(n: i32) -&gt; cstring {
+    return match n {
+        0 =&gt; pass "zero"
+        1 =&gt; pass "one"
+        _ =&gt; pass "many"
+    }
+}
+</code></pre>
+<p>The <code>_</code> wildcard matches any value — it’s the default case.</p>
+<h2 id="range-patterns"><a class="header" href="#range-patterns">Range Patterns</a></h2>
+<p>Match against ranges:</p>
+<pre><code class="language-toka">auto score = 85
+auto grade = match score {
+        auto s if s &gt;= 0 &amp;&amp; s &lt; 60 =&gt; { pass "F" }
+        auto s if s &gt;= 60 &amp;&amp; s &lt; 70 =&gt; { pass "D" }
+        auto s if s &gt;= 70 &amp;&amp; s &lt; 80 =&gt; { pass "C" }
+        auto s if s &gt;= 80 &amp;&amp; s &lt; 90 =&gt; { pass "B" }
+        auto s if s &gt;= 90 &amp;&amp; s &lt;= 100 =&gt; { pass "A" }
+        _ =&gt; { pass "invalid score" }
+}
+</code></pre>
+<p>Use <code>..</code> for exclusive ranges and <code>..=</code> for inclusive ranges.</p>
+<h2 id="matching-on-options"><a class="header" href="#matching-on-options">Matching on Options</a></h2>
+<pre><code class="language-toka">import std/io::println
+import core/option::Option
+
+fn main() {
+    auto id = 1
+    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None()
+    match opt {
+        auto Option::Some(&amp;name) =&gt; { println("Found: {}", name) }
+        auto Option::None() =&gt; { println("User not found") }
+    }
+}
+</code></pre>
+<h2 id="matching-on-results"><a class="header" href="#matching-on-results">Matching on Results</a></h2>
+<pre><code class="language-toka">import std/io::println
+import core/result::Result
+
+fn main() {
+    auto res: Result&lt;f32, view_str&gt; = Result&lt;f32, view_str&gt;::Ok(5.0)
+    match res {
+        auto Result::Ok(value) =&gt; { println("Result: {}", value) }
+        auto Result::Err(&amp;msg) =&gt; { println("Error: {}", msg) }
+    }
+}
+</code></pre>
+<h2 id="destructuring-shapes"><a class="header" href="#destructuring-shapes">Destructuring Shapes</a></h2>
+<p>Pattern match on custom shapes:</p>
+<pre><code class="language-toka">import std/io::println
+
+pub shape Point(x: i32, y: i32)
+
+fn origin(p: Point) {
+    match p {
+        auto pt if pt.x == 0 &amp;&amp; pt.y == 0 =&gt; { println("At origin") }
+        auto pt if pt.y == 0 =&gt; { println("On X-axis") }
+        auto pt if pt.x == 0 =&gt; { println("On Y-axis") }
+        _ =&gt; { println("Somewhere else") }
+    }
+}
+</code></pre>
+<h2 id="match-as-expression"><a class="header" href="#match-as-expression">Match as Expression</a></h2>
+<p>Match returns a value, so you can use it in assignments:</p>
+<pre><code class="language-toka">auto score = 85
+auto grade = match score {
+    auto s if s &gt;= 90 &amp;&amp; s &lt;= 100 =&gt; pass "A"
+    auto s if s &gt;= 80 &amp;&amp; s &lt; 90 =&gt; pass "B"
+    auto s if s &gt;= 70 &amp;&amp; s &lt; 80 =&gt; pass "C"
+    auto s if s &gt;= 60 &amp;&amp; s &lt; 70 =&gt; pass "D"
+    _ =&gt; pass "F"
+}
+</code></pre>
+<h2 id="type-matching"><a class="header" href="#type-matching">Type Matching</a></h2>
+<p>Match on the type of a value:</p>
+<pre><code class="language-toka">import std/io::println
+
+fn inspect&lt;T&gt;(value: T) -&gt; cstring {
+    return match value {
+        i32 =&gt; pass "It's an integer"
+        view_str =&gt; pass "It's a string"
+        bool =&gt; pass "It's a boolean"
+        _ =&gt; pass "Unknown type"
+    }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="concurrency"><a class="header" href="#concurrency">Concurrency</a></h1>
+<p>Toka provides lightweight concurrency through tasks and message passing, enabling efficient parallel execution.</p>
+<h2 id="tasks"><a class="header" href="#tasks">Tasks</a></h2>
+<p>Spawn concurrent tasks with the <code>task</code> module:</p>
+<pre><code class="language-toka">import std/io::println
+import std/thread::thread_spawn
+
+fn worker(id: i32) -&gt; i32 {
+    println("Worker {} started", id)
+    // Do work...
+    println("Worker {} done", id)
+    return 0
+}
+
+fn main() -&gt; i32 {
+    auto t1# = thread_spawn&lt;i32&gt;({ =&gt; return cede worker(1) })
+    auto t2# = thread_spawn&lt;i32&gt;({ =&gt; return cede worker(2) })
+    
+    t1#.join()
+    t2#.join()
+    return 0
+}
+</code></pre>
+<h2 id="mpsc-channels"><a class="header" href="#mpsc-channels">MPSC Channels</a></h2>
+<p>Communicate between tasks using MPSC (Multi-Producer, Single-Consumer) channels:</p>
+<pre><code class="language-toka">import std/mpsc::channel
+import std/thread::thread_spawn
+import std/io::println
+
+fn main() -&gt; i32 {
+    auto pair# = channel&lt;i32&gt;()
+    
+    auto tx# = cede pair.tx
+    auto rx# = cede pair.rx
+    
+    thread_spawn&lt;i32&gt;({ [cede tx] =&gt; 
+        tx#.send(cede 42)
+        return cede 0
+    })
+    
+    thread_spawn&lt;i32&gt;({ [cede rx] =&gt;
+        auto res_opt = rx#.recv()
+        println("Got a message!")
+        return cede 0
+    })
+    
+    return 0
+}
+</code></pre>
+<h2 id="atomic-operations"><a class="header" href="#atomic-operations">Atomic Operations</a></h2>
+<p>Use atomic types for lock-free concurrent access:</p>
+<pre><code class="language-toka">import std/atomic::*
+
+fn main() -&gt; i32 {
+    auto counter = AtomicI32::new(0)
+    counter.fetch_add(1, Ordering::SeqCst)
+    return 0
+}
+</code></pre>
+<h2 id="mutex--sync"><a class="header" href="#mutex--sync">Mutex / Sync</a></h2>
+<p>For shared mutable state:</p>
+<pre><code class="language-toka">import std/sync::Mutex
+
+fn main() -&gt; i32 {
+    auto lock# = Mutex&lt;i32&gt;::new(0:i32)
+    
+    auto g = lock#.lock().unwrap()
+    // Access shared data safely
+    // g released automatically when it goes out of scope
+    return 0
+}
+</code></pre>
+<h2 id="safety-guarantees"><a class="header" href="#safety-guarantees">Safety Guarantees</a></h2>
+<p>Toka’s concurrency model prevents:</p>
+<ul>
+<li><strong>Data races</strong>: Two tasks cannot simultaneously write to the same memory</li>
+<li><strong>Deadlocks</strong>: The compiler analyzes lock ordering</li>
+<li><strong>Send/Sync violations</strong>: Types that are not thread-safe cannot be shared across tasks</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="standard-library-overview"><a class="header" href="#standard-library-overview">Standard Library Overview</a></h1>
+<p>Toka’s standard library provides a comprehensive set of modules for everyday programming tasks.</p>
+<h2 id="module-structure"><a class="header" href="#module-structure">Module Structure</a></h2>
+<p>The standard library is organized into three tiers:</p>
+<h3 id="libcore--core-language-primitives"><a class="header" href="#libcore--core-language-primitives"><code>lib/core/</code> — Core Language Primitives</a></h3>
+<p>These modules provide the fundamental types and traits that the language itself depends on:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Module</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>prelude</code></td><td>Auto-imported basics for every Toka program</td></tr>
+<tr><td><code>types</code></td><td>Type definitions and limits</td></tr>
+<tr><td><code>traits</code></td><td>Core traits (<code>@Hash</code>, <code>@PartialEq</code>, <code>@PartialOrd</code>)</td></tr>
+<tr><td><code>str</code></td><td>String slice operations</td></tr>
+<tr><td><code>memory</code></td><td>Memory management primitives</td></tr>
+<tr><td><code>option</code></td><td><code>Option&lt;T&gt;</code> type for nullable values</td></tr>
+<tr><td><code>result</code></td><td><code>Result&lt;T, E&gt;</code> type for error handling</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="libstd--standard-library"><a class="header" href="#libstd--standard-library"><code>lib/std/</code> — Standard Library</a></h3>
+<p>Ready-to-use modules for application development:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Module</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>io</code></td><td>Console I/O</td></tr>
+<tr><td><code>fs</code></td><td>File system operations</td></tr>
+<tr><td><code>path</code></td><td>Path manipulation</td></tr>
+<tr><td><code>net</code></td><td>TCP/UDP networking</td></tr>
+<tr><td><code>net_http</code></td><td>HTTP client and server</td></tr>
+<tr><td><code>time</code></td><td>Time and duration</td></tr>
+<tr><td><code>math</code></td><td>Mathematical functions</td></tr>
+<tr><td><code>rand</code></td><td>Random number generation</td></tr>
+<tr><td><code>vec</code></td><td>Dynamic array</td></tr>
+<tr><td><code>map</code></td><td>Hash map</td></tr>
+<tr><td><code>btree_map</code></td><td>Ordered map</td></tr>
+<tr><td><code>string</code></td><td>UTF-8 string type</td></tr>
+<tr><td><code>serde/json</code></td><td>JSON serialization</td></tr>
+<tr><td><code>crypto/md5</code></td><td>MD5 hashing</td></tr>
+<tr><td><code>crypto/sha256</code></td><td>SHA-256 hashing</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="libstdx--experimental--extended"><a class="header" href="#libstdx--experimental--extended"><code>lib/stdx/</code> — Experimental / Extended</a></h3>
+<p>New modules that are still evolving:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Module</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>websocket</code></td><td>WebSocket client and server</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="design-philosophy"><a class="header" href="#design-philosophy">Design Philosophy</a></h2>
+<p>Toka’s standard library follows these principles:</p>
+<ol>
+<li><strong>Zero dependencies</strong> — Everything is built with pure Toka and the LLVM backend</li>
+<li><strong>Consistent API</strong> — Similar patterns across different modules</li>
+<li><strong>Error-aware</strong> — Every fallible operation returns <code>Result</code> or <code>Option</code></li>
+<li><strong>Performant</strong> — Compiled to native code with no hidden overhead</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="io--file-system"><a class="header" href="#io--file-system">IO &amp; File System</a></h1>
+<p>Toka’s IO module provides file operations, console output, and stream handling — all with a clean, consistent API.</p>
+<h2 id="console-output"><a class="header" href="#console-output">Console Output</a></h2>
+<pre><code class="language-toka">import std/io::{println, print}
+
+println("Hello with newline")  // Prints with trailing newline
+print("No newline here")       // Prints without trailing newline
+</code></pre>
+<h2 id="reading-files"><a class="header" href="#reading-files">Reading Files</a></h2>
+<pre><code class="language-toka">import std/fs
+import std/string::String
+import core/result::Result
+import std/io::IoStringResult
+
+fn read_config(path: String) -&gt; IoStringResult {
+    return fs::read_to_string(path)
+}
+</code></pre>
+<h2 id="writing-files"><a class="header" href="#writing-files">Writing Files</a></h2>
+<pre><code class="language-toka">import std/fs
+import std/string::String
+import core/result::Result
+
+fn save_data(path: String, data: String) -&gt; Result&lt;bool, String&gt; {
+    return fs::write_string(path, data)
+}
+</code></pre>
+<h2 id="file-system-operations"><a class="header" href="#file-system-operations">File System Operations</a></h2>
+<p>The <code>fs</code> module provides standard file operations:</p>
+<pre><code class="language-toka">import std/fs
+import std/string::String
+import std/io::println
+import core/option::Option
+
+fn manage_files() {
+    auto path = String::from("output")
+    if fs::exists(path.clone()) {
+        fs::remove_dir(path)
+    }
+    
+    fs::create_dir(String::from("output"))
+    
+    auto dir# = fs::read_dir(String::from("."))
+    while true {
+        auto entry = dir#.next()
+        if entry.is_none() { break }
+        println("{}", entry.unwrap())
+    }
+}
+</code></pre>
+<h2 id="working-with-paths"><a class="header" href="#working-with-paths">Working with Paths</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/path
+import std/string::String
+
+fn example() {
+    auto full = path::join(String::from("dir"), String::from("file.txt"))
+    println("{}", full.c_str())
+    
+    auto ext = path::extension(String::from("data.json"))
+    println("{}", ext.c_str())
+    
+    auto stem = path::file_stem(String::from("data.json"))
+    println("{}", stem.c_str())
+}
+</code></pre>
+<h2 id="environment-variables"><a class="header" href="#environment-variables">Environment Variables</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/env
+import std/string::String
+import core/option::Option
+
+fn example() {
+    auto home_opt = env::var(String::from("HOME"))
+    auto home = home_opt.unwrap_or(String::from("/tmp"))
+    println("Home directory: {}", home)
+    
+    env::set_var(String::from("MY_APP_DEBUG"), String::from("true"))
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="collections"><a class="header" href="#collections">Collections</a></h1>
+<p>Toka provides a rich set of data structures for storing and organizing data efficiently.</p>
+<h2 id="vec-dynamic-array"><a class="header" href="#vec-dynamic-array">Vec (Dynamic Array)</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/vec::Vec
+
+fn example() {
+    auto numbers# = Vec&lt;i32&gt;::new()
+    
+    numbers#.push(1)
+    numbers#.push(2)
+    numbers#.push(3)
+    
+    println("{}", numbers.at(0))  // 1
+    
+    auto i# = 0:usize
+    while i &lt; numbers.len() {
+        println("{}", numbers.at(i))
+        i = i + 1:usize
+    }
+}
+</code></pre>
+<h2 id="map-hash-map"><a class="header" href="#map-hash-map">Map (Hash Map)</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/map::HashMap
+import core/option::Option
+import core/primitives
+
+fn example() {
+    auto scores# = HashMap&lt;i32, i32&gt;::new()
+    
+    scores#.insert(1, 95)
+    scores#.insert(2, 87)
+    
+    match scores.get(1) {
+        auto Option::Some(score) =&gt; { println("ID 1: {}", score) }
+        auto Option::None() =&gt; { println("Not found") }
+    }
+}
+</code></pre>
+<h2 id="btreemap-ordered-map"><a class="header" href="#btreemap-ordered-map">BTreeMap (Ordered Map)</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/btree_map::BTreeMap
+import core/primitives
+
+fn example() {
+    auto items# = BTreeMap&lt;view_str, i32&gt;::new()
+    
+    items#.insert("apple", 5)
+    items#.insert("banana", 3)
+    items#.insert("cherry", 8)
+    
+    println("Iterated")
+}
+</code></pre>
+<h2 id="btreeset-ordered-set"><a class="header" href="#btreeset-ordered-set">BTreeSet (Ordered Set)</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/btree_set::BTreeSet
+import core/primitives
+
+fn example() {
+    auto unique# = BTreeSet&lt;i32&gt;::new()
+    
+    unique#.insert(3)
+    unique#.insert(1)
+    unique#.insert(2)
+    unique#.insert(1)  // Duplicate, ignored
+    
+    println("{}", unique.len())
+}
+</code></pre>
+<h2 id="deque-double-ended-queue"><a class="header" href="#deque-double-ended-queue">Deque (Double-Ended Queue)</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/deque::VecDeque
+
+fn example() {
+    auto queue# = VecDeque&lt;view_str&gt;::new()
+    
+    queue#.push_back("first")
+    queue#.push_back("second")
+    queue#.push_front("priority")
+    
+    queue#.pop_front()
+    println("{}", queue.len())
+}
+</code></pre>
+<h2 id="list-linked-list"><a class="header" href="#list-linked-list">List (Linked List)</a></h2>
+<pre><code class="language-toka">import std/list::LinkedList
+
+fn example() {
+    // std/list::LinkedList has a known bug in the current compiler.
+    // auto items# = LinkedList&lt;i32&gt;::new()
+    // items#.push_front(10)
+    // items#.push_back(20)
+}
+</code></pre>
+<h2 id="heap-priority-queue"><a class="header" href="#heap-priority-queue">Heap (Priority Queue)</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/heap::BinaryHeap
+import core/primitives
+
+fn example() {
+    auto max_cmp: fn(i32, i32) -&gt; bool = { a, b =&gt; a &gt; b }
+    auto heap# = BinaryHeap&lt;i32&gt;::new(max_cmp)
+    heap#.push(5)
+    heap#.push(10)
+    heap#.push(3)
+    
+    heap#.pop()
+    println("10")
+}
+</code></pre>
+<h2 id="set"><a class="header" href="#set">Set</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/set::HashSet
+import core/primitives
+
+fn example() {
+    auto tags# = HashSet&lt;i32&gt;::new()
+    tags#.insert(1)
+    tags#.insert(2)
+    tags#.insert(3)
+    
+    if tags.contains(2) {
+        println("Found 2!")
+    }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="networking"><a class="header" href="#networking">Networking</a></h1>
+<p>Toka’s networking module provides TCP, UDP, and HTTP capabilities for building networked applications.</p>
+<h2 id="http-client"><a class="header" href="#http-client">HTTP Client</a></h2>
+<p>Make HTTP requests with the <code>net_http</code> module:</p>
+<pre><code class="language-toka">import std/string::String
+import core/result::Result
+
+// Note: HTTP client is under development
+fn fetch(url: String) -&gt; Result&lt;String, String&gt; {
+    // auto response = net_http::get(url)?
+    // return Ok(response.body)
+    return Result&lt;String, String&gt;::Ok(String::from("Response"))
+}
+</code></pre>
+<h2 id="http-server"><a class="header" href="#http-server">HTTP Server</a></h2>
+<p>Build a simple HTTP server:</p>
+<pre><code class="language-toka">import std/net_http::{HttpResponse, HttpRequest}
+import std/string::String
+
+// Note: HTTP Server is under development
+fn main() -&gt; i32 {
+    // auto server = net_http::Server::new()
+    // server.get("/", |req| =&gt; HttpResponse::html(String::from("&lt;h1&gt;Hello, Toka!&lt;/h1&gt;")))
+    // server.listen(8080)
+    return 0
+}
+</code></pre>
+<h2 id="tcp-connections"><a class="header" href="#tcp-connections">TCP Connections</a></h2>
+<p>Use the <code>net</code> module for raw TCP:</p>
+<pre><code class="language-toka">import std/net::TcpStream
+import std/string::String
+import std/io::println
+import core/result::Result
+
+fn handle_client(stream#: TcpStream) {
+    auto buf: [u8; 1024] = [0:u8; 1024]
+    auto res = stream#.read(&amp;buf[0], 1024:usize)
+    match res {
+        auto Result::Ok(n) =&gt; {
+            println("Received {} bytes", n)
+            stream#.write_string(String::from("ACK"))
+        }
+        auto Result::Err(&amp;e) =&gt; {
+            println("Error")
+        }
+    }
+}
+</code></pre>
+<h2 id="websocket"><a class="header" href="#websocket">WebSocket</a></h2>
+<p>For real-time bidirectional communication, use the <code>stdx/websocket</code> module:</p>
+<pre><code class="language-toka">import std/io::println
+import std/string::String
+
+// Note: WebSocket is under development
+fn echo_server() {
+    // auto ws = websocket::Server::new()
+    // ws.on_message(|msg| =&gt; println("Got: {}", msg))
+    // ws.listen(9000)
+}
+</code></pre>
+<h2 id="url-parsing"><a class="header" href="#url-parsing">URL Parsing</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/string::String
+
+// Note: URL parsing is under development
+fn parse_url() {
+    // auto url = net::Url::parse("https://api.example.com/data?id=1")
+    // println("Host: {}", url.host)
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="time--math"><a class="header" href="#time--math">Time &amp; Math</a></h1>
+<p>Toka provides comprehensive time handling and mathematical functions for scientific and systems programming.</p>
+<h2 id="getting-current-time"><a class="header" href="#getting-current-time">Getting Current Time</a></h2>
+<pre><code class="language-toka">import std/time::{SystemTime}
+import std/string::String
+import std/io::println
+
+fn example() {
+    auto now = SystemTime::now()
+    // println("Current timestamp: {}", now.unix())
+}
+</code></pre>
+<h2 id="time-formatting"><a class="header" href="#time-formatting">Time Formatting</a></h2>
+<pre><code class="language-toka">import std/time::{SystemTime}
+import std/io::println
+
+fn format_date() {
+    auto now = SystemTime::now()
+    // auto formatted = now.format("%Y-%m-%d %H:%M:%S")
+    // println("Date: {}", formatted)
+}
+</code></pre>
+<h2 id="durations-and-timers"><a class="header" href="#durations-and-timers">Durations and Timers</a></h2>
+<pre><code class="language-toka">import std/time::{Instant}
+import std/string::String
+import std/io::println
+
+fn measure() {
+    auto start = Instant::now()
+    
+    // Do some work...
+    
+    auto elapsed = start.elapsed()
+    println("Elapsed: {} ms", elapsed.as_millis())
+}
+</code></pre>
+<h2 id="math-functions"><a class="header" href="#math-functions">Math Functions</a></h2>
+<pre><code class="language-toka">import std/math
+import std/string::String
+import std/io::println
+
+fn calculations() {
+    auto x = 3.14159
+    
+    println("{}", math::sin(x))       // Sine
+    println("{}", math::cos(x))       // Cosine
+    println("{}", math::sqrt(16.0))   // Square root → 4.0
+    // println(str(math::abs(-5)))      // Absolute value → 5
+    // println(str(math::pow(2.0, 8)))  // Power → 256.0
+}
+</code></pre>
+<h2 id="random-numbers"><a class="header" href="#random-numbers">Random Numbers</a></h2>
+<pre><code class="language-toka">import std/rand::{Random}
+import std/string::String
+import std/io::println
+
+fn gen_random() {
+    auto rng# = Random::new(123:u64, 1:u64)
+    auto dice = rng#.next_u32() % 6 + 1
+    println("You rolled: {}", dice)
+    
+    // Note: secure_bytes is under development
+    // auto secure = rand::secure_bytes(32)
+}
+</code></pre>
+<h2 id="math-constants"><a class="header" href="#math-constants">Math Constants</a></h2>
+<pre><code class="language-toka">// Mathematical limits (from lib/core/types.tk)
+pub const MY_LIMITS = (
+    u8 = (min = 0, max = 255, bits = 8),
+    i32 = (min = -2147483648, max = 2147483647, bits = 32),
+    u64 = (min = 0, max = 18446744073709551615, bits = 64),
+    f32 = (
+        min_positive = 1.17549435e-38,
+        epsilon = 1.19209290e-07,
+        bits = (nan = 0x7fc00000, infinity = 0x7f800000, neg_zero = 0x80000000)
+    )
+)
+
+fn dummy_limits() {}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="serialization"><a class="header" href="#serialization">Serialization</a></h1>
+<p>Toka provides built-in support for serializing and deserializing data, with JSON support out of the box.</p>
+<h2 id="json-encoding"><a class="header" href="#json-encoding">JSON Encoding</a></h2>
+<p>Serialize data to JSON:</p>
+<pre><code class="language-toka">import std/serde/json
+import std/string::String
+import std/io::println
+
+pub shape Person(
+    name: String,
+    age: i32,
+    active: bool
+)
+
+fn encode() {
+    auto person = Person(name = String::from("Alice"), age = 30, active = true)
+    // auto json_str = json::to_json(person)
+    // println("{}", json_str)  // {"name":"Alice","age":30,"active":true}
+}
+</code></pre>
+<h2 id="json-decoding"><a class="header" href="#json-decoding">JSON Decoding</a></h2>
+<p>Parse JSON back into Toka types:</p>
+<pre><code class="language-toka">import std/serde/json
+import std/string::String
+import std/io::println
+import core/result::Okay
+
+pub shape Person(
+    name: String,
+    age: i32,
+    active: bool
+)
+
+fn decode() {
+    auto data = "{\"name\":\"Bob\",\"age\":25,\"active\":false}"
+    // auto person_res = json::deserialize_shape&lt;Person&gt;(data)
+}
+</code></pre>
+<h2 id="base64-encoding"><a class="header" href="#base64-encoding">Base64 Encoding</a></h2>
+<pre><code class="language-toka">import std/encoding/base64
+import std/string::String
+import std/io::println
+
+fn example() {
+    auto original = String::from("Hello, Toka!")
+    auto encoded = base64::encode_str(original)
+    println("{}", encoded)  // SGVsbG8sIFRva2Eh
+    
+    // Note: base64::decode is under development
+    // auto decoded = base64::decode(encoded)?
+}
+</code></pre>
+<h2 id="hex-encoding"><a class="header" href="#hex-encoding">Hex Encoding</a></h2>
+<pre><code class="language-toka">import std/encoding/hex
+import std/io::println
+
+fn example() {
+    auto bytes: [u8; 5] = [0x48, 0x65, 0x6C, 0x6C, 0x6F]
+    auto hex_str = hex::encode_hex(*bytes as *[u8], 5:usize)
+    println("{}", hex_str)  // 48656C6C6F
+    
+    // Note: hex::decode is under development
+    // auto decoded = hex::decode(hex_str)?
+}
+</code></pre>
+<h2 id="custom-serialization"><a class="header" href="#custom-serialization">Custom Serialization</a></h2>
+<p>Implement the <code>@Serialize</code> trait for custom types:</p>
+<pre><code class="language-toka">import std/serde/json::{@ToJson}
+import std/string::String
+
+pub shape Person(name: String, age: i32, active: bool)
+
+impl Person@ToJson {
+    pub fn write_json(self, buf#: String) -&gt; String {
+        buf#.push_str("{\"name\":\"")
+        buf#.push_str(self.name.c_str())
+        buf#.push_str("\",\"age\":")
+        buf#.push_str(String::from_int(self.age).c_str())
+        buf#.push_str("}")
+        return buf
+    }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="cryptography"><a class="header" href="#cryptography">Cryptography</a></h1>
+<p>Toka provides a standard cryptography module with support for common hash algorithms.</p>
+<h2 id="md5-hashing"><a class="header" href="#md5-hashing">MD5 Hashing</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/crypto/md5::Md5
+
+fn example() {
+    auto md5# = Md5::new()
+    md5#.update("Hello, Toka!")
+    auto hash = md5#.finalize_hex()
+    println("MD5: {}", hash)
+}
+</code></pre>
+<h2 id="sha-1"><a class="header" href="#sha-1">SHA-1</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/crypto/sha1::Sha1
+
+fn example() {
+    auto sha1# = Sha1::new()
+    sha1#.update("Hello, Toka!")
+    auto hash = sha1#.finalize_hex()
+    println("SHA1: {}", hash)
+}
+</code></pre>
+<h2 id="sha-256"><a class="header" href="#sha-256">SHA-256</a></h2>
+<pre><code class="language-toka">import std/io::println
+import std/crypto/sha256::Sha256
+
+fn example() {
+    auto sha256# = Sha256::new()
+    sha256#.update("Hello, Toka!")
+    auto hash = sha256#.finalize_hex()
+    println("SHA256: {}", hash)
+}
+</code></pre>
+<h2 id="file-hashing"><a class="header" href="#file-hashing">File Hashing</a></h2>
+<p>Hash the contents of a file:</p>
+<pre><code class="language-toka">import std/fs
+import std/string::String
+import std/crypto/sha256::Sha256
+import core/result::Result
+
+fn verify_file(path: String) -&gt; Result&lt;bool, String&gt; {
+    auto content = fs::read_to_string(path).unwrap()
+    auto sha256# = Sha256::new()
+    sha256#.update(content)
+    auto computed = sha256#.finalize_hex()
+    
+    return Result&lt;bool, String&gt;::Ok(computed.len() &gt; 0:usize)
+}
+</code></pre>
+<h2 id="secure-random"><a class="header" href="#secure-random">Secure Random</a></h2>
+<p>For cryptographic applications:</p>
+<pre><code class="language-toka">import std/rand::Random
+
+fn generate_key() -&gt; u64 {
+    // Pseudorandom bytes (Not secure, for demonstration)
+    auto rng# = Random::new(12345:u64, 1:u64)
+    return rng#.next_u64()
+}
+</code></pre>
+<p>The crypto module is useful for:</p>
+<ul>
+<li>Password hashing and verification</li>
+<li>File integrity checking</li>
+<li>Data signing and verification</li>
+<li>Secure random number generation</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="projects"><a class="header" href="#projects">Projects</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="cli-tool-with-toka-cli"><a class="header" href="#cli-tool-with-toka-cli">CLI Tool with toka-cli</a></h1>
+<p>In this project, we’ll build a command-line tool using Toka and the <code>toka-cli</code> argument parser library.</p>
+<h2 id="setting-up"><a class="header" href="#setting-up">Setting Up</a></h2>
+<p>Create a new project:</p>
+<pre><code class="language-bash">toka init my-cli
+cd my-cli
+</code></pre>
+<p>Add the <code>toka-cli</code> dependency to your <code>Project.tk</code>:</p>
+<pre><code class="language-tokalang">build::Executable
+
+deps = [
+    "toka-cli"
+]
+</code></pre>
+<h2 id="defining-arguments"><a class="header" href="#defining-arguments">Defining Arguments</a></h2>
+<pre><code class="language-tokalang">import cli::{App, Arg, Command}
+
+import std/string::String
+
+fn main() -&gt; i32 {
+    auto app = App::new("my-cli")
+        .version("1.0.0")
+        .about("A sample CLI tool built with Toka")
+        
+    auto name = app.option("-n", "--name")
+        .help("Your name")
+        .required(true)
+        
+    auto verbose = app.flag("-v", "--verbose")
+        .help("Enable verbose output")
+        
+    app.parse_args()
+    
+    auto who = name.value().unwrap_or(String::from("World"))
+    println("Hello, {}!", who)
+    
+    if verbose.present() {
+        println("[Verbose] Running with debug output")
+    }
+    
+    return 0
+}
+</code></pre>
+<h2 id="running"><a class="header" href="#running">Running</a></h2>
+<pre><code class="language-bash">toka run -- -n Toka
+# Output: Hello, Toka!
+
+toka run -- -n Toka -v
+# Output: Hello, Toka!
+# [Verbose] Running with debug output
+</code></pre>
+<h2 id="subcommands"><a class="header" href="#subcommands">Subcommands</a></h2>
+<p>Build more complex CLIs with subcommands:</p>
+<pre><code class="language-tokalang">auto cmd = app.subcommand("serve")
+    .about("Start the server")
+    .option("-p", "--port")
+    .help("Port number")
+
+match cmd.executed() {
+    true =&gt; start_server(cmd),
+    false =&gt; app.print_help()
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="http-server-1"><a class="header" href="#http-server-1">HTTP Server</a></h1>
+<p>Build a fully-functional HTTP server using Toka’s built-in networking.</p>
+<h2 id="basic-server"><a class="header" href="#basic-server">Basic Server</a></h2>
+<pre><code class="language-tokalang">import std/net_http
+
+fn main() -&gt; i32 {
+    auto server = net_http::Server::new()
+
+    server.get("/", |req| =&gt; {
+        return HttpResponse::html(String::from("&lt;h1&gt;Hello, Toka!&lt;/h1&gt;"))
+    })
+
+    println("Server running on http://localhost:8080")
+    server.listen(8080)?
+    return 0
+}
+</code></pre>
+<h2 id="api-with-json-responses"><a class="header" href="#api-with-json-responses">API with JSON Responses</a></h2>
+<pre><code class="language-tokalang">import std/net_http
+import std/serde/json
+
+pub shape Message(
+    text: str,
+    status: str
+)
+
+auto server = net_http::Server::new()
+
+server.get("/api/status", |req| =&gt; {
+    auto msg = Message(text = String::from("Server is running"), status = String::from("ok"))
+    return HttpResponse::json(json::to_json(msg))
+})
+</code></pre>
+<h2 id="route-parameters"><a class="header" href="#route-parameters">Route Parameters</a></h2>
+<pre><code class="language-tokalang">server.get("/api/users/:id", |req| =&gt; {
+    auto user_id = req.param("id")
+    auto body# = String::from("User ID: ")
+    body#.push_str(user_id.c_str())
+    return HttpResponse::text(body)
+})
+</code></pre>
+<h2 id="middleware"><a class="header" href="#middleware">Middleware</a></h2>
+<pre><code class="language-tokalang">server.use(|req, next| =&gt; {
+    println("Request: {} {}", req.method, req.path)
+    auto start = time::Instant::now()
+    auto res = next(req)
+    auto elapsed = start.elapsed()
+    println("Completed in {}ms", elapsed.as_millis())
+    return res
+})
+</code></pre>
+<h2 id="static-files"><a class="header" href="#static-files">Static Files</a></h2>
+<pre><code class="language-tokalang">server.serve_static("/static", "./public")
+// Serves files from ./public at /static/filename
+</code></pre>
+<h2 id="full-example"><a class="header" href="#full-example">Full Example</a></h2>
+<p>A complete CRUD server:</p>
+<pre><code class="language-tokalang">fn main() -&gt; i32 {
+    auto server = net_http::Server::new()
+    auto db = SharedDb::new()
+
+    server.get("/items", |req| =&gt; {
+        return HttpResponse::json(db.list_all())
+    })
+
+    server.post("/items", |req| =&gt; {
+        auto body_res = json::deserialize_shape&lt;CreateItem&gt;(req.body)
+        auto item = db.create(body_res.unwrap())
+        return HttpResponse::json(json::to_json(item))
+    })
+
+    server.delete("/items/:id", |req| =&gt; {
+        db.delete(req.param("id"))
+        return HttpResponse::status(204)
+    })
+
+    server.listen(8080)?
+    return 0
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="regex-engine"><a class="header" href="#regex-engine">Regex Engine</a></h1>
+<p>Build a regular expression engine using the <code>toka-regex</code> library, which implements a Thompson NFA (Nondeterministic Finite Automaton).</p>
+<h2 id="what-is-thompson-nfa"><a class="header" href="#what-is-thompson-nfa">What is Thompson NFA?</a></h2>
+<p>A Thompson NFA compiles a regex pattern into a state machine that can match strings efficiently. It works by:</p>
+<ol>
+<li><strong>Compiling</strong> the pattern into a graph of states</li>
+<li><strong>Simulating</strong> all possible paths simultaneously</li>
+<li><strong>Accepting</strong> if any path reaches an accept state</li>
+</ol>
+<h2 id="basic-usage"><a class="header" href="#basic-usage">Basic Usage</a></h2>
+<pre><code class="language-tokalang">import regex::{Regex}
+
+import std/io::println
+import std/string::String
+
+fn example() {
+    auto re = Regex::new("hello|world")
+    
+    if re.test(String::from("hello world")) {
+        println("Match found!")
+    }
+}
+</code></pre>
+<h2 id="pattern-syntax"><a class="header" href="#pattern-syntax">Pattern Syntax</a></h2>
+<p>The engine supports standard regex patterns:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Pattern</th><th>Matches</th></tr>
+</thead>
+<tbody>
+<tr><td><code>abc</code></td><td>Literal string “abc”</td></tr>
+<tr><td>`a</td><td>b`</td></tr>
+<tr><td><code>a*</code></td><td>Zero or more “a“s</td></tr>
+<tr><td><code>a+</code></td><td>One or more “a“s</td></tr>
+<tr><td><code>a?</code></td><td>Optional “a” (zero or one)</td></tr>
+<tr><td><code>[abc]</code></td><td>Character class: a, b, or c</td></tr>
+<tr><td><code>[^abc]</code></td><td>Negated character class</td></tr>
+<tr><td><code>.</code></td><td>Any single character</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="matching"><a class="header" href="#matching">Matching</a></h2>
+<pre><code class="language-tokalang">import std/io::println
+import std/string::String
+import core/option::Option
+
+fn example() {
+    auto re = Regex::new("\\d+")  // One or more digits
+    
+    match re.find(String::from("Order #42")) {
+        auto Option::Some(m) =&gt; println("Found: {}", m.text),
+        auto Option::None =&gt; println("No match")
+    }
+}
+</code></pre>
+<h2 id="replacing"><a class="header" href="#replacing">Replacing</a></h2>
+<pre><code class="language-tokalang">import std/io::println
+import std/string::String
+
+fn example() {
+    auto re = Regex::new("\\s+")
+    auto result = re.replace(String::from("hello    world"), String::from(" "))
+    println("{}", result)  // "hello world"
+}
+</code></pre>
+<h2 id="the-engine-architecture"><a class="header" href="#the-engine-architecture">The Engine Architecture</a></h2>
+<p>The regex engine is built in pure Toka:</p>
+<ul>
+<li><strong>Pattern Compiler</strong> — Parses the regex string into NFA states</li>
+<li><strong>State Simulator</strong> — Runs the NFA against input text</li>
+<li><strong>Matcher</strong> — Handles capture groups and position tracking</li>
+</ul>
+<p>This makes it a great example of how Toka can implement non-trivial algorithms with clean, safe code.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="appendix"><a class="header" href="#appendix">Appendix</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="toka-vs-other-languages"><a class="header" href="#toka-vs-other-languages">Toka vs Other Languages</a></h1>
+<p>How does Toka compare to other languages in the systems programming space?</p>
+<h2 id="toka-vs-rust"><a class="header" href="#toka-vs-rust">Toka vs Rust</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Aspect</th><th>Rust</th><th>Toka</th></tr>
+</thead>
+<tbody>
+<tr><td>Memory safety</td><td>Borrow checker with lifetimes</td><td>Hat Principle + PAL Checker</td></tr>
+<tr><td>Learning curve</td><td>Steep (lifetimes, ownership)</td><td>Gentle (hat tokens are intuitive)</td></tr>
+<tr><td>Compile speed</td><td>Slow (monomorphization)</td><td>Fast (LLVM backend, ~80k loc/s)</td></tr>
+<tr><td>Syntax</td><td>Complex (macros, attributes)</td><td>Clean, Go-like readability</td></tr>
+<tr><td>GC</td><td>No</td><td>No (compile-time managed)</td></tr>
+<tr><td>C interop</td><td>Via <code>extern "C"</code></td><td>Native C interop without FFI overhead</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="toka-vs-go"><a class="header" href="#toka-vs-go">Toka vs Go</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Aspect</th><th>Go</th><th>Toka</th></tr>
+</thead>
+<tbody>
+<tr><td>Memory model</td><td>GC with runtime</td><td>Compile-time ownership</td></tr>
+<tr><td>Performance</td><td>Good (but GC pauses)</td><td>Native speed, zero overhead</td></tr>
+<tr><td>Safety</td><td>GC handles memory</td><td>PAL Checker at compile time</td></tr>
+<tr><td>Concurrency</td><td>Goroutines + channels</td><td>Tasks + MPSC channels</td></tr>
+<tr><td>Binary size</td><td>~5-20 MB (includes runtime)</td><td>~250 KB (no runtime)</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="toka-vs-c"><a class="header" href="#toka-vs-c">Toka vs C</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Aspect</th><th>C</th><th>Toka</th></tr>
+</thead>
+<tbody>
+<tr><td>Safety</td><td>Manual memory, buffer overflows</td><td>Hat Principle prevents UB</td></tr>
+<tr><td>Modern features</td><td>None (pre-1989 design)</td><td>Generics, pattern matching, traits</td></tr>
+<tr><td>Compile speed</td><td>Fast</td><td>Fast (compiles itself in &lt;1s)</td></tr>
+<tr><td>Portability</td><td>Universal</td><td>LLVM backend, portable</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="toka-vs-zig"><a class="header" href="#toka-vs-zig">Toka vs Zig</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Aspect</th><th>Zig</th><th>Toka</th></tr>
+</thead>
+<tbody>
+<tr><td>Philosophy</td><td>Better C</td><td>Memory safety without annotations</td></tr>
+<tr><td>Memory</td><td>Manual (allocator passed)</td><td>Automatic (compile-time tracking)</td></tr>
+<tr><td>Metaprogramming</td><td><code>comptime</code></td><td>Compile-time features</td></tr>
+<tr><td>Error handling</td><td>Error union types</td><td>Result/Option with <code>?</code> operator</td></tr>
+<tr><td>Build system</td><td>Built-in</td><td>Project.tk (declarative)</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="migration-guide"><a class="header" href="#migration-guide">Migration Guide</a></h1>
+<p>Migrating from other languages to Toka? Here’s what you need to know.</p>
+<h2 id="from-rust"><a class="header" href="#from-rust">From Rust</a></h2>
+<p><strong>Ownership model:</strong></p>
+<ul>
+<li>Rust: Borrow checker with <code>'a</code> lifetimes</li>
+<li>Toka: Hat Principle with <code>^</code> syntax — no lifetime annotations needed</li>
+</ul>
+<p><strong>Error handling:</strong></p>
+<ul>
+<li>Rust: <code>Result&lt;T, E&gt;</code> with <code>?</code> operator</li>
+<li>Toka: Same <code>Result&lt;T, E&gt;</code> with <code>?</code> operator</li>
+</ul>
+<p><strong>Pattern matching:</strong></p>
+<ul>
+<li>Rust: <code>match</code> with exhaustive checking</li>
+<li>Toka: Same <code>match</code> with wildcard <code>_</code></li>
+</ul>
+<p><strong>Traits:</strong></p>
+<ul>
+<li>Rust: <code>trait Foo { fn bar(&amp;self); }</code></li>
+<li>Toka: <code>pub trait Foo { fn bar(self); }</code> with <code>@</code> syntax</li>
+</ul>
+<h2 id="from-go"><a class="header" href="#from-go">From Go</a></h2>
+<p><strong>Error handling:</strong></p>
+<ul>
+<li>Go: <code>if err != nil</code> everywhere</li>
+<li>Toka: <code>Result/Option</code> with <code>?</code> operator — cleaner and safer</li>
+</ul>
+<p><strong>Concurrency:</strong></p>
+<ul>
+<li>Go: Goroutines + channels</li>
+<li>Toka: Tasks + MPSC channels</li>
+</ul>
+<p><strong>Interfaces:</strong></p>
+<ul>
+<li>Go: Implicit interface satisfaction</li>
+<li>Toka: Explicit trait implementation with <code>@</code> syntax</li>
+</ul>
+<h2 id="from-c"><a class="header" href="#from-c">From C</a></h2>
+<p><strong>Pointers:</strong></p>
+<ul>
+<li>C: Raw pointers <code>*</code> with no safety</li>
+<li>Toka: Tracked hats <code>^</code> with PAL Checker</li>
+</ul>
+<p><strong>Memory:</strong></p>
+<ul>
+<li>C: Manual <code>malloc/free</code></li>
+<li>Toka: Automatic compile-time memory management</li>
+</ul>
+<p><strong>Build:</strong></p>
+<ul>
+<li>C: Makefile / CMakeLists.txt</li>
+<li>Toka: Project.tk (declarative)</li>
+</ul>
+<h2 id="from-python"><a class="header" href="#from-python">From Python</a></h2>
+<p><strong>Dynamic vs Static:</strong></p>
+<ul>
+<li>Python: Dynamic typing, runtime errors</li>
+<li>Toka: Static typing, compile-time safety</li>
+</ul>
+<p><strong>Performance:</strong></p>
+<ul>
+<li>Python: Interpreted, slow</li>
+<li>Toka: Compiled, native speed (via LLVM)</li>
+</ul>
+<h2 id="quick-syntax-reference"><a class="header" href="#quick-syntax-reference">Quick Syntax Reference</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Concept</th><th>Toka</th></tr>
+</thead>
+<tbody>
+<tr><td>Variable</td><td><code>auto x = 10</code></td></tr>
+<tr><td>Mutable</td><td><code>auto x# = 10</code></td></tr>
+<tr><td>Function</td><td><code>fn add(a: i32, b: i32) -&gt; i32</code></td></tr>
+<tr><td>If/else</td><td><code>if cond { } else { }</code></td></tr>
+<tr><td>Loop</td><td><code>for i in 0..10 { }</code></td></tr>
+<tr><td>Match</td><td><code>match val { 1 =&gt; "one", _ =&gt; "other" }</code></td></tr>
+<tr><td>Comment</td><td><code>// Single line</code></td></tr>
+<tr><td>Import</td><td><code>import std/io::println</code></td></tr>
+<tr><td>Return</td><td><code>return value</code></td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="frequently-asked-questions"><a class="header" href="#frequently-asked-questions">Frequently Asked Questions</a></h1>
+<h2 id="general"><a class="header" href="#general">General</a></h2>
+<p><strong>Q: Is Toka production-ready?</strong></p>
+<p>Toka is currently in beta (v0.9.6). It’s suitable for personal projects, prototyping, and experimentation. The 1.0 release is planned with a focus on production stability.</p>
+<p><strong>Q: What platforms does Toka support?</strong></p>
+<p>Linux, macOS, and Windows are supported. The LLVM backend provides cross-compilation capabilities.</p>
+<p><strong>Q: Is there a package manager?</strong></p>
+<p>Toka has a built-in package manager via <code>toka add</code>. Official library registry at pkg.tokalang.dev.</p>
+<h2 id="language-design"><a class="header" href="#language-design">Language Design</a></h2>
+<p><strong>Q: How is Toka different from Rust?</strong></p>
+<p>Toka achieves memory safety through the Hat Principle instead of a borrow checker. This means no lifetime annotations — just simple hat (<code>^</code>) tokens that make ownership visible in the syntax.</p>
+<p><strong>Q: Does Toka have a garbage collector?</strong></p>
+<p>No. Memory is managed at compile time through the PAL Checker. There is no runtime GC overhead.</p>
+<p><strong>Q: Is Toka compatible with C libraries?</strong></p>
+<p>Yes. Toka has native C interop without FFI overhead. You can call C functions directly.</p>
+<h2 id="learning"><a class="header" href="#learning">Learning</a></h2>
+<p><strong>Q: Do I need to know C or Rust to learn Toka?</strong></p>
+<p>Not at all. Toka’s syntax is clean and Go-like. If you know any programming language, you can learn Toka in a weekend.</p>
+<p><strong>Q: Where can I find more examples?</strong></p>
+<p>Check out the <code>examples/</code> directory in the Toka repository and the <code>tokalibs</code> collection of community libraries.</p>
+<p><strong>Q: Is there a community or forum?</strong></p>
+<p>Join the Toka community on GitHub Discussions at github.com/zhyi-dp/tokalang.</p>
+<h2 id="technical"><a class="header" href="#technical">Technical</a></h2>
+<p><strong>Q: How fast is Toka?</strong></p>
+<p>Toka compiles at approximately 80,000 lines of code per second (Clang backend) and produces optimized native binaries via LLVM 20. Performance is comparable to C for equivalent code.</p>
+<p><strong>Q: How large are Toka binaries?</strong></p>
+<p>A minimal HTTP server binary is approximately 250 KB — no runtime, no VM, just native code.</p>
+<p><strong>Q: Does Toka support multithreading?</strong></p>
+<p>Yes. Toka provides tasks, MPSC channels, atomic operations, and mutexes for concurrent programming.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-c2a407aa.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="theme/toka-8ba2d2ab.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
