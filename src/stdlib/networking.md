@@ -23,7 +23,7 @@ fn fetch(url: String) -> Result<String, String> {
 Build a simple HTTP server:
 
 ```toka
-import std/net_http::{HttpResponse, HttpRequest}
+import stdx/net/http::{HttpResponse, HttpRequest}
 import std/string::String
 
 // Note: HTTP Server is under development
@@ -81,10 +81,19 @@ fn echo_server() {
 ```toka
 import std/io::println
 import std/string::String
+import core/result::Result
+import stdx/net/url::{Url, parse_url}
 
-// Note: URL parsing is under development
-fn parse_url() {
-    // auto url = net::Url::parse("https://api.example.com/data?id=1")
-    // println("Host: {}", url.host)
+fn example() {
+    auto url_res = parse_url(String::from("https://api.example.com:8080/data?id=1#top"))
+    match url_res {
+        auto Result::Ok(&url) => {
+            println("Host: {}", url.host)
+            println("Port: {}", String::from_int(url.port as i32))
+        }
+        auto Result::Err(&err) => {
+            println("Error: {}", err)
+        }
+    }
 }
 ```

@@ -6,7 +6,7 @@ Toka provides a standard cryptography module with support for common hash algori
 
 ```toka
 import std/io::println
-import std/crypto/md5::Md5
+import stdx/crypto/md5::Md5
 
 fn example() {
     auto md5# = Md5::new()
@@ -20,7 +20,7 @@ fn example() {
 
 ```toka
 import std/io::println
-import std/crypto/sha1::Sha1
+import stdx/crypto/sha1::Sha1
 
 fn example() {
     auto sha1# = Sha1::new()
@@ -34,7 +34,7 @@ fn example() {
 
 ```toka
 import std/io::println
-import std/crypto/sha256::Sha256
+import stdx/crypto/sha256::Sha256
 
 fn example() {
     auto sha256# = Sha256::new()
@@ -51,7 +51,7 @@ Hash the contents of a file:
 ```toka
 import std/fs
 import std/string::String
-import std/crypto/sha256::Sha256
+import stdx/crypto/sha256::Sha256
 import core/result::Result
 
 fn verify_file(path: String) -> Result<bool, String> {

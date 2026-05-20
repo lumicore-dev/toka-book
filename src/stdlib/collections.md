@@ -29,7 +29,7 @@ fn example() {
 
 ```toka
 import std/io::println
-import std/map::HashMap
+import std/hash_map::HashMap
 import core/option::Option
 import core/primitives
 
@@ -137,7 +137,7 @@ fn example() {
 
 ```toka
 import std/io::println
-import std/set::HashSet
+import std/hash_set::HashSet
 import core/primitives
 
 fn example() {

@@ -7,7 +7,7 @@ Toka provides built-in support for serializing and deserializing data, with JSON
 Serialize data to JSON:
 
 ```toka
-import std/serde/json
+import stdx/serde/json
 import std/string::String
 import std/io::println
 
@@ -29,10 +29,10 @@ fn encode() {
 Parse JSON back into Toka types:
 
 ```toka
-import std/serde/json
+import stdx/serde/json
 import std/string::String
 import std/io::println
-import core/result::Okay
+import core/result::Result
 
 pub shape Person(
     name: String,
@@ -49,7 +49,7 @@ fn decode() {
 ## Base64 Encoding
 
 ```toka
-import std/encoding/base64
+import stdx/encoding/base64
 import std/string::String
 import std/io::println
 
@@ -66,7 +66,7 @@ fn example() {
 ## Hex Encoding
 
 ```toka
-import std/encoding/hex
+import stdx/encoding/hex
 import std/io::println
 
 fn example() {
@@ -84,7 +84,7 @@ fn example() {
 Implement the `@Serialize` trait for custom types:
 
 ```toka
-import std/serde/json::{@ToJson}
+import stdx/serde/json::{@ToJson}
 import std/string::String
 
 pub shape Person(name: String, age: i32, active: bool)

@@ -6,20 +6,25 @@ Toka provides robust error handling through the Result and Option types, inspire
 
 Use `Option` for values that may or may not exist:
 
-```tokalang
-import core/option::{Maybe}
+```toka
+import core/option::{Option}
+import std/string::String
+import std/io::println
 
-fn find_user(id: i32) -> Maybe<String> {
+fn find_user(id: i32) -> Option<String> {
     if id == 1 {
-        return Maybe<String>::Some(String::from("Alice"))
+        return Option<String>::Some(String::from("Alice"))
     }
-    return Maybe<String>::None
+    return Option<String>::None
 }
 
-auto result = find_user(1)
-match result {
-    auto Maybe::Some(&name) => println("Found: {}", name),
-    auto Maybe::None => println("User not found")
+fn main() -> i32 {
+    auto result = find_user(1)
+    match result {
+        auto Option::Some(&name) => println("Found: {}", name)
+        auto Option::None => println("User not found")
+    }
+    return 0
 }
 ```
 
@@ -27,14 +32,15 @@ match result {
 
 Use `Result` for operations that can succeed or fail:
 
-```tokalang
-import core/result::{Okay}
+```toka
+import core/result::{Result}
+import std/string::String
 
-fn divide(a: f64, b: f64) -> Okay<f64, String> {
+fn divide(a: f64, b: f64) -> Result<f64, String> {
     if b == 0.0 {
-        return Okay<f64, String>::Err(String::from("Division by zero"))
+        return Result<f64, String>::Err(String::from("Division by zero"))
     }
-    return Okay<f64, String>::Ok(a / b)
+    return Result<f64, String>::Ok(a / b)
 }
 ```
 
@@ -44,22 +50,51 @@ The Result type is generic over two parameters:
 
 ## Pattern Matching on Results
 
-```tokalang
-match divide(10.0, 2.0) {
-    auto Okay::Ok(value) => println("Result: {}", value),
-    auto Okay::Err(&msg) => println("Error: {}", msg)
+```toka
+import core/result::{Result}
+import std/string::String
+import std/io::println
+
+fn divide(a: f64, b: f64) -> Result<f64, String> {
+    if b == 0.0 {
+        return Result<f64, String>::Err(String::from("Division by zero"))
+    }
+    return Result<f64, String>::Ok(a / b)
+}
+
+fn main() -> i32 {
+    match divide(10.0, 2.0) {
+        auto Result::Ok(value) => println("Result: {}", value)
+        auto Result::Err(&msg) => println("Error: {}", msg)
+    }
+    return 0
 }
 ```
 
-## Short-Circuiting with `?`
+## Short-Circuiting with `!`
 
-Use the `?` operator to propagate errors automatically:
+Use the `!` operator to propagate errors automatically:
 
-```tokalang
-fn process_file(path: String) -> Okay<String, String> {
-    auto content = read_file(path)?  // Returns early on error
-    auto parsed = parse(content)?    // Same here
-    return Okay<String, String>::Ok(format_result(parsed))
+```toka
+import core/result::{Result}
+import std/string::String
+
+fn read_file(path: String) -> Result<String, String> {
+    return Result<String, String>::Ok(path)
+}
+
+fn parse(content: String) -> Result<String, String> {
+    return Result<String, String>::Ok(content)
+}
+
+fn format_result(parsed: String) -> String {
+    return parsed
+}
+
+fn process_file(path: String) -> Result<String, String> {
+    auto content = read_file(path)!  // Returns early on error
+    auto parsed = parse(content)!    // Same here
+    return Result<String, String>::Ok(format_result(parsed))
 }
 ```
 
@@ -77,17 +112,22 @@ auto value = parse_int("42").unwrap_or(0)  // Uses 0 if parsing fails
 
 You can define structured errors:
 
-```tokalang
+```toka
+import core/result::{Result}
+import std/string::String
+
+pub shape Config()
+
 pub shape ParseError(
     line: i32,
     col: i32,
     message: String
 )
 
-fn parse_config(text: String) -> Okay<Config, ParseError> {
+fn parse_config(text: String) -> Result<Config, ParseError> {
     if text.len() == 0 {
-        return Okay<Config, ParseError>::Err(ParseError(line = 0, col = 0, message = String::from("Empty input")))
+        return Result<Config, ParseError>::Err(ParseError(line = 0, col = 0, message = String::from("Empty input")))
     }
-    // ... parsing logic
+    return Result<Config, ParseError>::Ok(Config())
 }
 ```

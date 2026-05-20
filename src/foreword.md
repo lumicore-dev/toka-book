@@ -27,6 +27,13 @@ If you're new to Toka, start from the beginning and work your way through. Each 
 
 If you're an experienced developer, feel free to jump to specific topics using the sidebar navigation.
 
+## Language Version Alignment
+
+This book is kept up-to-date with the latest Toka compiler development. The current version of this documentation is aligned with:
+- **Compiler Version**: `v0.9.7`
+- **Toka Commit**: `a062d19` (Fix fake Shape escape vulnerability in Sema and add subtraction ambiguity diagnostic note for kebab-case identifiers)
+- **Tag**: `v0.9.7-23-ga062d19`
+
 ## A Note From the Author
 
 Toka is a young but ambitious language. This guide was written alongside the language's development to help early adopters get started. As Toka evolves, this book will evolve with it.
