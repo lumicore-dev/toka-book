@@ -109,3 +109,46 @@ hljs.registerLanguage('toka', function(hljs) {
     injectButton();
   }
 })();
+
+// Dynamic Return to Homepage Sidebar Link Injection
+(function() {
+  var path = window.location.pathname;
+  var isEn = path.indexOf('/en/') !== -1;
+  var isZh = path.indexOf('/zh/') !== -1;
+  if (!isEn && !isZh) return; // not inside the book subdirectories
+
+  function injectReturnLink() {
+    var sidebarScrollbox = document.querySelector('.sidebar-scrollbox');
+    if (!sidebarScrollbox) return;
+
+    var chapterList = sidebarScrollbox.querySelector('ol.chapter');
+    if (!chapterList) return;
+
+    // Check if already injected
+    if (document.getElementById('mdbook-return-link')) return;
+
+    var li = document.createElement('li');
+    li.className = 'chapter-item expanded';
+    li.id = 'mdbook-return-link';
+
+    var span = document.createElement('span');
+    span.className = 'chapter-link-wrapper';
+
+    var a = document.createElement('a');
+    a.href = 'https://tokalang.dev';
+    a.target = '_parent';
+    a.textContent = isZh ? '🏠 返回 tokalang.dev' : '🏠 Return to tokalang.dev';
+
+    span.appendChild(a);
+    li.appendChild(span);
+
+    // Insert at the very top of the sidebar list
+    chapterList.insertBefore(li, chapterList.firstChild);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectReturnLink);
+  } else {
+    injectReturnLink();
+  }
+})();
