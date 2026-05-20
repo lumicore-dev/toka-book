@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-b2623d23.js";
+            window.path_to_searchindex_js = "searchindex-6a410e44.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -182,11 +182,20 @@
 <p>这些项目绝非脱离现实的“玩具代码”，而是直击底层软件工程最核心的三个支柱：<strong>系统工具开发、高性能并发网络、语言与文本解析</strong>。</p>
 <hr>
 <h2 id="项目实战阶梯"><a class="header" href="#项目实战阶梯">项目实战阶梯</a></h2>
-<p>本章包含的三个项目呈阶梯状递进，帮助你逐步建立起健壮的系统级开发心智：</p>
-<pre><code class="language-mermaid">graph TD
-    P1[命令行工具 CLI Tool] --&gt;|熟悉 API 与基础命令行系统操作| P2[高并发 Web 服务器 HTTP Server]
-    P2 --&gt;|彻底打通帽子并发安全性与网络I/O| P3[手写正则匹配引擎 Regex Engine]
-    P3 --&gt;|深入锻炼复杂数据结构算法与模式匹配解构| P4[系统级全能开发者]
+<p>本章包含的三个项目呈阶梯状递进，帮助你逐步建立起健壮 of 系统级开发心智：</p>
+<pre><code class="language-text">           系统级软件工程的实战阶梯（Roadmap）
+                            │
+                            ▼
+   [ 阶梯一：命令行工具 ]  ─── 熟悉官方 stdx/cli/flag 标准扩展 API
+                            │
+                            ▼
+   [ 阶梯二：HTTP 服务器 ] ─── 打通原始 TCP 与 Hat Concurrency 并发安全
+                            │
+                            ▼
+   [ 阶梯三：手写正则引擎 ] ─── 锻炼字符 Token 流控制与树状模式匹配算法
+                            │
+                            ▼
+           🏆 【 进阶为系统级全能开发者 】
 </code></pre>
 <h3 id="1-用-stdxcliflag-构建-cli-工具"><a class="header" href="#1-用-stdxcliflag-构建-cli-工具">1. <a href="projects/cli_tool.html">用 stdx/cli/flag 构建 CLI 工具</a></a></h3>
 <ul>

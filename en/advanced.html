@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-21a29cfd.js";
+            window.path_to_searchindex_js = "searchindex-7b541f2e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -183,16 +183,15 @@
 <hr>
 <h2 id="chapter-map"><a class="header" href="#chapter-map">Chapter Map</a></h2>
 <p>This chapter will guide you through the following four pillars of system development:</p>
-<pre><code class="language-mermaid">graph TD
-    A[Toka Advanced Abstractions] --&gt; B(Generics)
-    A --&gt; C(Error Handling)
-    A --&gt; D(Pattern Matching)
-    A --&gt; E(Concurrency)
-
-    B --&gt; B1["Zero-overhead Polymorphism &amp; Avoiding 'Soul Collapse'"]
-    C --&gt; C1["Option / Result &amp; Short-circuit Operator !"]
-    D --&gt; D1["Deep Shape Deconstruction &amp; if Guards"]
-    E --&gt; E1["Safe Lightweight Coroutines &amp; Multicore Parallelism"]
+<pre><code class="language-text">               Toka Advanced Features &amp; Abstractions
+                         │
+        ┌────────────────┼────────────────┬────────────────┐
+        ▼                ▼                ▼                ▼
+    Generics       Error Handling  Pattern Matching   Concurrency
+        │                │                │                │
+        ▼                ▼                ▼                ▼
+ Zero-overhead ADT representation  Deconstruct Shapes  Lightweight fibers
+ Avoid Soul Collapse  Short-circuit (!)    Combined w/ guards  Multicore scaling
 </code></pre>
 <h3 id="1-generics"><a class="header" href="#1-generics">1. <a href="advanced/generics.html">Generics</a></a></h3>
 <p>Achieve zero-overhead polymorphism while maintaining strong type safety. You will learn about Toka’s unique <strong>Morphic Generic Types</strong> (like <code>'A</code>) and the strict rule of prefixing corresponding Shape fields with a single quote (e.g., <code>'first: 'A</code>) to avoid <strong>“Soul Collapse”</strong>.</p>

@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-b2623d23.js";
+            window.path_to_searchindex_js = "searchindex-6a410e44.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -183,16 +183,15 @@
 <hr>
 <h2 id="本章知识图谱"><a class="header" href="#本章知识图谱">本章知识图谱</a></h2>
 <p>本章将带你深入探索以下四个系统开发的核心利器：</p>
-<pre><code class="language-mermaid">graph TD
-    A[Toka 高级抽象] --&gt; B(泛型 Generics)
-    A --&gt; C(错误处理 Error Handling)
-    A --&gt; D(模式匹配 Pattern Matching)
-    A --&gt; E(并发编程 Concurrency)
-
-    B --&gt; B1["零开销多态 &amp; 规避‘灵魂塌陷’"]
-    C --&gt; C1["Option / Result 代数类型 &amp; 短路传播 !"]
-    D --&gt; D1["Shape 深度解构 &amp; if 守卫过滤"]
-    E --&gt; E1["安全轻量级协程 &amp; 多核并行"]
+<pre><code class="language-text">               Toka 高级特性与抽象表达
+                         │
+        ┌────────────────┼────────────────┬────────────────┐
+        ▼                ▼                ▼                ▼
+   泛型 (Generics)   错误处理 (Error)  模式匹配 (Pattern)  并发编程 (Async)
+        │                │                │                │
+        ▼                ▼                ▼                ▼
+   零开销多态表达   代数数据类型契约  解构 Shape 实体  安全轻量协程
+ 规避“灵魂塌陷”约束  短路机制 (!) 传播  配合 if 条件守卫   多核并行狂飙
 </code></pre>
 <h3 id="1-泛型generics"><a class="header" href="#1-泛型generics">1. <a href="advanced/generics.html">泛型（Generics）</a></a></h3>
 <p>在强类型安全的前提下，提供零运行开销的多态表达。你将学习到极其独特的 <strong>Morphic 泛型类型</strong>（如 <code>'A</code>），以及在定义 Shape 时如何通过对应的 <code>'first</code> 单引号字段前缀来规避 <strong>“灵魂塌陷（Soul Collapse）”</strong> 的底层约束规则。</p>

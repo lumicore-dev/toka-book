@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-b2623d23.js";
+            window.path_to_searchindex_js = "searchindex-6a410e44.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -1070,16 +1070,15 @@ fn borrowing_safe_example() {
 <hr>
 <h2 id="本章知识图谱"><a class="header" href="#本章知识图谱">本章知识图谱</a></h2>
 <p>本章将带你深入探索以下四个系统开发的核心利器：</p>
-<pre><code class="language-mermaid">graph TD
-    A[Toka 高级抽象] --&gt; B(泛型 Generics)
-    A --&gt; C(错误处理 Error Handling)
-    A --&gt; D(模式匹配 Pattern Matching)
-    A --&gt; E(并发编程 Concurrency)
-
-    B --&gt; B1["零开销多态 &amp; 规避‘灵魂塌陷’"]
-    C --&gt; C1["Option / Result 代数类型 &amp; 短路传播 !"]
-    D --&gt; D1["Shape 深度解构 &amp; if 守卫过滤"]
-    E --&gt; E1["安全轻量级协程 &amp; 多核并行"]
+<pre><code class="language-text">               Toka 高级特性与抽象表达
+                         │
+        ┌────────────────┼────────────────┬────────────────┐
+        ▼                ▼                ▼                ▼
+   泛型 (Generics)   错误处理 (Error)  模式匹配 (Pattern)  并发编程 (Async)
+        │                │                │                │
+        ▼                ▼                ▼                ▼
+   零开销多态表达   代数数据类型契约  解构 Shape 实体  安全轻量协程
+ 规避“灵魂塌陷”约束  短路机制 (!) 传播  配合 if 条件守卫   多核并行狂飙
 </code></pre>
 <h3 id="1-泛型generics"><a class="header" href="#1-泛型generics">1. <a href="#泛型generics">泛型（Generics）</a></a></h3>
 <p>在强类型安全的前提下，提供零运行开销的多态表达。你将学习到极其独特的 <strong>Morphic 泛型类型</strong>（如 <code>'A</code>），以及在定义 Shape 时如何通过对应的 <code>'first</code> 单引号字段前缀来规避 <strong>“灵魂塌陷（Soul Collapse）”</strong> 的底层约束规则。</p>
@@ -2035,11 +2034,20 @@ fn generate_key() -&gt; u64 {
 <p>这些项目绝非脱离现实的“玩具代码”，而是直击底层软件工程最核心的三个支柱：<strong>系统工具开发、高性能并发网络、语言与文本解析</strong>。</p>
 <hr>
 <h2 id="项目实战阶梯"><a class="header" href="#项目实战阶梯">项目实战阶梯</a></h2>
-<p>本章包含的三个项目呈阶梯状递进，帮助你逐步建立起健壮的系统级开发心智：</p>
-<pre><code class="language-mermaid">graph TD
-    P1[命令行工具 CLI Tool] --&gt;|熟悉 API 与基础命令行系统操作| P2[高并发 Web 服务器 HTTP Server]
-    P2 --&gt;|彻底打通帽子并发安全性与网络I/O| P3[手写正则匹配引擎 Regex Engine]
-    P3 --&gt;|深入锻炼复杂数据结构算法与模式匹配解构| P4[系统级全能开发者]
+<p>本章包含的三个项目呈阶梯状递进，帮助你逐步建立起健壮 of 系统级开发心智：</p>
+<pre><code class="language-text">           系统级软件工程的实战阶梯（Roadmap）
+                            │
+                            ▼
+   [ 阶梯一：命令行工具 ]  ─── 熟悉官方 stdx/cli/flag 标准扩展 API
+                            │
+                            ▼
+   [ 阶梯二：HTTP 服务器 ] ─── 打通原始 TCP 与 Hat Concurrency 并发安全
+                            │
+                            ▼
+   [ 阶梯三：手写正则引擎 ] ─── 锻炼字符 Token 流控制与树状模式匹配算法
+                            │
+                            ▼
+           🏆 【 进阶为系统级全能开发者 】
 </code></pre>
 <h3 id="1-用-stdxcliflag-构建-cli-工具"><a class="header" href="#1-用-stdxcliflag-构建-cli-工具">1. <a href="#用-stdxcliflag-构建-cli-工具">用 stdx/cli/flag 构建 CLI 工具</a></a></h3>
 <ul>
