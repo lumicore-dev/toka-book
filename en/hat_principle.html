@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-51e67837.js";
+            window.path_to_searchindex_js = "searchindex-b74e3371.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-e0ac2e83.js"></script>
@@ -200,7 +200,13 @@
 <li><strong>Soul (The Data)</strong>: Identifiers <strong>without</strong> a sigil (<code>p</code>) represent the <em>underlying data</em>.</li>
 </ul>
 <p>When you want to read or modify the value a pointer points to, you simply operate on the <strong>soul</strong> directly — no dereference token needed:</p>
-<pre><code class="language-toka">{{#include ../../examples/ownership.tk:raw_ptr}}
+<pre><code class="language-toka">fn raw_ptr_example() {
+    unsafe {
+        auto *p# = alloc i32
+        p = 99
+        println("raw: {}", p)
+    }
+}
 </code></pre>
 <p>This is a major quality-of-life improvement over C’s <code>*p = 200</code> or Rust’s <code>*p = 200</code>. Toka’s approach makes pointer-heavy code much more readable.</p>
 <h2 id="how-the-pal-checker-uses-hats"><a class="header" href="#how-the-pal-checker-uses-hats">How the PAL Checker Uses Hats</a></h2>
@@ -263,7 +269,7 @@
         <script src="book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="theme/toka-8ba2d2ab.js"></script>
+        <script src="theme/toka-388bb14c.js"></script>
 
 
 
