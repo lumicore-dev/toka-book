@@ -1,0 +1,9 @@
+[book]
+title = "Toka 编程语言指南"
+authors = ["lumicore-dev"]
+language = "zh"
+
+[output.html]
+git-repository-url = "https://github.com/tokalang/toka"
+destination = "zh"
+additional-js = ["theme/toka.js"]
