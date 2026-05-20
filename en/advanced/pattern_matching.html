@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -201,30 +201,32 @@ auto grade = match score {
         _ =&gt; { pass "invalid score" }
 }
 </code></pre>
-<p>Use <code>..</code> for exclusive ranges and <code>..=</code> for inclusive ranges.</p>
+<p>Note that Toka does not support native range patterns (like <code>0..10</code>). Instead, use variables with <code>if</code> guard expressions to perform range checking.</p>
 <h2 id="matching-on-options"><a class="header" href="#matching-on-options">Matching on Options</a></h2>
 <pre><code class="language-toka">import std/io::println
 import core/option::Option
 
-fn main() {
+fn main() -&gt; i32 {
     auto id = 1
-    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None()
+    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None
     match opt {
-        auto Option::Some(&amp;name) =&gt; { println("Found: {}", name) }
-        auto Option::None() =&gt; { println("User not found") }
+        auto Option&lt;view_str&gt;::Some(&amp;name) =&gt; { println("Found: {}", name) }
+        auto Option&lt;view_str&gt;::None =&gt; { println("User not found") }
     }
+    return 0
 }
 </code></pre>
 <h2 id="matching-on-results"><a class="header" href="#matching-on-results">Matching on Results</a></h2>
 <pre><code class="language-toka">import std/io::println
 import core/result::Result
 
-fn main() {
+fn main() -&gt; i32 {
     auto res: Result&lt;f32, view_str&gt; = Result&lt;f32, view_str&gt;::Ok(5.0)
     match res {
-        auto Result::Ok(value) =&gt; { println("Result: {}", value) }
-        auto Result::Err(&amp;msg) =&gt; { println("Error: {}", msg) }
+        auto Result&lt;f32, view_str&gt;::Ok(value) =&gt; { println("Result: {}", value) }
+        auto Result&lt;f32, view_str&gt;::Err(&amp;msg) =&gt; { println("Error: {}", msg) }
     }
+    return 0
 }
 </code></pre>
 <h2 id="destructuring-shapes"><a class="header" href="#destructuring-shapes">Destructuring Shapes</a></h2>
@@ -253,19 +255,9 @@ auto grade = match score {
     _ =&gt; pass "F"
 }
 </code></pre>
-<h2 id="type-matching"><a class="header" href="#type-matching">Type Matching</a></h2>
-<p>Match on the type of a value:</p>
-<pre><code class="language-toka">import std/io::println
-
-fn inspect&lt;T&gt;(value: T) -&gt; cstring {
-    return match value {
-        i32 =&gt; pass "It's an integer"
-        view_str =&gt; pass "It's a string"
-        bool =&gt; pass "It's a boolean"
-        _ =&gt; pass "Unknown type"
-    }
-}
-</code></pre>
+<h2 id="no-type-based-matching"><a class="header" href="#no-type-based-matching">No Type-Based Matching</a></h2>
+<p>Toka does not support matching directly on types (such as writing <code>i32 =&gt; ...</code> or <code>view_str =&gt; ...</code> inside a <code>match</code> expression). Any type name used in a branch without standard syntax will be treated as a new variable binding pattern (Variable Pattern), which matches any value and shadows other cases, leading to compilation errors or unreachable branches.</p>
+<pre><code></code></pre>
 
                     </main>
 

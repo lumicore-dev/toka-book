@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-3cdd4a37.js";
+            window.path_to_searchindex_js = "../searchindex-0ad52201.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -201,15 +201,15 @@ while count &lt; 5 {
     count = count + 1
 }
 </code></pre>
-<h2 id="for-循环与区间"><a class="header" href="#for-循环与区间">For 循环与区间</a></h2>
-<p>Toka 支持基于区间的迭代：</p>
+<h2 id="遍历数组"><a class="header" href="#遍历数组">遍历数组</a></h2>
+<p>Toka 支持在数组上进行迭代：</p>
 <pre><code class="language-toka">import std/io::println
 
 for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
     println("{}", i)
 }
 </code></pre>
-<p><code>0..10</code> 区间在末尾是排除的——它迭代 <code>0, 1, 2, ..., 9</code>。</p>
+<p>目前 Toka 暂不支持原生范围区间运算符（如 <code>..</code>）。你可以在数组上进行迭代，或使用 <code>while</code> 实现自定义迭代逻辑。</p>
 <h2 id="遍历集合"><a class="header" href="#遍历集合">遍历集合</a></h2>
 <pre><code class="language-toka">import std/io::println
 

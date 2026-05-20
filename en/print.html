@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -281,8 +281,8 @@ toka run hello.tk
 <h2 id="building-from-source"><a class="header" href="#building-from-source">Building from Source</a></h2>
 <p>For the latest development version:</p>
 <pre><code class="language-bash">git clone https://github.com/tokalang/toka.git
-cd tokalang
-./rebuild.sh
+cd toka
+make -C build -j8
 </code></pre>
 <h2 id="supported-platforms"><a class="header" href="#supported-platforms">Supported Platforms</a></h2>
 <div class="table-wrapper">
@@ -333,7 +333,7 @@ fn main() -&gt; i32 {
 </ul>
 <h3 id="quick-one-liner"><a class="header" href="#quick-one-liner">Quick One-Liner</a></h3>
 <p>For a quick test without creating a file, you can also use:</p>
-<pre><code class="language-bash">echo 'import std/io::{println} fn main() { println("Hello, Toka World!") }' &gt; hello.tk
+<pre><code class="language-bash">echo 'import std/io::println fn main() -&gt; i32 { println("Hello, Toka World!") return 0 }' &gt; hello.tk
 toka run hello.tk
 </code></pre>
 <h2 id="whats-next"><a class="header" href="#whats-next">What’s Next?</a></h2>
@@ -374,7 +374,7 @@ pub const PACKAGE = (
 </code></pre>
 <h2 id="adding-dependencies"><a class="header" href="#adding-dependencies">Adding Dependencies</a></h2>
 <p>You can easily add third-party packages to your project using the <code>toka add</code> command:</p>
-<pre><code class="language-bash">toka add toka-ink
+<pre><code class="language-bash">toka add toka_ink
 </code></pre>
 <p>This will automatically query the Toka Registry, resolve the package to its GitHub repository and version tag, and update your <code>package.tk</code>:</p>
 <pre><code class="language-tokalang">// package.tk
@@ -382,7 +382,7 @@ pub const PACKAGE = (
     name = "my_project",
     version = "0.1.0",
     dependencies = (
-        toka-ink = "github.com/lumicore-dev/toka-ink:v0.2.1",
+        toka_ink = "github.com/lumicore-dev/toka-ink:v0.2.1",
     )
 )
 </code></pre>
@@ -461,8 +461,9 @@ auto name = "Toka"   // str (string slice)
 // Package and namespace names can contain hyphens
 import ./nested/toka-ink as toka-ink
 
-fn main() {
+fn main() -&gt; i32 {
     toka-ink::render()
+    return 0
 }
 </code></pre>
 <h3 id="variables--functions"><a class="header" href="#variables--functions">Variables &amp; Functions</a></h3>
@@ -545,7 +546,7 @@ impl List {
     pub fn push(self#, val: i32) {}
 }
 
-fn main() {
+fn main() -&gt; i32 {
     auto y = List(data = 10)  // immutable
     auto x# = List(data = 10) // mutable — # at declaration
 
@@ -556,6 +557,7 @@ fn main() {
     // Calling a mutable method requires # on the variable
     x#.sort()                 // OK — # on variable before .method()
     x#.push(5)                // OK
+    return 0
 }
 </code></pre>
 <p>This is an example of Toka’s <strong>Attribute Token System</strong> — the <code>#</code> suffix denotes soul mutability and is placed on the variable itself when declaring it or calling its mutable methods.</p>
@@ -616,8 +618,9 @@ impl Number {
     }
 }
 
-fn main() {
+fn main() -&gt; i32 {
     auto result = Number(val = 5).double()  // result = 10
+    return 0
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -645,15 +648,15 @@ while count &lt; 5 {
     count = count + 1
 }
 </code></pre>
-<h2 id="for-loops-with-ranges"><a class="header" href="#for-loops-with-ranges">For Loops with Ranges</a></h2>
-<p>Toka supports range-based iteration:</p>
+<h2 id="iterating-over-arrays"><a class="header" href="#iterating-over-arrays">Iterating Over Arrays</a></h2>
+<p>Toka supports array-based iteration:</p>
 <pre><code class="language-toka">import std/io::println
 
 for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
     println("{}", i)
 }
 </code></pre>
-<p>The <code>0..10</code> range is exclusive on the end — it iterates <code>0, 1, 2, ..., 9</code>.</p>
+<p>Currently, Toka does not support a native range operator (like <code>..</code>). You can iterate over an array of elements or implement custom loops using <code>while</code>.</p>
 <h2 id="iterating-collections"><a class="header" href="#iterating-collections">Iterating Collections</a></h2>
 <pre><code class="language-toka">import std/io::println
 
@@ -714,7 +717,7 @@ while iter &lt; 100 {
 </thead>
 <tbody>
 <tr><td><code>str</code></td><td>String slice (like Rust <code>&amp;str</code> or C++ <code>string_view</code>) — immutable, borrowed</td></tr>
-<tr><td><code>string</code></td><td>Owned mutable string (UTF-8 by default)</td></tr>
+<tr><td><code>String</code></td><td>Owned mutable string (UTF-8 by default, defined in <code>std/string::String</code>)</td></tr>
 </tbody>
 </table>
 </div>
@@ -748,8 +751,8 @@ println("Welcome to {} version {}!", name, version)
 auto full# = String::from("Hello, ")
 full#.push_str("World!")
 </code></pre>
-<h2 id="conversion-to-string"><a class="header" href="#conversion-to-string">Conversion to String</a></h2>
-<p>Convert other types to string with <code>str()</code>:</p>
+<h2 id="formatting-and-printing"><a class="header" href="#formatting-and-printing">Formatting and Printing</a></h2>
+<p>You can print other types easily using placeholders without manual conversion:</p>
 <pre><code class="language-toka">import std/io::println
 
 auto n = 42
@@ -857,13 +860,15 @@ auto unicode: u32 = 0x4E16:u32
 </code></pre>
 <h3 id="--shared-pointer"><a class="header" href="#--shared-pointer"><code>~</code> — Shared Pointer</a></h3>
 <p>Reference-counted, shared ownership via pointer morphology.</p>
-<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 auto ~s2# = ~s1 // Shared Copy (ref count increments)
 s2.x = 3000     // Modifies the underlying soul
 </code></pre>
 <h3 id="--borrow-pointer"><a class="header" href="#--borrow-pointer"><code>&amp;</code> — Borrow Pointer</a></h3>
 <p>A reference or borrow pointer to another value. Created explicitly via <code>&amp;</code> to refer to an existing soul:</p>
-<pre><code class="language-toka">auto &amp;y = &amp;(x) // y is a borrow pointer pointing to the soul of x
+<pre><code class="language-toka">auto x = 42
+auto &amp;y = &amp;(x) // y is a borrow pointer pointing to the soul of x
 </code></pre>
 <h2 id="identity-and-address"><a class="header" href="#identity-and-address">Identity and Address</a></h2>
 <p>To get the raw memory address of a local variable, use the <code>*(expr)</code> syntax:</p>
@@ -901,14 +906,16 @@ s2.x = 3000     // Modifies the underlying soul
 <p>The <code>^</code> token operates like Rust’s <code>Box</code> or C++’s <code>std::unique_ptr</code>. When a unique pointer goes out of scope, its resource is automatically freed.</p>
 <h3 id="--shared-pointer-reference-counted"><a class="header" href="#--shared-pointer-reference-counted"><code>~</code> — Shared Pointer (Reference-Counted)</a></h3>
 <p>Shared pointers enable multiple owners via reference counting:</p>
-<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 auto ~s2# = ~s1  // Shared Copy (ref count increments)
 s2.x = 3000      // Modifies the underlying soul
 </code></pre>
 <p>The resource is freed when the last <code>~</code> reference goes out of scope.</p>
 <h3 id="--borrow-pointer-reference-semantics"><a class="header" href="#--borrow-pointer-reference-semantics"><code>&amp;</code> — Borrow Pointer (Reference Semantics)</a></h3>
 <p>Borrow pointers represent references to other values without taking ownership. They allow temporary, checked access to data:</p>
-<pre><code class="language-toka">auto &amp;y = &amp;(x)   // Local borrow pointer pointing to the soul of x
+<pre><code class="language-toka">auto x = 42
+auto &amp;y = &amp;(x)   // Local borrow pointer pointing to the soul of x
 </code></pre>
 <h2 id="moving-vs-copying"><a class="header" href="#moving-vs-copying">Moving vs Copying</a></h2>
 <p>By default, assignment in Toka performs a <strong>copy</strong> (value copy for simple types, and shallow copy for shapes and complex types):</p>
@@ -919,19 +926,21 @@ s2.x = 3000      // Modifies the underlying soul
     println("a: {}, b: {}", a, b)
 }
 </code></pre>
-<p>This applies to both simple types (like <code>i32</code>, <code>f64</code>, <code>bool</code>) and complex types (like <code>string</code>, <code>Vec</code>, or custom <code>shape</code> types).</p>
+<p>This applies to both simple types (like <code>i32</code>, <code>f64</code>, <code>bool</code>) and complex types (like <code>String</code>, <code>Vec</code>, or custom <code>shape</code> types).</p>
 <h3 id="default-move-semantics"><a class="header" href="#default-move-semantics">Default Move Semantics</a></h3>
 <p>By default, <strong>move semantics</strong> apply exclusively to <strong>Unique Pointers (<code>^</code>)</strong>. Assignment of a unique pointer transfers exclusive ownership of its heap-allocated resource from the source to the destination:</p>
-<pre><code class="language-toka">auto ^p1 = new Point(x = 10, y = 20, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ^p1 = new Point(x = 10, y = 20, z = 0)
 auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid
 </code></pre>
 <h3 id="explicit-move-with-cede"><a class="header" href="#explicit-move-with-cede">Explicit Move with <code>cede</code></a></h3>
 <p>For other types (or to explicitly transfer ownership of any value), you must use the <strong><code>cede</code> keyword</strong> to perform an explicit move. Once a value is ceded, the source variable is no longer valid:</p>
-<pre><code class="language-toka">auto s1 = String::from("hello")
+<pre><code class="language-toka">import std/string::String
+auto s1 = String::from("hello")
 auto s2 = cede s1 // Explicit move: s1 is no longer valid
 </code></pre>
-<h2 id="function-parameters-pass-by-value"><a class="header" href="#function-parameters-pass-by-value">Function Parameters (Pass by Value)</a></h2>
-<p>In Toka, function parameters are immutable by default and passed by value (copied, or shallow-copied for complex types). You don’t need special sigils for standard parameter passing:</p>
+<h2 id="function-parameters-zero-copy-capture-mechanism"><a class="header" href="#function-parameters-zero-copy-capture-mechanism">Function Parameters (Zero-Copy Capture Mechanism)</a></h2>
+<p>In Toka, function parameters are immutable by default and passed via a <strong>zero-copy implicit reference capture mechanism</strong> rather than traditional pass-by-value (copying). The compiler ensures that capturing a parameter has zero runtime overhead and does not consume or copy the original argument. You don’t need special pointer sigils for standard parameter passing unless you explicitly intend to pass/rebind pointer handles:</p>
 <pre><code class="language-toka">fn process(data: i32) {
     println("data: {}", data)
 }
@@ -1010,14 +1019,15 @@ fn main() -&gt; i32 {
 <p>The <code>unsafe</code> keyword signals to the PAL Checker that you are taking manual responsibility for memory safety.</p>
 <h2 id="shared-pointers---reference-counting"><a class="header" href="#shared-pointers---reference-counting">Shared Pointers (<code>~</code>) — Reference Counting</a></h2>
 <p>Shared pointers use runtime reference counting and are fully safe. They allow multiple pointers to share ownership of the same heap-allocated resource.</p>
-<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 {
     auto ~s2# = ~s1 // Shared Copy (ref count increments)
     s2.x = 3000     // Modifies the underlying soul
 } // Ref count decrements when s2 goes out of scope
 </code></pre>
 <h2 id="borrowing-safety"><a class="header" href="#borrowing-safety">Borrowing Safety</a></h2>
-<p>In Toka, function parameters are immutable by default and passed by value (copied). Values of both simple types (like <code>i32</code>) and complex types (like custom <code>shape</code> types) are copied (shallow copied for structures) when passed to a function, keeping the caller’s arguments safe from modification:</p>
+<p>In Toka, function parameters are immutable by default and passed via a <strong>zero-copy implicit reference capture mechanism</strong>. Values of both simple types (like <code>i32</code>) and complex types (like custom <code>shape</code> types) are captured by reference with zero overhead and no cloning, keeping the caller’s arguments safe from modification because parameters are immutable by default inside the function:</p>
 <pre><code class="language-toka">fn show(x: i32) {
     println("x: {}", x)
 }
@@ -1068,7 +1078,7 @@ auto y = identity("hello") // Works with strings
 </code></pre>
 <h2 id="generic-constraints"><a class="header" href="#generic-constraints">Generic Constraints</a></h2>
 <p>Constrain generics with traits:</p>
-<pre><code class="language-tokalang">fn max&lt;'T @PartialOrd&gt;(a: 'T, b: 'T) -&gt; 'T {
+<pre><code class="language-tokalang">fn max&lt;'T: @PartialOrd&gt;(a: 'T, b: 'T) -&gt; 'T {
     if a &gt; b {
         return a
     }
@@ -1078,13 +1088,13 @@ auto y = identity("hello") // Works with strings
 <p>This function works with any type that implements <code>@PartialOrd</code>.</p>
 <h2 id="generic-data-structures"><a class="header" href="#generic-data-structures">Generic Data Structures</a></h2>
 <pre><code class="language-toka">pub shape Pair&lt;'A, 'B&gt;(
-    first: 'A,
-    second: 'B
+    'first: 'A,
+    'second: 'B
 )
 
 impl&lt;'A, 'B&gt; Pair&lt;'A, 'B&gt; {
     pub fn new(first: 'A, second: 'B) -&gt; Pair&lt;'A, 'B&gt; {
-        return Pair(first = first, second = second)
+        return Pair('first = first, 'second = second)
     }
     
     pub fn first(self) -&gt; 'A {
@@ -1096,9 +1106,14 @@ impl&lt;'A, 'B&gt; Pair&lt;'A, 'B&gt; {
     }
 }
 </code></pre>
-<h2 id="type-inference"><a class="header" href="#type-inference">Type Inference</a></h2>
-<p>Toka can infer generic types in most cases, so you rarely need to specify them explicitly:</p>
-<pre><code class="language-tokalang">fn pair&lt;'A, 'B&gt;(a: 'A, b: 'B) -&gt; Pair&lt;'A, 'B&gt; {
+<p>When defining shapes with Morphic generic types (those with a single quote prefix like <code>'A</code>), Toka enforces a strict rule: the corresponding fields must also be prefixed with a single quote (e.g., <code>'first: 'A</code>). This indicates that these fields can dynamically accept different pointer morphology states, avoiding “soul collapse.” However, when calling methods or retrieving fields, you refer to them as normal field names (e.g., <code>self.first</code> instead of <code>self.'first</code>).</p>
+<pre><code>
+## Type Inference
+
+Toka can infer generic types in most cases, so you rarely need to specify them explicitly:
+
+```tokalang
+fn pair&lt;'A, 'B&gt;(a: 'A, b: 'B) -&gt; Pair&lt;'A, 'B&gt; {
     return Pair::new(a, b)
 }
 
@@ -1138,8 +1153,8 @@ fn find_user(id: i32) -&gt; Option&lt;String&gt; {
 fn main() -&gt; i32 {
     auto result = find_user(1)
     match result {
-        auto Option::Some(&amp;name) =&gt; println("Found: {}", name)
-        auto Option::None =&gt; println("User not found")
+        auto Option&lt;String&gt;::Some(&amp;name) =&gt; println("Found: {}", name)
+        auto Option&lt;String&gt;::None =&gt; println("User not found")
     }
     return 0
 }
@@ -1175,8 +1190,8 @@ fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
 
 fn main() -&gt; i32 {
     match divide(10.0, 2.0) {
-        auto Result::Ok(value) =&gt; println("Result: {}", value)
-        auto Result::Err(&amp;msg) =&gt; println("Error: {}", msg)
+        auto Result&lt;f64, String&gt;::Ok(value) =&gt; println("Result: {}", value)
+        auto Result&lt;f64, String&gt;::Err(&amp;msg) =&gt; println("Error: {}", msg)
     }
     return 0
 }
@@ -1254,30 +1269,32 @@ auto grade = match score {
         _ =&gt; { pass "invalid score" }
 }
 </code></pre>
-<p>Use <code>..</code> for exclusive ranges and <code>..=</code> for inclusive ranges.</p>
+<p>Note that Toka does not support native range patterns (like <code>0..10</code>). Instead, use variables with <code>if</code> guard expressions to perform range checking.</p>
 <h2 id="matching-on-options"><a class="header" href="#matching-on-options">Matching on Options</a></h2>
 <pre><code class="language-toka">import std/io::println
 import core/option::Option
 
-fn main() {
+fn main() -&gt; i32 {
     auto id = 1
-    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None()
+    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None
     match opt {
-        auto Option::Some(&amp;name) =&gt; { println("Found: {}", name) }
-        auto Option::None() =&gt; { println("User not found") }
+        auto Option&lt;view_str&gt;::Some(&amp;name) =&gt; { println("Found: {}", name) }
+        auto Option&lt;view_str&gt;::None =&gt; { println("User not found") }
     }
+    return 0
 }
 </code></pre>
 <h2 id="matching-on-results"><a class="header" href="#matching-on-results">Matching on Results</a></h2>
 <pre><code class="language-toka">import std/io::println
 import core/result::Result
 
-fn main() {
+fn main() -&gt; i32 {
     auto res: Result&lt;f32, view_str&gt; = Result&lt;f32, view_str&gt;::Ok(5.0)
     match res {
-        auto Result::Ok(value) =&gt; { println("Result: {}", value) }
-        auto Result::Err(&amp;msg) =&gt; { println("Error: {}", msg) }
+        auto Result&lt;f32, view_str&gt;::Ok(value) =&gt; { println("Result: {}", value) }
+        auto Result&lt;f32, view_str&gt;::Err(&amp;msg) =&gt; { println("Error: {}", msg) }
     }
+    return 0
 }
 </code></pre>
 <h2 id="destructuring-shapes"><a class="header" href="#destructuring-shapes">Destructuring Shapes</a></h2>
@@ -1306,19 +1323,9 @@ auto grade = match score {
     _ =&gt; pass "F"
 }
 </code></pre>
-<h2 id="type-matching"><a class="header" href="#type-matching">Type Matching</a></h2>
-<p>Match on the type of a value:</p>
-<pre><code class="language-toka">import std/io::println
-
-fn inspect&lt;T&gt;(value: T) -&gt; cstring {
-    return match value {
-        i32 =&gt; pass "It's an integer"
-        view_str =&gt; pass "It's a string"
-        bool =&gt; pass "It's a boolean"
-        _ =&gt; pass "Unknown type"
-    }
-}
-</code></pre>
+<h2 id="no-type-based-matching"><a class="header" href="#no-type-based-matching">No Type-Based Matching</a></h2>
+<p>Toka does not support matching directly on types (such as writing <code>i32 =&gt; ...</code> or <code>view_str =&gt; ...</code> inside a <code>match</code> expression). Any type name used in a branch without standard syntax will be treated as a new variable binding pattern (Variable Pattern), which matches any value and shadows other cases, leading to compilation errors or unreachable branches.</p>
+<pre><code></code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="concurrency"><a class="header" href="#concurrency">Concurrency</a></h1>
 <p>Toka provides lightweight concurrency through tasks and message passing, enabling efficient parallel execution.</p>
@@ -1588,8 +1595,8 @@ fn example() {
     scores#.insert(2, 87)
     
     match scores.get(1) {
-        auto Option::Some(score) =&gt; { println("ID 1: {}", score) }
-        auto Option::None() =&gt; { println("Not found") }
+        auto Option&lt;i32&gt;::Some(score) =&gt; { println("ID 1: {}", score) }
+        auto Option&lt;i32&gt;::None =&gt; { println("Not found") }
     }
 }
 </code></pre>
@@ -1718,13 +1725,14 @@ import core/result::Result
 
 fn handle_client(stream#: TcpStream) {
     auto buf: [u8; 1024] = [0:u8; 1024]
-    auto res = stream#.read(&amp;buf[0], 1024:usize)
+    auto *buf_ptr# = &amp;buf[0] as *u8
+    auto res = stream#.read(*buf_ptr, 1024:usize)
     match res {
-        auto Result::Ok(n) =&gt; {
+        auto Result&lt;usize, String&gt;::Ok(n) =&gt; {
             println("Received {} bytes", n)
             stream#.write_string(String::from("ACK"))
         }
-        auto Result::Err(&amp;e) =&gt; {
+        auto Result&lt;usize, String&gt;::Err(&amp;e) =&gt; {
             println("Error")
         }
     }
@@ -1751,11 +1759,11 @@ import stdx/net/url::{Url, parse_url}
 fn example() {
     auto url_res = parse_url(String::from("https://api.example.com:8080/data?id=1#top"))
     match url_res {
-        auto Result::Ok(&amp;url) =&gt; {
+        auto Result&lt;Url, String&gt;::Ok(&amp;url) =&gt; {
             println("Host: {}", url.host)
             println("Port: {}", String::from_int(url.port as i32))
         }
-        auto Result::Err(&amp;err) =&gt; {
+        auto Result&lt;Url, String&gt;::Err(&amp;err) =&gt; {
             println("Error: {}", err)
         }
     }
@@ -1998,66 +2006,66 @@ fn generate_key() -&gt; u64 {
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="projects"><a class="header" href="#projects">Projects</a></h1>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="cli-tool-with-toka-cli"><a class="header" href="#cli-tool-with-toka-cli">CLI Tool with toka-cli</a></h1>
-<p>In this project, we’ll build a command-line tool using Toka and the <code>toka-cli</code> argument parser library.</p>
+<h1 id="cli-tool-with-stdxcliflag"><a class="header" href="#cli-tool-with-stdxcliflag">CLI Tool with stdx/cli/flag</a></h1>
+<p>In this project, we’ll build a command-line tool using Toka and the standard <code>stdx/cli/flag</code> argument parser library.</p>
 <h2 id="setting-up"><a class="header" href="#setting-up">Setting Up</a></h2>
 <p>Create a new project:</p>
 <pre><code class="language-bash">toka init my-cli
 cd my-cli
 </code></pre>
-<p>Add the <code>toka-cli</code> dependency using the Toka package manager:</p>
-<pre><code class="language-bash">toka add toka-cli
-</code></pre>
-<p>This updates your <code>package.tk</code> dependencies automatically.</p>
+<p>Since <code>stdx/cli/flag</code> is a standard library extension in Toka, you do not need to add any external dependencies via the package manager. It is ready to use out-of-the-box!</p>
 <h2 id="defining-arguments"><a class="header" href="#defining-arguments">Defining Arguments</a></h2>
-<pre><code class="language-tokalang">import cli::{App, Arg, Command}
-
+<pre><code class="language-tokalang">import stdx/cli/flag::{Parser, ParsedArgs}
+import std/env
 import std/string::String
+import std/io
 
 fn main() -&gt; i32 {
-    auto app = App::new("my-cli")
-        .version("1.0.0")
-        .about("A sample CLI tool built with Toka")
-        
-    auto name = app.option("-n", "--name")
-        .help("Your name")
-        .required(true)
-        
-    auto verbose = app.flag("-v", "--verbose")
-        .help("Enable verbose output")
-        
-    app.parse_args()
+    // Parser::new takes the program name and a brief description
+    auto parser# = Parser::new(String::from("my-cli"), String::from("A sample CLI tool built with Toka"))
     
-    auto who = name.value().unwrap_or(String::from("World"))
-    println("Hello, {}!", who)
-    
-    if verbose.present() {
-        println("[Verbose] Running with debug output")
+    // Add options to the parser
+    parser#.add_string(String::from("name"), 110:char, String::from("World"), String::from("Your name"))
+    parser#.add_bool(String::from("verbose"), 118:char, false, String::from("Enable verbose output"))
+
+    auto args = env::args()
+    auto res = parser.parse(args)
+    match res {
+        auto Result&lt;ParsedArgs, String&gt;::Ok(parsed) =&gt; {
+            auto who = parsed.get_string(String::from("name"))
+            io::println("Hello, %s!", who.c_str())
+            
+            if parsed.get_bool(String::from("verbose")) {
+                io::println("[Verbose] Running with debug output")
+            }
+        }
+        auto Result&lt;ParsedArgs, String&gt;::Err(&amp;err) =&gt; {
+            if err == String::from("help requested") {
+                parser.print_help()
+                return 0
+            }
+            io::println("Error: %s", err.c_str())
+            return 1
+        }
     }
-    
     return 0
 }
 </code></pre>
 <h2 id="running"><a class="header" href="#running">Running</a></h2>
-<pre><code class="language-bash">toka run -- -n Toka
+<pre><code class="language-bash">toka run src/main.tk -- -n Toka
 # Output: Hello, Toka!
 
-toka run -- -n Toka -v
+toka run src/main.tk -- -n Toka -v
 # Output: Hello, Toka!
 # [Verbose] Running with debug output
 </code></pre>
-<h2 id="subcommands"><a class="header" href="#subcommands">Subcommands</a></h2>
-<p>Build more complex CLIs with subcommands:</p>
-<pre><code class="language-tokalang">auto cmd = app.subcommand("serve")
-    .about("Start the server")
-    .option("-p", "--port")
-    .help("Port number")
-
-match cmd.executed() {
-    true =&gt; start_server(cmd),
-    false =&gt; app.print_help()
-}
+<h2 id="advanced-argument-handling"><a class="header" href="#advanced-argument-handling">Advanced Argument Handling</a></h2>
+<p>Toka’s current <code>stdx/cli/flag</code> library provides basic options and flags parsing with types like <code>bool</code>, <code>i64</code>, <code>f64</code>, and <code>String</code>.</p>
+<p>Positional arguments are captured automatically and can be fetched from the parsed arguments using <code>positionals()</code>:</p>
+<pre><code class="language-tokalang">auto pos_args = parsed.positionals()
+// pos_args is a Vec&lt;String&gt; containing any arguments not matching flags or options
 </code></pre>
+<p>For complex command-line interfaces requiring nested subcommands (like <code>git status</code> or <code>docker run</code>), you can manually match on <code>pos_args</code> to delegate execution to different parser configurations.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="http-server-1"><a class="header" href="#http-server-1">HTTP Server</a></h1>
 <p>Build a fully-functional HTTP server using Toka’s modern networking library.</p>

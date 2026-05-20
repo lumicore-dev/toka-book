@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-3cdd4a37.js";
+            window.path_to_searchindex_js = "../searchindex-0ad52201.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -191,19 +191,21 @@ auto name = "Toka"   // str（字符串切片）
 <p>包名和导入的命名空间<strong>可以</strong>自由使用连字符。这在导入嵌套文件夹或遵循 kebab-case 目录结构的外部库时很常见。你可以导入它们并使用连字符命名空间调用函数：</p>
 <pre><code class="language-tokalang">import std/io::println
 
-// 包名和命名空间可以包含连字符
-import ./nested/toka-ink as toka-ink
+// 包名和命名空间可以包含连字符（但在模块标识符中建议使用下划线对齐真实标准）
+import ./nested/toka_ink as toka_ink
 
-fn main() {
-    toka-ink::render()
+fn main() -&gt; i32 {
+    toka_ink::render()
+    return 0
 }
 </code></pre>
 <h3 id="变量与函数"><a class="header" href="#变量与函数">变量与函数</a></h3>
 <p>普通变量名、常量名、shape/结构体名和函数定义<strong>不能</strong>包含连字符。它们必须遵循标准的字母数字/下划线命名规则（如 <code>camelCase</code> 或 <code>snake_case</code>）：</p>
-<pre><code class="language-tokalang">fn main() {
+<pre><code class="language-tokalang">fn main() -&gt; i32 {
     auto max_size = 1024       // OK（snake_case）
     auto maxSize = 1024        // OK（camelCase）
     // auto max-size = 1024    // 错误：变量名中不允许使用连字符
+    return 0
 }
 </code></pre>
 <h3 id="无歧义的减法运算"><a class="header" href="#无歧义的减法运算">无歧义的减法运算</a></h3>
@@ -278,7 +280,7 @@ impl List {
     pub fn push(self#, val: i32) {}
 }
 
-fn main() {
+fn main() -&gt; i32 {
     auto y = List(data = 10)  // 不可变
     auto x# = List(data = 10) // 可变 — 声明时加 #
 
@@ -289,6 +291,7 @@ fn main() {
     // 调用可变方法需要在变量上加 #
     x#.sort()                 // OK — 调用 .method() 之前在变量上加 #
     x#.push(5)                // OK
+    return 0
 }
 </code></pre>
 <p>这是 Toka <strong>属性标记系统（Attribute Token System）</strong> 的一个例子——<code>#</code> 后缀表示灵魂的可变性，在声明变量或调用其可变方法时放在变量上。</p>

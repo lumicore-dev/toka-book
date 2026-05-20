@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-3cdd4a37.js";
+            window.path_to_searchindex_js = "searchindex-0ad52201.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -282,7 +282,7 @@ toka run hello.tk
 <p>如果你想使用最新的开发版本：</p>
 <pre><code class="language-bash">git clone https://github.com/tokalang/toka.git
 cd tokalang
-./rebuild.sh
+make -C build -j8
 </code></pre>
 <h2 id="支持平台"><a class="header" href="#支持平台">支持平台</a></h2>
 <div class="table-wrapper">
@@ -333,7 +333,7 @@ fn main() -&gt; i32 {
 </ul>
 <h3 id="快速一行测试"><a class="header" href="#快速一行测试">快速一行测试</a></h3>
 <p>如果想快速测试而不创建文件，也可以直接使用：</p>
-<pre><code class="language-bash">echo 'import std/io::{println} fn main() { println("Hello, Toka World!") }' &gt; hello.tk
+<pre><code class="language-bash">echo 'import std/io::{println} fn main() -&gt; i32 { println("Hello, Toka World!") return 0 }' &gt; hello.tk
 toka run hello.tk
 </code></pre>
 <h2 id="下一步"><a class="header" href="#下一步">下一步</a></h2>
@@ -374,7 +374,7 @@ pub const PACKAGE = (
 </code></pre>
 <h2 id="添加依赖"><a class="header" href="#添加依赖">添加依赖</a></h2>
 <p>你可以通过 <code>toka add</code> 命令轻松添加第三方包到项目中：</p>
-<pre><code class="language-bash">toka add toka-ink
+<pre><code class="language-bash">toka add toka_ink
 </code></pre>
 <p>该命令会自动查询 Toka Registry，将包解析为其对应的 GitHub 仓库和版本标签，并更新你的 <code>package.tk</code>：</p>
 <pre><code class="language-tokalang">// package.tk
@@ -382,7 +382,7 @@ pub const PACKAGE = (
     name = "my_project",
     version = "0.1.0",
     dependencies = (
-        toka-ink = "github.com/lumicore-dev/toka-ink:v0.2.1",
+        toka_ink = "github.com/lumicore-dev/toka_ink:v0.2.1",
     )
 )
 </code></pre>
@@ -431,7 +431,7 @@ fn main() -&gt; i32 {
 <ol>
 <li><strong>默认安全</strong> — 变量默认不可变，除非显式标记。</li>
 <li><strong>无隐藏运行时</strong> — 你写什么就执行什么。没有垃圾回收器，没有虚拟机。</li>
-<li><strong>类 C 性能</strong> — 基于 LLVM 二十，Toka 生成优化的原生代码。</li>
+<li><strong>类 C 性能</strong> — 基于 LLVM 20，Toka 生成优化的原生代码。</li>
 <li><strong>现代语法</strong> — 简洁、可读性强，配备强大的模式匹配和错误处理。</li>
 </ol>
 <h2 id="注释语法"><a class="header" href="#注释语法">注释语法</a></h2>
@@ -458,19 +458,21 @@ auto name = "Toka"   // str（字符串切片）
 <p>包名和导入的命名空间<strong>可以</strong>自由使用连字符。这在导入嵌套文件夹或遵循 kebab-case 目录结构的外部库时很常见。你可以导入它们并使用连字符命名空间调用函数：</p>
 <pre><code class="language-tokalang">import std/io::println
 
-// 包名和命名空间可以包含连字符
-import ./nested/toka-ink as toka-ink
+// 包名和命名空间可以包含连字符（但在模块标识符中建议使用下划线对齐真实标准）
+import ./nested/toka_ink as toka_ink
 
-fn main() {
-    toka-ink::render()
+fn main() -&gt; i32 {
+    toka_ink::render()
+    return 0
 }
 </code></pre>
 <h3 id="变量与函数"><a class="header" href="#变量与函数">变量与函数</a></h3>
 <p>普通变量名、常量名、shape/结构体名和函数定义<strong>不能</strong>包含连字符。它们必须遵循标准的字母数字/下划线命名规则（如 <code>camelCase</code> 或 <code>snake_case</code>）：</p>
-<pre><code class="language-tokalang">fn main() {
+<pre><code class="language-tokalang">fn main() -&gt; i32 {
     auto max_size = 1024       // OK（snake_case）
     auto maxSize = 1024        // OK（camelCase）
     // auto max-size = 1024    // 错误：变量名中不允许使用连字符
+    return 0
 }
 </code></pre>
 <h3 id="无歧义的减法运算"><a class="header" href="#无歧义的减法运算">无歧义的减法运算</a></h3>
@@ -545,7 +547,7 @@ impl List {
     pub fn push(self#, val: i32) {}
 }
 
-fn main() {
+fn main() -&gt; i32 {
     auto y = List(data = 10)  // 不可变
     auto x# = List(data = 10) // 可变 — 声明时加 #
 
@@ -556,6 +558,7 @@ fn main() {
     // 调用可变方法需要在变量上加 #
     x#.sort()                 // OK — 调用 .method() 之前在变量上加 #
     x#.push(5)                // OK
+    return 0
 }
 </code></pre>
 <p>这是 Toka <strong>属性标记系统（Attribute Token System）</strong> 的一个例子——<code>#</code> 后缀表示灵魂的可变性，在声明变量或调用其可变方法时放在变量上。</p>
@@ -616,8 +619,9 @@ impl Number {
     }
 }
 
-fn main() {
+fn main() -&gt; i32 {
     auto result = Number(val = 5).double()  // result = 10
+    return 0
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -645,15 +649,15 @@ while count &lt; 5 {
     count = count + 1
 }
 </code></pre>
-<h2 id="for-循环与区间"><a class="header" href="#for-循环与区间">For 循环与区间</a></h2>
-<p>Toka 支持基于区间的迭代：</p>
+<h2 id="遍历数组"><a class="header" href="#遍历数组">遍历数组</a></h2>
+<p>Toka 支持在数组上进行迭代：</p>
 <pre><code class="language-toka">import std/io::println
 
 for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
     println("{}", i)
 }
 </code></pre>
-<p><code>0..10</code> 区间在末尾是排除的——它迭代 <code>0, 1, 2, ..., 9</code>。</p>
+<p>目前 Toka 暂不支持原生范围区间运算符（如 <code>..</code>）。你可以在数组上进行迭代，或使用 <code>while</code> 实现自定义迭代逻辑。</p>
 <h2 id="遍历集合"><a class="header" href="#遍历集合">遍历集合</a></h2>
 <pre><code class="language-toka">import std/io::println
 
@@ -714,7 +718,7 @@ while iter &lt; 100 {
 </thead>
 <tbody>
 <tr><td><code>str</code></td><td>字符串切片（类似 Rust 的 <code>&amp;str</code> 或 C++ 的 <code>string_view</code>）— 不可变，借用</td></tr>
-<tr><td><code>string</code></td><td>拥有的可变字符串（默认 UTF-8 编码）</td></tr>
+<tr><td><code>String</code></td><td>拥有所有权的可变字符串（默认 UTF-8 编码）</td></tr>
 </tbody>
 </table>
 </div>
@@ -748,8 +752,8 @@ println("欢迎使用 {} 版本 {}！", name, version)
 auto full# = String::from("你好，")
 full#.push_str("世界！")
 </code></pre>
-<h2 id="转换为字符串"><a class="header" href="#转换为字符串">转换为字符串</a></h2>
-<p>使用 <code>str()</code> 将其他类型转换为字符串：</p>
+<h2 id="格式化与打印"><a class="header" href="#格式化与打印">格式化与打印</a></h2>
+<p>你可以直接在占位符中打印其他基础类型，无需进行显式的手动类型转换：</p>
 <pre><code class="language-toka">import std/io::println
 
 auto n = 42
@@ -856,14 +860,16 @@ auto unicode: u32 = 0x4E16:u32
 }
 </code></pre>
 <h3 id="--共享指针"><a class="header" href="#--共享指针"><code>~</code> — 共享指针</a></h3>
-<p>通过指针帽子形态实现的基于引用计数的共享所有权。</p>
-<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+<p>引用计数、基于指针形态学的共享所有权。</p>
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 auto ~s2# = ~s1 // 共享拷贝（引用计数增加）
 s2.x = 3000     // 直接修改底层数据（灵魂）
 </code></pre>
 <h3 id="--借用指针"><a class="header" href="#--借用指针"><code>&amp;</code> — 借用指针</a></h3>
-<p>对另一个值的引用或借用指针。显式使用 <code>&amp;</code> 创建以引用已有的灵魂：</p>
-<pre><code class="language-toka">auto &amp;y = &amp;(x) // y 是指向 x 灵魂的借用指针
+<p>指向另一个值的引用或借用指针。通过显式地 <code>&amp;</code> 指向现有的灵魂来创建：</p>
+<pre><code class="language-toka">auto x = 42
+auto &amp;y = &amp;(x) // y 是指向 x 灵魂的借用指针
 </code></pre>
 <h2 id="身份与地址"><a class="header" href="#身份与地址">身份与地址</a></h2>
 <p>要获取局部变量的原始内存地址，使用 <code>*(expr)</code> 语法：</p>
@@ -901,14 +907,16 @@ s2.x = 3000     // 直接修改底层数据（灵魂）
 <p><code>^</code> 标记的作用类似于 Rust 的 <code>Box</code> 或 C++ 的 <code>std::unique_ptr</code>。当独占指针离开作用域时，其资源会自动释放。</p>
 <h3 id="--共享指针引用计数"><a class="header" href="#--共享指针引用计数"><code>~</code> — 共享指针（引用计数）</a></h3>
 <p>共享指针允许多个所有者通过引用计数共享所有权：</p>
-<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 auto ~s2# = ~s1  // 共享拷贝（引用计数增加）
 s2.x = 3000      // 直接修改底层数据（灵魂）
 </code></pre>
 <p>当最后一个 <code>~</code> 引用离开作用域时，资源被释放。</p>
 <h3 id="--借用指针引用语义"><a class="header" href="#--借用指针引用语义"><code>&amp;</code> — 借用指针（引用语义）</a></h3>
 <p>借用指针表示对其他值的引用，不获取其所有权。它们允许临时、受检地访问数据：</p>
-<pre><code class="language-toka">auto &amp;y = &amp;(x)   // 指向 x 灵魂的局部借用指针
+<pre><code class="language-toka">auto x = 42
+auto &amp;y = &amp;(x)   // 指向 x 灵魂的局部借用指针
 </code></pre>
 <h2 id="移动-vs-拷贝"><a class="header" href="#移动-vs-拷贝">移动 vs. 拷贝</a></h2>
 <p>默认情况下，Toka 中的赋值操作执行的是<strong>拷贝</strong>（对于简单类型是按值拷贝，对于结构体/复杂类型是浅拷贝）：</p>
@@ -919,19 +927,21 @@ s2.x = 3000      // 直接修改底层数据（灵魂）
     println("a: {}, b: {}", a, b)
 }
 </code></pre>
-<p>这适用于简单类型（如 <code>i32</code>、<code>f64</code>、<code>bool</code>）以及复杂类型（如 <code>string</code>、<code>Vec</code> 或自定义 <code>shape</code> 类型）。</p>
+<p>这适用于简单类型（如 <code>i32</code>、<code>f64</code>、<code>bool</code>）以及复杂类型（如 <code>String</code>、<code>Vec</code> 或自定义 <code>shape</code> 类型）。</p>
 <h3 id="默认移动语义"><a class="header" href="#默认移动语义">默认移动语义</a></h3>
 <p>默认情况下，<strong>移动语义（Move semantics）<strong>仅适用于</strong>独占指针（<code>^</code>）</strong>。赋值独占指针会将其底层堆资源的独占所有权从源转移到目标：</p>
-<pre><code class="language-toka">auto ^p1 = new Point(x = 10, y = 20, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ^p1 = new Point(x = 10, y = 20, z = 0)
 auto ^p2 = ^p1  // 所有权转移（移动）给 p2，p1 之后不再有效
 </code></pre>
 <h3 id="使用-cede-进行显式移动"><a class="header" href="#使用-cede-进行显式移动">使用 <code>cede</code> 进行显式移动</a></h3>
 <p>对于其他类型（或为了显式转移任何值的所有权），必须使用 <strong><code>cede</code> 关键字</strong>进行显式移动。一旦值被 <code>cede</code>，源变量将不再有效：</p>
-<pre><code class="language-toka">auto s1 = String::from("hello")
+<pre><code class="language-toka">import std/string::String
+auto s1 = String::from("hello")
 auto s2 = cede s1 // 显式移动：s1 之后不再有效
 </code></pre>
-<h2 id="函数参数按值传递"><a class="header" href="#函数参数按值传递">函数参数（按值传递）</a></h2>
-<p>在 Toka 中，函数参数默认是不可变的，并且是按值传递的（简单类型为按值拷贝，复杂类型为浅拷贝）。标准的参数传递不需要特殊的标记符号：</p>
+<h2 id="函数参数零拷贝捕获机制"><a class="header" href="#函数参数零拷贝捕获机制">函数参数（零拷贝捕获机制）</a></h2>
+<p>在 Toka 中，函数参数默认是不可变的，并且是通过<strong>零拷贝隐式引用捕获机制</strong>传递的，而不是传统的按值传递（拷贝）。编译器保证捕获参数具有零运行时开销，并且不会消耗或拷贝原始实参。标准的参数传递不需要特殊的指针标记符号，除非你明确打算传递或重绑定指针句柄：</p>
 <pre><code class="language-toka">fn process(data: i32) {
     println("data: {}", data)
 }
@@ -1010,14 +1020,15 @@ fn main() -&gt; i32 {
 <p><code>unsafe</code> 关键字向 PAL Checker 发出信号，表示你在手动承担内存安全的责任。</p>
 <h2 id="共享指针-引用计数"><a class="header" href="#共享指针-引用计数">共享指针（<code>~</code>）— 引用计数</a></h2>
 <p>共享指针使用运行时引用计数，并且是完全安全的。它们允许多个指针共享对同一堆分配资源的所有权。</p>
-<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 {
     auto ~s2# = ~s1 // 共享拷贝（引用计数增加）
     s2.x = 3000     // 直接修改底层数据（灵魂）
 } // 当 s2 离开作用域时，引用计数减少
 </code></pre>
 <h2 id="借用安全"><a class="header" href="#借用安全">借用安全</a></h2>
-<p>在 Toka 中，函数参数默认是不可变的，并且是按值传递（拷贝）的。无论是简单类型（如 <code>i32</code>）还是复杂类型（如自定义 <code>shape</code> 类型），在传递给函数时都会执行拷贝（结构体执行浅拷贝），从而保护调用方的参数不被修改：</p>
+<p>在 Toka 中，函数参数默认是不可变的，并且是通过<strong>零拷贝隐式引用捕获机制</strong>传递的。无论是简单类型（如 <code>i32</code>）还是复杂类型（如自定义 <code>shape</code> 类型），在作为参数传入时，都是通过引用直接捕获的，具有零拷贝和零运行时开销，同时编译器默认阻止对不可变参数的任何修改，从而保护调用方的参数不被篡改：</p>
 <pre><code class="language-toka">fn show(x: i32) {
     println("x: {}", x)
 }
@@ -1068,7 +1079,7 @@ auto y = identity("hello") // 适用于字符串
 </code></pre>
 <h2 id="泛型约束"><a class="header" href="#泛型约束">泛型约束</a></h2>
 <p>使用 trait 约束泛型：</p>
-<pre><code class="language-tokalang">fn max&lt;'T @PartialOrd&gt;(a: 'T, b: 'T) -&gt; 'T {
+<pre><code class="language-toka">fn max&lt;'T: @PartialOrd&gt;(a: 'T, b: 'T) -&gt; 'T {
     if a &gt; b {
         return a
     }
@@ -1078,13 +1089,13 @@ auto y = identity("hello") // 适用于字符串
 <p>该函数适用于任何实现了 <code>@PartialOrd</code> 的类型。</p>
 <h2 id="泛型数据结构"><a class="header" href="#泛型数据结构">泛型数据结构</a></h2>
 <pre><code class="language-toka">pub shape Pair&lt;'A, 'B&gt;(
-    first: 'A,
-    second: 'B
+    'first: 'A,
+    'second: 'B
 )
 
 impl&lt;'A, 'B&gt; Pair&lt;'A, 'B&gt; {
     pub fn new(first: 'A, second: 'B) -&gt; Pair&lt;'A, 'B&gt; {
-        return Pair(first = first, second = second)
+        return Pair('first = first, 'second = second)
     }
     
     pub fn first(self) -&gt; 'A {
@@ -1096,6 +1107,7 @@ impl&lt;'A, 'B&gt; Pair&lt;'A, 'B&gt; {
     }
 }
 </code></pre>
+<p>当定义具有 Morphic 泛型类型（那些带有单引号前缀的类型，如 <code>'A</code>）的 Shape 时，Toka 强制执行一条严格规则：对应的字段名称也必须带有单引号前缀（例如 <code>'first: 'A</code>）。这表明这些字段能够动态接受不同的指针形态状态，从而规避“灵魂塌陷”。但是，在调用方法或获取字段值时，应像往常一样使用常规字段名称进行引用（例如使用 <code>self.first</code>，而不是 <code>self.'first</code>）。</p>
 <h2 id="类型推断"><a class="header" href="#类型推断">类型推断</a></h2>
 <p>在大多数情况下，Toka 可以推断泛型类型，因此你很少需要显式指定：</p>
 <pre><code class="language-tokalang">fn pair&lt;'A, 'B&gt;(a: 'A, b: 'B) -&gt; Pair&lt;'A, 'B&gt; {
@@ -1138,8 +1150,8 @@ fn find_user(id: i32) -&gt; Option&lt;String&gt; {
 fn main() -&gt; i32 {
     auto result = find_user(1)
     match result {
-        auto Option::Some(&amp;name) =&gt; println("找到：{}", name)
-        auto Option::None =&gt; println("未找到用户")
+        auto Option&lt;String&gt;::Some(&amp;name) =&gt; println("找到：{}", name)
+        auto Option&lt;String&gt;::None =&gt; println("未找到用户")
     }
     return 0
 }
@@ -1175,8 +1187,8 @@ fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
 
 fn main() -&gt; i32 {
     match divide(10.0, 2.0) {
-        auto Result::Ok(value) =&gt; println("结果：{}", value)
-        auto Result::Err(&amp;msg) =&gt; println("错误：{}", msg)
+        auto Result&lt;f64, String&gt;::Ok(value) =&gt; println("结果：{}", value)
+        auto Result&lt;f64, String&gt;::Err(&amp;msg) =&gt; println("错误：{}", msg)
     }
     return 0
 }
@@ -1254,30 +1266,32 @@ auto grade = match score {
         _ =&gt; { pass "无效分数" }
 }
 </code></pre>
-<p>使用 <code>..</code> 表示排他范围，<code>..=</code> 表示包含范围。</p>
+<p>请注意，Toka 不支持原生范围模式匹配（如 0..10）。相反，应使用带有 if 守卫表达式的变量来进行范围检查。</p>
 <h2 id="匹配-option"><a class="header" href="#匹配-option">匹配 Option</a></h2>
 <pre><code class="language-toka">import std/io::println
 import core/option::Option
 
-fn main() {
+fn main() -&gt; i32 {
     auto id = 1
-    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None()
+    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None
     match opt {
-        auto Option::Some(&amp;name) =&gt; { println("找到：{}", name) }
-        auto Option::None() =&gt; { println("未找到用户") }
+        auto Option&lt;view_str&gt;::Some(&amp;name) =&gt; { println("找到：{}", name) }
+        auto Option&lt;view_str&gt;::None =&gt; { println("未找到用户") }
     }
+    return 0
 }
 </code></pre>
 <h2 id="匹配-result"><a class="header" href="#匹配-result">匹配 Result</a></h2>
 <pre><code class="language-toka">import std/io::println
 import core/result::Result
 
-fn main() {
+fn main() -&gt; i32 {
     auto res: Result&lt;f32, view_str&gt; = Result&lt;f32, view_str&gt;::Ok(5.0)
     match res {
-        auto Result::Ok(value) =&gt; { println("结果：{}", value) }
-        auto Result::Err(&amp;msg) =&gt; { println("错误：{}", msg) }
+        auto Result&lt;f32, view_str&gt;::Ok(value) =&gt; { println("结果：{}", value) }
+        auto Result&lt;f32, view_str&gt;::Err(&amp;msg) =&gt; { println("错误：{}", msg) }
     }
+    return 0
 }
 </code></pre>
 <h2 id="解构-shape"><a class="header" href="#解构-shape">解构 Shape</a></h2>
@@ -1306,19 +1320,8 @@ auto grade = match score {
     _ =&gt; pass "F"
 }
 </code></pre>
-<h2 id="类型匹配"><a class="header" href="#类型匹配">类型匹配</a></h2>
-<p>对值的类型进行匹配：</p>
-<pre><code class="language-toka">import std/io::println
-
-fn inspect&lt;T&gt;(value: T) -&gt; cstring {
-    return match value {
-        i32 =&gt; pass "这是一个整数"
-        view_str =&gt; pass "这是一个字符串"
-        bool =&gt; pass "这是一个布尔值"
-        _ =&gt; pass "未知类型"
-    }
-}
-</code></pre>
+<h2 id="不支持基于类型的匹配"><a class="header" href="#不支持基于类型的匹配">不支持基于类型的匹配</a></h2>
+<p>Toka 不支持直接对类型进行模式匹配（例如在 <code>match</code> 表达式内部书写 <code>i32 =&gt; ...</code> 或 <code>view_str =&gt; ...</code>）。在分支中若使用不带标准语法的类型名称，将被视为一个新的变量绑定模式（Variable Pattern），这会匹配任意值并遮蔽其他分支，从而导致编译错误或不可达分支。</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="并发编程"><a class="header" href="#并发编程">并发编程</a></h1>
 <p>Toka 通过任务（task）和消息传递提供轻量级的并发能力，实现高效的并行执行。</p>
@@ -1588,8 +1591,8 @@ fn example() {
     scores#.insert(2, 87)
     
     match scores.get(1) {
-        auto Option::Some(score) =&gt; { println("ID 1: {}", score) }
-        auto Option::None() =&gt; { println("未找到") }
+        auto Option&lt;i32&gt;::Some(score) =&gt; { println("ID 1: {}", score) }
+        auto Option&lt;i32&gt;::None =&gt; { println("未找到") }
     }
 }
 </code></pre>
@@ -1718,13 +1721,14 @@ import core/result::Result
 
 fn handle_client(stream#: TcpStream) {
     auto buf: [u8; 1024] = [0:u8; 1024]
-    auto res = stream#.read(&amp;buf[0], 1024:usize)
+    auto *buf_ptr# = &amp;buf[0] as *u8
+    auto res = stream#.read(*buf_ptr, 1024:usize)
     match res {
-        auto Result::Ok(n) =&gt; {
+        auto Result&lt;usize, String&gt;::Ok(n) =&gt; {
             println("收到 {} 字节", n)
             stream#.write_string(String::from("ACK"))
         }
-        auto Result::Err(&amp;e) =&gt; {
+        auto Result&lt;usize, String&gt;::Err(&amp;e) =&gt; {
             println("错误")
         }
     }
@@ -1751,11 +1755,11 @@ import stdx/net/url::{Url, parse_url}
 fn example() {
     auto url_res = parse_url(String::from("https://api.example.com:8080/data?id=1#top"))
     match url_res {
-        auto Result::Ok(&amp;url) =&gt; {
+        auto Result&lt;Url, String&gt;::Ok(&amp;url) =&gt; {
             println("主机：{}", url.host)
             println("端口：{}", String::from_int(url.port as i32))
         }
-        auto Result::Err(&amp;err) =&gt; {
+        auto Result&lt;Url, String&gt;::Err(&amp;err) =&gt; {
             println("错误：{}", err)
         }
     }
@@ -1998,66 +2002,66 @@ fn generate_key() -&gt; u64 {
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="实战项目"><a class="header" href="#实战项目">实战项目</a></h1>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="用-toka-cli-构建-cli-工具"><a class="header" href="#用-toka-cli-构建-cli-工具">用 toka-cli 构建 CLI 工具</a></h1>
-<p>在这个项目中，我们将使用 Toka 和 <code>toka-cli</code> 参数解析库构建一个命令行工具。</p>
+<h1 id="用-stdxcliflag-构建-cli-工具"><a class="header" href="#用-stdxcliflag-构建-cli-工具">用 stdx/cli/flag 构建 CLI 工具</a></h1>
+<p>在这个项目中，我们将使用 Toka 以及标准的 <code>stdx/cli/flag</code> 参数解析库来构建一个命令行工具。</p>
 <h2 id="项目设置"><a class="header" href="#项目设置">项目设置</a></h2>
 <p>创建一个新项目：</p>
 <pre><code class="language-bash">toka init my-cli
 cd my-cli
 </code></pre>
-<p>使用 Toka 包管理器添加 <code>toka-cli</code> 依赖：</p>
-<pre><code class="language-bash">toka add toka-cli
-</code></pre>
-<p>这会自动更新你的 <code>package.tk</code> 依赖配置。</p>
+<p>由于 <code>stdx/cli/flag</code> 是 Toka 中的标准库扩展，你不需要通过包管理器添加任何外部依赖。它开箱即用！</p>
 <h2 id="定义参数"><a class="header" href="#定义参数">定义参数</a></h2>
-<pre><code class="language-tokalang">import cli::{App, Arg, Command}
-
+<pre><code class="language-tokalang">import stdx/cli/flag::{Parser, ParsedArgs}
+import std/env
 import std/string::String
+import std/io
 
 fn main() -&gt; i32 {
-    auto app = App::new("my-cli")
-        .version("1.0.0")
-        .about("一个用 Toka 构建的示例 CLI 工具")
-        
-    auto name = app.option("-n", "--name")
-        .help("你的名字")
-        .required(true)
-        
-    auto verbose = app.flag("-v", "--verbose")
-        .help("启用详细输出")
-        
-    app.parse_args()
+    // Parser::new 接收程序名称和简短的描述
+    auto parser# = Parser::new(String::from("my-cli"), String::from("一个用 Toka 构建的示例 CLI 工具"))
     
-    auto who = name.value().unwrap_or(String::from("World"))
-    println("Hello, {}!", who)
-    
-    if verbose.present() {
-        println("[Verbose] 正在以调试模式运行")
+    // 向解析器中添加选项
+    parser#.add_string(String::from("name"), 110:char, String::from("World"), String::from("你的名字"))
+    parser#.add_bool(String::from("verbose"), 118:char, false, String::from("启用详细输出"))
+
+    auto args = env::args()
+    auto res = parser.parse(args)
+    match res {
+        auto Result&lt;ParsedArgs, String&gt;::Ok(parsed) =&gt; {
+            auto who = parsed.get_string(String::from("name"))
+            io::println("Hello, %s!", who.c_str())
+            
+            if parsed.get_bool(String::from("verbose")) {
+                io::println("[Verbose] 正在以调试模式运行")
+            }
+        }
+        auto Result&lt;ParsedArgs, String&gt;::Err(&amp;err) =&gt; {
+            if err == String::from("help requested") {
+                parser.print_help()
+                return 0
+            }
+            io::println("Error: %s", err.c_str())
+            return 1
+        }
     }
-    
     return 0
 }
 </code></pre>
 <h2 id="运行"><a class="header" href="#运行">运行</a></h2>
-<pre><code class="language-bash">toka run -- -n Toka
+<pre><code class="language-bash">toka run src/main.tk -- -n Toka
 # 输出：Hello, Toka!
 
-toka run -- -n Toka -v
+toka run src/main.tk -- -n Toka -v
 # 输出：Hello, Toka!
 # [Verbose] 正在以调试模式运行
 </code></pre>
-<h2 id="子命令"><a class="header" href="#子命令">子命令</a></h2>
-<p>使用子命令构建更复杂的 CLI：</p>
-<pre><code class="language-tokalang">auto cmd = app.subcommand("serve")
-    .about("启动服务器")
-    .option("-p", "--port")
-    .help("端口号")
-
-match cmd.executed() {
-    true =&gt; start_server(cmd),
-    false =&gt; app.print_help()
-}
+<h2 id="高级参数处理"><a class="header" href="#高级参数处理">高级参数处理</a></h2>
+<p>Toka 目前的 <code>stdx/cli/flag</code> 库提供了基本的选项和标志解析，支持 <code>bool</code>、<code>i64</code>、<code>f64</code> 和 <code>String</code> 等类型。</p>
+<p>定位参数（Positional arguments）会被自动捕获，并可以通过已解析参数的 <code>positionals()</code> 方法来获取：</p>
+<pre><code class="language-tokalang">auto pos_args = parsed.positionals()
+// pos_args 是一个 Vec&lt;String&gt;，包含所有不匹配任何标志或选项的参数
 </code></pre>
+<p>对于需要嵌套子命令（如 <code>git status</code> 或 <code>docker run</code>）的复杂命令行界面，你可以手动对 <code>pos_args</code> 进行模式匹配，以将执行分发给不同的解析器配置。</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="http-服务器-1"><a class="header" href="#http-服务器-1">HTTP 服务器</a></h1>
 <p>使用 Toka 的现代网络库构建一个功能完整的 HTTP 服务器。</p>

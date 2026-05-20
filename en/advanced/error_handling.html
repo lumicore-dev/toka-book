@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -195,8 +195,8 @@ fn find_user(id: i32) -&gt; Option&lt;String&gt; {
 fn main() -&gt; i32 {
     auto result = find_user(1)
     match result {
-        auto Option::Some(&amp;name) =&gt; println("Found: {}", name)
-        auto Option::None =&gt; println("User not found")
+        auto Option&lt;String&gt;::Some(&amp;name) =&gt; println("Found: {}", name)
+        auto Option&lt;String&gt;::None =&gt; println("User not found")
     }
     return 0
 }
@@ -232,8 +232,8 @@ fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
 
 fn main() -&gt; i32 {
     match divide(10.0, 2.0) {
-        auto Result::Ok(value) =&gt; println("Result: {}", value)
-        auto Result::Err(&amp;msg) =&gt; println("Error: {}", msg)
+        auto Result&lt;f64, String&gt;::Ok(value) =&gt; println("Result: {}", value)
+        auto Result&lt;f64, String&gt;::Err(&amp;msg) =&gt; println("Error: {}", msg)
     }
     return 0
 }

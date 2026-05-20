@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -188,7 +188,7 @@
 </thead>
 <tbody>
 <tr><td><code>str</code></td><td>String slice (like Rust <code>&amp;str</code> or C++ <code>string_view</code>) — immutable, borrowed</td></tr>
-<tr><td><code>string</code></td><td>Owned mutable string (UTF-8 by default)</td></tr>
+<tr><td><code>String</code></td><td>Owned mutable string (UTF-8 by default, defined in <code>std/string::String</code>)</td></tr>
 </tbody>
 </table>
 </div>
@@ -222,8 +222,8 @@ println("Welcome to {} version {}!", name, version)
 auto full# = String::from("Hello, ")
 full#.push_str("World!")
 </code></pre>
-<h2 id="conversion-to-string"><a class="header" href="#conversion-to-string">Conversion to String</a></h2>
-<p>Convert other types to string with <code>str()</code>:</p>
+<h2 id="formatting-and-printing"><a class="header" href="#formatting-and-printing">Formatting and Printing</a></h2>
+<p>You can print other types easily using placeholders without manual conversion:</p>
 <pre><code class="language-toka">import std/io::println
 
 auto n = 42

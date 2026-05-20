@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-3cdd4a37.js";
+            window.path_to_searchindex_js = "../searchindex-0ad52201.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -177,66 +177,66 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="用-toka-cli-构建-cli-工具"><a class="header" href="#用-toka-cli-构建-cli-工具">用 toka-cli 构建 CLI 工具</a></h1>
-<p>在这个项目中，我们将使用 Toka 和 <code>toka-cli</code> 参数解析库构建一个命令行工具。</p>
+                        <h1 id="用-stdxcliflag-构建-cli-工具"><a class="header" href="#用-stdxcliflag-构建-cli-工具">用 stdx/cli/flag 构建 CLI 工具</a></h1>
+<p>在这个项目中，我们将使用 Toka 以及标准的 <code>stdx/cli/flag</code> 参数解析库来构建一个命令行工具。</p>
 <h2 id="项目设置"><a class="header" href="#项目设置">项目设置</a></h2>
 <p>创建一个新项目：</p>
 <pre><code class="language-bash">toka init my-cli
 cd my-cli
 </code></pre>
-<p>使用 Toka 包管理器添加 <code>toka-cli</code> 依赖：</p>
-<pre><code class="language-bash">toka add toka-cli
-</code></pre>
-<p>这会自动更新你的 <code>package.tk</code> 依赖配置。</p>
+<p>由于 <code>stdx/cli/flag</code> 是 Toka 中的标准库扩展，你不需要通过包管理器添加任何外部依赖。它开箱即用！</p>
 <h2 id="定义参数"><a class="header" href="#定义参数">定义参数</a></h2>
-<pre><code class="language-tokalang">import cli::{App, Arg, Command}
-
+<pre><code class="language-tokalang">import stdx/cli/flag::{Parser, ParsedArgs}
+import std/env
 import std/string::String
+import std/io
 
 fn main() -&gt; i32 {
-    auto app = App::new("my-cli")
-        .version("1.0.0")
-        .about("一个用 Toka 构建的示例 CLI 工具")
-        
-    auto name = app.option("-n", "--name")
-        .help("你的名字")
-        .required(true)
-        
-    auto verbose = app.flag("-v", "--verbose")
-        .help("启用详细输出")
-        
-    app.parse_args()
+    // Parser::new 接收程序名称和简短的描述
+    auto parser# = Parser::new(String::from("my-cli"), String::from("一个用 Toka 构建的示例 CLI 工具"))
     
-    auto who = name.value().unwrap_or(String::from("World"))
-    println("Hello, {}!", who)
-    
-    if verbose.present() {
-        println("[Verbose] 正在以调试模式运行")
+    // 向解析器中添加选项
+    parser#.add_string(String::from("name"), 110:char, String::from("World"), String::from("你的名字"))
+    parser#.add_bool(String::from("verbose"), 118:char, false, String::from("启用详细输出"))
+
+    auto args = env::args()
+    auto res = parser.parse(args)
+    match res {
+        auto Result&lt;ParsedArgs, String&gt;::Ok(parsed) =&gt; {
+            auto who = parsed.get_string(String::from("name"))
+            io::println("Hello, %s!", who.c_str())
+            
+            if parsed.get_bool(String::from("verbose")) {
+                io::println("[Verbose] 正在以调试模式运行")
+            }
+        }
+        auto Result&lt;ParsedArgs, String&gt;::Err(&amp;err) =&gt; {
+            if err == String::from("help requested") {
+                parser.print_help()
+                return 0
+            }
+            io::println("Error: %s", err.c_str())
+            return 1
+        }
     }
-    
     return 0
 }
 </code></pre>
 <h2 id="运行"><a class="header" href="#运行">运行</a></h2>
-<pre><code class="language-bash">toka run -- -n Toka
+<pre><code class="language-bash">toka run src/main.tk -- -n Toka
 # 输出：Hello, Toka!
 
-toka run -- -n Toka -v
+toka run src/main.tk -- -n Toka -v
 # 输出：Hello, Toka!
 # [Verbose] 正在以调试模式运行
 </code></pre>
-<h2 id="子命令"><a class="header" href="#子命令">子命令</a></h2>
-<p>使用子命令构建更复杂的 CLI：</p>
-<pre><code class="language-tokalang">auto cmd = app.subcommand("serve")
-    .about("启动服务器")
-    .option("-p", "--port")
-    .help("端口号")
-
-match cmd.executed() {
-    true =&gt; start_server(cmd),
-    false =&gt; app.print_help()
-}
+<h2 id="高级参数处理"><a class="header" href="#高级参数处理">高级参数处理</a></h2>
+<p>Toka 目前的 <code>stdx/cli/flag</code> 库提供了基本的选项和标志解析，支持 <code>bool</code>、<code>i64</code>、<code>f64</code> 和 <code>String</code> 等类型。</p>
+<p>定位参数（Positional arguments）会被自动捕获，并可以通过已解析参数的 <code>positionals()</code> 方法来获取：</p>
+<pre><code class="language-tokalang">auto pos_args = parsed.positionals()
+// pos_args 是一个 Vec&lt;String&gt;，包含所有不匹配任何标志或选项的参数
 </code></pre>
+<p>对于需要嵌套子命令（如 <code>git status</code> 或 <code>docker run</code>）的复杂命令行界面，你可以手动对 <code>pos_args</code> 进行模式匹配，以将执行分发给不同的解析器配置。</p>
 
                     </main>
 

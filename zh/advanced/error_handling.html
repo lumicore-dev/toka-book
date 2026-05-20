@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-3cdd4a37.js";
+            window.path_to_searchindex_js = "../searchindex-0ad52201.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -195,8 +195,8 @@ fn find_user(id: i32) -&gt; Option&lt;String&gt; {
 fn main() -&gt; i32 {
     auto result = find_user(1)
     match result {
-        auto Option::Some(&amp;name) =&gt; println("找到：{}", name)
-        auto Option::None =&gt; println("未找到用户")
+        auto Option&lt;String&gt;::Some(&amp;name) =&gt; println("找到：{}", name)
+        auto Option&lt;String&gt;::None =&gt; println("未找到用户")
     }
     return 0
 }
@@ -232,8 +232,8 @@ fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
 
 fn main() -&gt; i32 {
     match divide(10.0, 2.0) {
-        auto Result::Ok(value) =&gt; println("结果：{}", value)
-        auto Result::Err(&amp;msg) =&gt; println("错误：{}", msg)
+        auto Result&lt;f64, String&gt;::Ok(value) =&gt; println("结果：{}", value)
+        auto Result&lt;f64, String&gt;::Err(&amp;msg) =&gt; println("错误：{}", msg)
     }
     return 0
 }

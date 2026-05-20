@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -217,13 +217,15 @@
 </code></pre>
 <h3 id="--shared-pointer"><a class="header" href="#--shared-pointer"><code>~</code> — Shared Pointer</a></h3>
 <p>Reference-counted, shared ownership via pointer morphology.</p>
-<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 auto ~s2# = ~s1 // Shared Copy (ref count increments)
 s2.x = 3000     // Modifies the underlying soul
 </code></pre>
 <h3 id="--borrow-pointer"><a class="header" href="#--borrow-pointer"><code>&amp;</code> — Borrow Pointer</a></h3>
 <p>A reference or borrow pointer to another value. Created explicitly via <code>&amp;</code> to refer to an existing soul:</p>
-<pre><code class="language-toka">auto &amp;y = &amp;(x) // y is a borrow pointer pointing to the soul of x
+<pre><code class="language-toka">auto x = 42
+auto &amp;y = &amp;(x) // y is a borrow pointer pointing to the soul of x
 </code></pre>
 <h2 id="identity-and-address"><a class="header" href="#identity-and-address">Identity and Address</a></h2>
 <p>To get the raw memory address of a local variable, use the <code>*(expr)</code> syntax:</p>

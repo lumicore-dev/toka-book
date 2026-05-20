@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-3cdd4a37.js";
+            window.path_to_searchindex_js = "../searchindex-0ad52201.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -210,7 +210,7 @@ fn main() -&gt; i32 {
 </ul>
 <h3 id="快速一行测试"><a class="header" href="#快速一行测试">快速一行测试</a></h3>
 <p>如果想快速测试而不创建文件，也可以直接使用：</p>
-<pre><code class="language-bash">echo 'import std/io::{println} fn main() { println("Hello, Toka World!") }' &gt; hello.tk
+<pre><code class="language-bash">echo 'import std/io::{println} fn main() -&gt; i32 { println("Hello, Toka World!") return 0 }' &gt; hello.tk
 toka run hello.tk
 </code></pre>
 <h2 id="下一步"><a class="header" href="#下一步">下一步</a></h2>

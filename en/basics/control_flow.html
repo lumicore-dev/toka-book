@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -201,15 +201,15 @@ while count &lt; 5 {
     count = count + 1
 }
 </code></pre>
-<h2 id="for-loops-with-ranges"><a class="header" href="#for-loops-with-ranges">For Loops with Ranges</a></h2>
-<p>Toka supports range-based iteration:</p>
+<h2 id="iterating-over-arrays"><a class="header" href="#iterating-over-arrays">Iterating Over Arrays</a></h2>
+<p>Toka supports array-based iteration:</p>
 <pre><code class="language-toka">import std/io::println
 
 for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
     println("{}", i)
 }
 </code></pre>
-<p>The <code>0..10</code> range is exclusive on the end — it iterates <code>0, 1, 2, ..., 9</code>.</p>
+<p>Currently, Toka does not support a native range operator (like <code>..</code>). You can iterate over an array of elements or implement custom loops using <code>while</code>.</p>
 <h2 id="iterating-collections"><a class="header" href="#iterating-collections">Iterating Collections</a></h2>
 <pre><code class="language-toka">import std/io::println
 

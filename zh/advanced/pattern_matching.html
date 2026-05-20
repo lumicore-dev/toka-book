@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-3cdd4a37.js";
+            window.path_to_searchindex_js = "../searchindex-0ad52201.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -201,30 +201,32 @@ auto grade = match score {
         _ =&gt; { pass "无效分数" }
 }
 </code></pre>
-<p>使用 <code>..</code> 表示排他范围，<code>..=</code> 表示包含范围。</p>
+<p>请注意，Toka 不支持原生范围模式匹配（如 0..10）。相反，应使用带有 if 守卫表达式的变量来进行范围检查。</p>
 <h2 id="匹配-option"><a class="header" href="#匹配-option">匹配 Option</a></h2>
 <pre><code class="language-toka">import std/io::println
 import core/option::Option
 
-fn main() {
+fn main() -&gt; i32 {
     auto id = 1
-    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None()
+    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None
     match opt {
-        auto Option::Some(&amp;name) =&gt; { println("找到：{}", name) }
-        auto Option::None() =&gt; { println("未找到用户") }
+        auto Option&lt;view_str&gt;::Some(&amp;name) =&gt; { println("找到：{}", name) }
+        auto Option&lt;view_str&gt;::None =&gt; { println("未找到用户") }
     }
+    return 0
 }
 </code></pre>
 <h2 id="匹配-result"><a class="header" href="#匹配-result">匹配 Result</a></h2>
 <pre><code class="language-toka">import std/io::println
 import core/result::Result
 
-fn main() {
+fn main() -&gt; i32 {
     auto res: Result&lt;f32, view_str&gt; = Result&lt;f32, view_str&gt;::Ok(5.0)
     match res {
-        auto Result::Ok(value) =&gt; { println("结果：{}", value) }
-        auto Result::Err(&amp;msg) =&gt; { println("错误：{}", msg) }
+        auto Result&lt;f32, view_str&gt;::Ok(value) =&gt; { println("结果：{}", value) }
+        auto Result&lt;f32, view_str&gt;::Err(&amp;msg) =&gt; { println("错误：{}", msg) }
     }
+    return 0
 }
 </code></pre>
 <h2 id="解构-shape"><a class="header" href="#解构-shape">解构 Shape</a></h2>
@@ -253,19 +255,8 @@ auto grade = match score {
     _ =&gt; pass "F"
 }
 </code></pre>
-<h2 id="类型匹配"><a class="header" href="#类型匹配">类型匹配</a></h2>
-<p>对值的类型进行匹配：</p>
-<pre><code class="language-toka">import std/io::println
-
-fn inspect&lt;T&gt;(value: T) -&gt; cstring {
-    return match value {
-        i32 =&gt; pass "这是一个整数"
-        view_str =&gt; pass "这是一个字符串"
-        bool =&gt; pass "这是一个布尔值"
-        _ =&gt; pass "未知类型"
-    }
-}
-</code></pre>
+<h2 id="不支持基于类型的匹配"><a class="header" href="#不支持基于类型的匹配">不支持基于类型的匹配</a></h2>
+<p>Toka 不支持直接对类型进行模式匹配（例如在 <code>match</code> 表达式内部书写 <code>i32 =&gt; ...</code> 或 <code>view_str =&gt; ...</code>）。在分支中若使用不带标准语法的类型名称，将被视为一个新的变量绑定模式（Variable Pattern），这会匹配任意值并遮蔽其他分支，从而导致编译错误或不可达分支。</p>
 
                     </main>
 

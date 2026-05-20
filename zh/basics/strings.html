@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-3cdd4a37.js";
+            window.path_to_searchindex_js = "../searchindex-0ad52201.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -188,7 +188,7 @@
 </thead>
 <tbody>
 <tr><td><code>str</code></td><td>字符串切片（类似 Rust 的 <code>&amp;str</code> 或 C++ 的 <code>string_view</code>）— 不可变，借用</td></tr>
-<tr><td><code>string</code></td><td>拥有的可变字符串（默认 UTF-8 编码）</td></tr>
+<tr><td><code>String</code></td><td>拥有所有权的可变字符串（默认 UTF-8 编码）</td></tr>
 </tbody>
 </table>
 </div>
@@ -222,8 +222,8 @@ println("欢迎使用 {} 版本 {}！", name, version)
 auto full# = String::from("你好，")
 full#.push_str("世界！")
 </code></pre>
-<h2 id="转换为字符串"><a class="header" href="#转换为字符串">转换为字符串</a></h2>
-<p>使用 <code>str()</code> 将其他类型转换为字符串：</p>
+<h2 id="格式化与打印"><a class="header" href="#格式化与打印">格式化与打印</a></h2>
+<p>你可以直接在占位符中打印其他基础类型，无需进行显式的手动类型转换：</p>
 <pre><code class="language-toka">import std/io::println
 
 auto n = 42

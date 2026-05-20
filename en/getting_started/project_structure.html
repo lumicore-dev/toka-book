@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -212,7 +212,7 @@ pub const PACKAGE = (
 </code></pre>
 <h2 id="adding-dependencies"><a class="header" href="#adding-dependencies">Adding Dependencies</a></h2>
 <p>You can easily add third-party packages to your project using the <code>toka add</code> command:</p>
-<pre><code class="language-bash">toka add toka-ink
+<pre><code class="language-bash">toka add toka_ink
 </code></pre>
 <p>This will automatically query the Toka Registry, resolve the package to its GitHub repository and version tag, and update your <code>package.tk</code>:</p>
 <pre><code class="language-tokalang">// package.tk
@@ -220,7 +220,7 @@ pub const PACKAGE = (
     name = "my_project",
     version = "0.1.0",
     dependencies = (
-        toka-ink = "github.com/lumicore-dev/toka-ink:v0.2.1",
+        toka_ink = "github.com/lumicore-dev/toka-ink:v0.2.1",
     )
 )
 </code></pre>

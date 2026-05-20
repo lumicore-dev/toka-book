@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -213,13 +213,14 @@ import core/result::Result
 
 fn handle_client(stream#: TcpStream) {
     auto buf: [u8; 1024] = [0:u8; 1024]
-    auto res = stream#.read(&amp;buf[0], 1024:usize)
+    auto *buf_ptr# = &amp;buf[0] as *u8
+    auto res = stream#.read(*buf_ptr, 1024:usize)
     match res {
-        auto Result::Ok(n) =&gt; {
+        auto Result&lt;usize, String&gt;::Ok(n) =&gt; {
             println("Received {} bytes", n)
             stream#.write_string(String::from("ACK"))
         }
-        auto Result::Err(&amp;e) =&gt; {
+        auto Result&lt;usize, String&gt;::Err(&amp;e) =&gt; {
             println("Error")
         }
     }
@@ -246,11 +247,11 @@ import stdx/net/url::{Url, parse_url}
 fn example() {
     auto url_res = parse_url(String::from("https://api.example.com:8080/data?id=1#top"))
     match url_res {
-        auto Result::Ok(&amp;url) =&gt; {
+        auto Result&lt;Url, String&gt;::Ok(&amp;url) =&gt; {
             println("Host: {}", url.host)
             println("Port: {}", String::from_int(url.port as i32))
         }
-        auto Result::Err(&amp;err) =&gt; {
+        auto Result&lt;Url, String&gt;::Err(&amp;err) =&gt; {
             println("Error: {}", err)
         }
     }

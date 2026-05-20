@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-3cdd4a37.js";
+            window.path_to_searchindex_js = "../searchindex-0ad52201.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -212,8 +212,8 @@ fn example() {
     scores#.insert(2, 87)
     
     match scores.get(1) {
-        auto Option::Some(score) =&gt; { println("ID 1: {}", score) }
-        auto Option::None() =&gt; { println("未找到") }
+        auto Option&lt;i32&gt;::Some(score) =&gt; { println("ID 1: {}", score) }
+        auto Option&lt;i32&gt;::None =&gt; { println("未找到") }
     }
 }
 </code></pre>

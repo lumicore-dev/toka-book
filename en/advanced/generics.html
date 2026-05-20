@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -190,7 +190,7 @@ auto y = identity("hello") // Works with strings
 </code></pre>
 <h2 id="generic-constraints"><a class="header" href="#generic-constraints">Generic Constraints</a></h2>
 <p>Constrain generics with traits:</p>
-<pre><code class="language-tokalang">fn max&lt;'T @PartialOrd&gt;(a: 'T, b: 'T) -&gt; 'T {
+<pre><code class="language-tokalang">fn max&lt;'T: @PartialOrd&gt;(a: 'T, b: 'T) -&gt; 'T {
     if a &gt; b {
         return a
     }
@@ -200,13 +200,13 @@ auto y = identity("hello") // Works with strings
 <p>This function works with any type that implements <code>@PartialOrd</code>.</p>
 <h2 id="generic-data-structures"><a class="header" href="#generic-data-structures">Generic Data Structures</a></h2>
 <pre><code class="language-toka">pub shape Pair&lt;'A, 'B&gt;(
-    first: 'A,
-    second: 'B
+    'first: 'A,
+    'second: 'B
 )
 
 impl&lt;'A, 'B&gt; Pair&lt;'A, 'B&gt; {
     pub fn new(first: 'A, second: 'B) -&gt; Pair&lt;'A, 'B&gt; {
-        return Pair(first = first, second = second)
+        return Pair('first = first, 'second = second)
     }
     
     pub fn first(self) -&gt; 'A {
@@ -218,9 +218,14 @@ impl&lt;'A, 'B&gt; Pair&lt;'A, 'B&gt; {
     }
 }
 </code></pre>
-<h2 id="type-inference"><a class="header" href="#type-inference">Type Inference</a></h2>
-<p>Toka can infer generic types in most cases, so you rarely need to specify them explicitly:</p>
-<pre><code class="language-tokalang">fn pair&lt;'A, 'B&gt;(a: 'A, b: 'B) -&gt; Pair&lt;'A, 'B&gt; {
+<p>When defining shapes with Morphic generic types (those with a single quote prefix like <code>'A</code>), Toka enforces a strict rule: the corresponding fields must also be prefixed with a single quote (e.g., <code>'first: 'A</code>). This indicates that these fields can dynamically accept different pointer morphology states, avoiding “soul collapse.” However, when calling methods or retrieving fields, you refer to them as normal field names (e.g., <code>self.first</code> instead of <code>self.'first</code>).</p>
+<pre><code>
+## Type Inference
+
+Toka can infer generic types in most cases, so you rarely need to specify them explicitly:
+
+```tokalang
+fn pair&lt;'A, 'B&gt;(a: 'A, b: 'B) -&gt; Pair&lt;'A, 'B&gt; {
     return Pair::new(a, b)
 }
 

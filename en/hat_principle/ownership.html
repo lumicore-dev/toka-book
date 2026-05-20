@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -203,14 +203,16 @@
 <p>The <code>^</code> token operates like Rust’s <code>Box</code> or C++’s <code>std::unique_ptr</code>. When a unique pointer goes out of scope, its resource is automatically freed.</p>
 <h3 id="--shared-pointer-reference-counted"><a class="header" href="#--shared-pointer-reference-counted"><code>~</code> — Shared Pointer (Reference-Counted)</a></h3>
 <p>Shared pointers enable multiple owners via reference counting:</p>
-<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 auto ~s2# = ~s1  // Shared Copy (ref count increments)
 s2.x = 3000      // Modifies the underlying soul
 </code></pre>
 <p>The resource is freed when the last <code>~</code> reference goes out of scope.</p>
 <h3 id="--borrow-pointer-reference-semantics"><a class="header" href="#--borrow-pointer-reference-semantics"><code>&amp;</code> — Borrow Pointer (Reference Semantics)</a></h3>
 <p>Borrow pointers represent references to other values without taking ownership. They allow temporary, checked access to data:</p>
-<pre><code class="language-toka">auto &amp;y = &amp;(x)   // Local borrow pointer pointing to the soul of x
+<pre><code class="language-toka">auto x = 42
+auto &amp;y = &amp;(x)   // Local borrow pointer pointing to the soul of x
 </code></pre>
 <h2 id="moving-vs-copying"><a class="header" href="#moving-vs-copying">Moving vs Copying</a></h2>
 <p>By default, assignment in Toka performs a <strong>copy</strong> (value copy for simple types, and shallow copy for shapes and complex types):</p>
@@ -221,19 +223,21 @@ s2.x = 3000      // Modifies the underlying soul
     println("a: {}, b: {}", a, b)
 }
 </code></pre>
-<p>This applies to both simple types (like <code>i32</code>, <code>f64</code>, <code>bool</code>) and complex types (like <code>string</code>, <code>Vec</code>, or custom <code>shape</code> types).</p>
+<p>This applies to both simple types (like <code>i32</code>, <code>f64</code>, <code>bool</code>) and complex types (like <code>String</code>, <code>Vec</code>, or custom <code>shape</code> types).</p>
 <h3 id="default-move-semantics"><a class="header" href="#default-move-semantics">Default Move Semantics</a></h3>
 <p>By default, <strong>move semantics</strong> apply exclusively to <strong>Unique Pointers (<code>^</code>)</strong>. Assignment of a unique pointer transfers exclusive ownership of its heap-allocated resource from the source to the destination:</p>
-<pre><code class="language-toka">auto ^p1 = new Point(x = 10, y = 20, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ^p1 = new Point(x = 10, y = 20, z = 0)
 auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid
 </code></pre>
 <h3 id="explicit-move-with-cede"><a class="header" href="#explicit-move-with-cede">Explicit Move with <code>cede</code></a></h3>
 <p>For other types (or to explicitly transfer ownership of any value), you must use the <strong><code>cede</code> keyword</strong> to perform an explicit move. Once a value is ceded, the source variable is no longer valid:</p>
-<pre><code class="language-toka">auto s1 = String::from("hello")
+<pre><code class="language-toka">import std/string::String
+auto s1 = String::from("hello")
 auto s2 = cede s1 // Explicit move: s1 is no longer valid
 </code></pre>
-<h2 id="function-parameters-pass-by-value"><a class="header" href="#function-parameters-pass-by-value">Function Parameters (Pass by Value)</a></h2>
-<p>In Toka, function parameters are immutable by default and passed by value (copied, or shallow-copied for complex types). You don’t need special sigils for standard parameter passing:</p>
+<h2 id="function-parameters-zero-copy-capture-mechanism"><a class="header" href="#function-parameters-zero-copy-capture-mechanism">Function Parameters (Zero-Copy Capture Mechanism)</a></h2>
+<p>In Toka, function parameters are immutable by default and passed via a <strong>zero-copy implicit reference capture mechanism</strong> rather than traditional pass-by-value (copying). The compiler ensures that capturing a parameter has zero runtime overhead and does not consume or copy the original argument. You don’t need special pointer sigils for standard parameter passing unless you explicitly intend to pass/rebind pointer handles:</p>
 <pre><code class="language-toka">fn process(data: i32) {
     println("data: {}", data)
 }

@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -210,7 +210,7 @@ fn main() -&gt; i32 {
 </ul>
 <h3 id="quick-one-liner"><a class="header" href="#quick-one-liner">Quick One-Liner</a></h3>
 <p>For a quick test without creating a file, you can also use:</p>
-<pre><code class="language-bash">echo 'import std/io::{println} fn main() { println("Hello, Toka World!") }' &gt; hello.tk
+<pre><code class="language-bash">echo 'import std/io::println fn main() -&gt; i32 { println("Hello, Toka World!") return 0 }' &gt; hello.tk
 toka run hello.tk
 </code></pre>
 <h2 id="whats-next"><a class="header" href="#whats-next">What’s Next?</a></h2>

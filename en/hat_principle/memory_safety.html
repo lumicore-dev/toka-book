@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-ba5a6dbf.js";
+            window.path_to_searchindex_js = "../searchindex-0465bfe5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -209,14 +209,15 @@
 <p>The <code>unsafe</code> keyword signals to the PAL Checker that you are taking manual responsibility for memory safety.</p>
 <h2 id="shared-pointers---reference-counting"><a class="header" href="#shared-pointers---reference-counting">Shared Pointers (<code>~</code>) — Reference Counting</a></h2>
 <p>Shared pointers use runtime reference counting and are fully safe. They allow multiple pointers to share ownership of the same heap-allocated resource.</p>
-<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 {
     auto ~s2# = ~s1 // Shared Copy (ref count increments)
     s2.x = 3000     // Modifies the underlying soul
 } // Ref count decrements when s2 goes out of scope
 </code></pre>
 <h2 id="borrowing-safety"><a class="header" href="#borrowing-safety">Borrowing Safety</a></h2>
-<p>In Toka, function parameters are immutable by default and passed by value (copied). Values of both simple types (like <code>i32</code>) and complex types (like custom <code>shape</code> types) are copied (shallow copied for structures) when passed to a function, keeping the caller’s arguments safe from modification:</p>
+<p>In Toka, function parameters are immutable by default and passed via a <strong>zero-copy implicit reference capture mechanism</strong>. Values of both simple types (like <code>i32</code>) and complex types (like custom <code>shape</code> types) are captured by reference with zero overhead and no cloning, keeping the caller’s arguments safe from modification because parameters are immutable by default inside the function:</p>
 <pre><code class="language-toka">fn show(x: i32) {
     println("x: {}", x)
 }
