@@ -30,25 +30,28 @@ Ready-to-use modules for application development:
 | `fs` | File system operations |
 | `path` | Path manipulation |
 | `net` | TCP/UDP networking |
-| `net_http` | HTTP client and server |
 | `time` | Time and duration |
 | `math` | Mathematical functions |
 | `rand` | Random number generation |
 | `vec` | Dynamic array |
-| `map` | Hash map |
+| `hash_map` | Hash map |
 | `btree_map` | Ordered map |
 | `string` | UTF-8 string type |
-| `serde/json` | JSON serialization |
-| `crypto/md5` | MD5 hashing |
-| `crypto/sha256` | SHA-256 hashing |
 
-### `lib/stdx/` — Experimental / Extended
+### `lib/stdx/` — Experimental / Extended (stdx)
 
-New modules that are still evolving:
+New modules that are still evolving or optional extensions:
 
 | Module | Description |
 |--------|-------------|
+| `net/http` | HTTP client and server |
+| `net/url` | URL parsing |
+| `serde/json` | JSON serialization |
+| `crypto/md5` | MD5 hashing |
+| `crypto/sha1` | SHA-1 hashing |
+| `crypto/sha256` | SHA-256 hashing |
 | `websocket` | WebSocket client and server |
+| `cli/flag` | CLI flag parsing |
 
 ## Design Philosophy
 

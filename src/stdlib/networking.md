@@ -4,7 +4,7 @@ Toka's networking module provides TCP, UDP, and HTTP capabilities for building n
 
 ## HTTP Client
 
-Make HTTP requests with the `net_http` module:
+Make HTTP requests with the `stdx/net/http` module:
 
 ```toka
 import std/string::String
@@ -12,7 +12,7 @@ import core/result::Result
 
 // Note: HTTP client is under development
 fn fetch(url: String) -> Result<String, String> {
-    // auto response = net_http::get(url)?
+    // auto response = http::get(url)!
     // return Ok(response.body)
     return Result<String, String>::Ok(String::from("Response"))
 }
@@ -20,17 +20,17 @@ fn fetch(url: String) -> Result<String, String> {
 
 ## HTTP Server
 
-Build a simple HTTP server:
+Build a simple HTTP server using the `stdx/net/http` module:
 
 ```toka
 import stdx/net/http::{HttpResponse, HttpRequest}
 import std/string::String
 
-// Note: HTTP Server is under development
+// Note: HTTP Server is built by integrating std/net with stdx/net/http
 fn main() -> i32 {
-    // auto server = net_http::Server::new()
-    // server.get("/", |req| => HttpResponse::html(String::from("<h1>Hello, Toka!</h1>")))
-    // server.listen(8080)
+    // auto listener# = TcpListener::bind(addr)
+    // auto stream# = listener#.accept()
+    // auto req# = parse_http_request(req_str)
     return 0
 }
 ```
