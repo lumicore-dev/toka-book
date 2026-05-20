@@ -50,7 +50,7 @@ my-project/
 You can easily add third-party packages to your project using the `toka add` command:
 
 ```bash
-toka add toka-ink
+toka add toka_ink
 ```
 
 This will automatically query the Toka Registry, resolve the package to its GitHub repository and version tag, and update your `package.tk`:
@@ -61,7 +61,7 @@ pub const PACKAGE = (
     name = "my_project",
     version = "0.1.0",
     dependencies = (
-        toka-ink = "github.com/lumicore-dev/toka-ink:v0.2.1",
+        toka_ink = "github.com/lumicore-dev/toka-ink:v0.2.1",
     )
 )
 ```

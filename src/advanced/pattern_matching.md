@@ -32,7 +32,7 @@ auto grade = match score {
 }
 ```
 
-Use `..` for exclusive ranges and `..=` for inclusive ranges.
+Note that Toka does not support native range patterns (like `0..10`). Instead, use variables with `if` guard expressions to perform range checking.
 
 ## Matching on Options
 
@@ -40,13 +40,14 @@ Use `..` for exclusive ranges and `..=` for inclusive ranges.
 import std/io::println
 import core/option::Option
 
-fn main() {
+fn main() -> i32 {
     auto id = 1
-    auto opt: Option<view_str> = Option<view_str>::None()
+    auto opt: Option<view_str> = Option<view_str>::None
     match opt {
-        auto Option::Some(&name) => { println("Found: {}", name) }
-        auto Option::None() => { println("User not found") }
+        auto Option<view_str>::Some(&name) => { println("Found: {}", name) }
+        auto Option<view_str>::None => { println("User not found") }
     }
+    return 0
 }
 ```
 
@@ -56,12 +57,13 @@ fn main() {
 import std/io::println
 import core/result::Result
 
-fn main() {
+fn main() -> i32 {
     auto res: Result<f32, view_str> = Result<f32, view_str>::Ok(5.0)
     match res {
-        auto Result::Ok(value) => { println("Result: {}", value) }
-        auto Result::Err(&msg) => { println("Error: {}", msg) }
+        auto Result<f32, view_str>::Ok(value) => { println("Result: {}", value) }
+        auto Result<f32, view_str>::Err(&msg) => { println("Error: {}", msg) }
     }
+    return 0
 }
 ```
 
@@ -99,19 +101,7 @@ auto grade = match score {
 }
 ```
 
-## Type Matching
+## No Type-Based Matching
 
-Match on the type of a value:
-
-```toka
-import std/io::println
-
-fn inspect<T>(value: T) -> cstring {
-    return match value {
-        i32 => pass "It's an integer"
-        view_str => pass "It's a string"
-        bool => pass "It's a boolean"
-        _ => pass "Unknown type"
-    }
-}
+Toka does not support matching directly on types (such as writing `i32 => ...` or `view_str => ...` inside a `match` expression). Any type name used in a branch without standard syntax will be treated as a new variable binding pattern (Variable Pattern), which matches any value and shadows other cases, leading to compilation errors or unreachable branches.
 ```

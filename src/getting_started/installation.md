@@ -70,8 +70,8 @@ For the latest development version:
 
 ```bash
 git clone https://github.com/tokalang/toka.git
-cd tokalang
-./rebuild.sh
+cd toka
+make -C build -j8
 ```
 
 ## Supported Platforms

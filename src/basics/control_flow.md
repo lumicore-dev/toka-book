@@ -30,9 +30,9 @@ while count < 5 {
 }
 ```
 
-## For Loops with Ranges
+## Iterating Over Arrays
 
-Toka supports range-based iteration:
+Toka supports array-based iteration:
 
 ```toka
 import std/io::println
@@ -42,7 +42,7 @@ for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
 }
 ```
 
-The `0..10` range is exclusive on the end — it iterates `0, 1, 2, ..., 9`.
+Currently, Toka does not support a native range operator (like `..`). You can iterate over an array of elements or implement custom loops using `while`.
 
 ## Iterating Collections
 

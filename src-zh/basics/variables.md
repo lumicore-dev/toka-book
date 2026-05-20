@@ -23,11 +23,12 @@ Toka 对连字符（`-`）字符有一套严格而优雅的规则，在实现模
 ```tokalang
 import std/io::println
 
-// 包名和命名空间可以包含连字符
-import ./nested/toka-ink as toka-ink
+// 包名和命名空间可以包含连字符（但在模块标识符中建议使用下划线对齐真实标准）
+import ./nested/toka_ink as toka_ink
 
-fn main() {
-    toka-ink::render()
+fn main() -> i32 {
+    toka_ink::render()
+    return 0
 }
 ```
 
@@ -36,10 +37,11 @@ fn main() {
 普通变量名、常量名、shape/结构体名和函数定义**不能**包含连字符。它们必须遵循标准的字母数字/下划线命名规则（如 `camelCase` 或 `snake_case`）：
 
 ```tokalang
-fn main() {
+fn main() -> i32 {
     auto max_size = 1024       // OK（snake_case）
     auto maxSize = 1024        // OK（camelCase）
     // auto max-size = 1024    // 错误：变量名中不允许使用连字符
+    return 0
 }
 ```
 
@@ -138,7 +140,7 @@ impl List {
     pub fn push(self#, val: i32) {}
 }
 
-fn main() {
+fn main() -> i32 {
     auto y = List(data = 10)  // 不可变
     auto x# = List(data = 10) // 可变 — 声明时加 #
 
@@ -149,6 +151,7 @@ fn main() {
     // 调用可变方法需要在变量上加 #
     x#.sort()                 // OK — 调用 .method() 之前在变量上加 #
     x#.push(5)                // OK
+    return 0
 }
 ```
 

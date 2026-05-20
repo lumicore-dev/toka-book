@@ -62,9 +62,10 @@ def prepare_code(code):
     return final_code
 
 def main():
-    src_dir = Path('src')
+    dir_name = sys.argv[1] if len(sys.argv) > 1 else 'src'
+    src_dir = Path(dir_name)
     if not src_dir.exists():
-        print("Error: 'src' directory not found.")
+        print(f"Error: '{dir_name}' directory not found.")
         sys.exit(1)
 
     md_files = list(src_dir.rglob('*.md'))

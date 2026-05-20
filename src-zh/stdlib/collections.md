@@ -40,8 +40,8 @@ fn example() {
     scores#.insert(2, 87)
     
     match scores.get(1) {
-        auto Option::Some(score) => { println("ID 1: {}", score) }
-        auto Option::None() => { println("未找到") }
+        auto Option<i32>::Some(score) => { println("ID 1: {}", score) }
+        auto Option<i32>::None => { println("未找到") }
     }
 }
 ```

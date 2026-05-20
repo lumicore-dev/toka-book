@@ -32,7 +32,7 @@ auto grade = match score {
 }
 ```
 
-使用 `..` 表示排他范围，`..=` 表示包含范围。
+请注意，Toka 不支持原生范围模式匹配（如 0..10）。相反，应使用带有 if 守卫表达式的变量来进行范围检查。
 
 ## 匹配 Option
 
@@ -40,13 +40,14 @@ auto grade = match score {
 import std/io::println
 import core/option::Option
 
-fn main() {
+fn main() -> i32 {
     auto id = 1
-    auto opt: Option<view_str> = Option<view_str>::None()
+    auto opt: Option<view_str> = Option<view_str>::None
     match opt {
-        auto Option::Some(&name) => { println("找到：{}", name) }
-        auto Option::None() => { println("未找到用户") }
+        auto Option<view_str>::Some(&name) => { println("找到：{}", name) }
+        auto Option<view_str>::None => { println("未找到用户") }
     }
+    return 0
 }
 ```
 
@@ -56,12 +57,13 @@ fn main() {
 import std/io::println
 import core/result::Result
 
-fn main() {
+fn main() -> i32 {
     auto res: Result<f32, view_str> = Result<f32, view_str>::Ok(5.0)
     match res {
-        auto Result::Ok(value) => { println("结果：{}", value) }
-        auto Result::Err(&msg) => { println("错误：{}", msg) }
+        auto Result<f32, view_str>::Ok(value) => { println("结果：{}", value) }
+        auto Result<f32, view_str>::Err(&msg) => { println("错误：{}", msg) }
     }
+    return 0
 }
 ```
 
@@ -99,19 +101,6 @@ auto grade = match score {
 }
 ```
 
-## 类型匹配
+## 不支持基于类型的匹配
 
-对值的类型进行匹配：
-
-```toka
-import std/io::println
-
-fn inspect<T>(value: T) -> cstring {
-    return match value {
-        i32 => pass "这是一个整数"
-        view_str => pass "这是一个字符串"
-        bool => pass "这是一个布尔值"
-        _ => pass "未知类型"
-    }
-}
-```
+Toka 不支持直接对类型进行模式匹配（例如在 `match` 表达式内部书写 `i32 => ...` 或 `view_str => ...`）。在分支中若使用不带标准语法的类型名称，将被视为一个新的变量绑定模式（Variable Pattern），这会匹配任意值并遮蔽其他分支，从而导致编译错误或不可达分支。

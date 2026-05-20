@@ -71,7 +71,7 @@ Hello, Toka!
 ```bash
 git clone https://github.com/tokalang/toka.git
 cd tokalang
-./rebuild.sh
+make -C build -j8
 ```
 
 ## 支持平台

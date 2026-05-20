@@ -20,7 +20,7 @@ auto y = identity("hello") // Works with strings
 Constrain generics with traits:
 
 ```tokalang
-fn max<'T @PartialOrd>(a: 'T, b: 'T) -> 'T {
+fn max<'T: @PartialOrd>(a: 'T, b: 'T) -> 'T {
     if a > b {
         return a
     }
@@ -34,13 +34,13 @@ This function works with any type that implements `@PartialOrd`.
 
 ```toka
 pub shape Pair<'A, 'B>(
-    first: 'A,
-    second: 'B
+    'first: 'A,
+    'second: 'B
 )
 
 impl<'A, 'B> Pair<'A, 'B> {
     pub fn new(first: 'A, second: 'B) -> Pair<'A, 'B> {
-        return Pair(first = first, second = second)
+        return Pair('first = first, 'second = second)
     }
     
     pub fn first(self) -> 'A {
@@ -51,6 +51,9 @@ impl<'A, 'B> Pair<'A, 'B> {
         return self.second
     }
 }
+```
+
+When defining shapes with Morphic generic types (those with a single quote prefix like `'A`), Toka enforces a strict rule: the corresponding fields must also be prefixed with a single quote (e.g., `'first: 'A`). This indicates that these fields can dynamically accept different pointer morphology states, avoiding "soul collapse." However, when calling methods or retrieving fields, you refer to them as normal field names (e.g., `self.first` instead of `self.'first`).
 ```
 
 ## Type Inference

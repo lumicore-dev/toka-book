@@ -47,13 +47,14 @@ import core/result::Result
 
 fn handle_client(stream#: TcpStream) {
     auto buf: [u8; 1024] = [0:u8; 1024]
-    auto res = stream#.read(&buf[0], 1024:usize)
+    auto *buf_ptr# = &buf[0] as *u8
+    auto res = stream#.read(*buf_ptr, 1024:usize)
     match res {
-        auto Result::Ok(n) => {
+        auto Result<usize, String>::Ok(n) => {
             println("收到 {} 字节", n)
             stream#.write_string(String::from("ACK"))
         }
-        auto Result::Err(&e) => {
+        auto Result<usize, String>::Err(&e) => {
             println("错误")
         }
     }
@@ -87,11 +88,11 @@ import stdx/net/url::{Url, parse_url}
 fn example() {
     auto url_res = parse_url(String::from("https://api.example.com:8080/data?id=1#top"))
     match url_res {
-        auto Result::Ok(&url) => {
+        auto Result<Url, String>::Ok(&url) => {
             println("主机：{}", url.host)
             println("端口：{}", String::from_int(url.port as i32))
         }
-        auto Result::Err(&err) => {
+        auto Result<Url, String>::Err(&err) => {
             println("错误：{}", err)
         }
     }

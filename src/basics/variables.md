@@ -26,8 +26,9 @@ import std/io::println
 // Package and namespace names can contain hyphens
 import ./nested/toka-ink as toka-ink
 
-fn main() {
+fn main() -> i32 {
     toka-ink::render()
+    return 0
 }
 ```
 
@@ -138,7 +139,7 @@ impl List {
     pub fn push(self#, val: i32) {}
 }
 
-fn main() {
+fn main() -> i32 {
     auto y = List(data = 10)  // immutable
     auto x# = List(data = 10) // mutable — # at declaration
 
@@ -149,6 +150,7 @@ fn main() {
     // Calling a mutable method requires # on the variable
     x#.sort()                 // OK — # on variable before .method()
     x#.push(5)                // OK
+    return 0
 }
 ```
 

@@ -50,7 +50,7 @@ my-project/
 你可以通过 `toka add` 命令轻松添加第三方包到项目中：
 
 ```bash
-toka add toka-ink
+toka add toka_ink
 ```
 
 该命令会自动查询 Toka Registry，将包解析为其对应的 GitHub 仓库和版本标签，并更新你的 `package.tk`：
@@ -61,7 +61,7 @@ pub const PACKAGE = (
     name = "my_project",
     version = "0.1.0",
     dependencies = (
-        toka-ink = "github.com/lumicore-dev/toka-ink:v0.2.1",
+        toka_ink = "github.com/lumicore-dev/toka_ink:v0.2.1",
     )
 )
 ```

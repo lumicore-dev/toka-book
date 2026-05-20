@@ -31,6 +31,7 @@ The `^` token operates like Rust's `Box` or C++'s `std::unique_ptr`. When a uniq
 Shared pointers enable multiple owners via reference counting:
 
 ```toka
+shape Point(x: i32, y: i32, z: i32)
 auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 auto ~s2# = ~s1  // Shared Copy (ref count increments)
 s2.x = 3000      // Modifies the underlying soul
@@ -43,6 +44,7 @@ The resource is freed when the last `~` reference goes out of scope.
 Borrow pointers represent references to other values without taking ownership. They allow temporary, checked access to data:
 
 ```toka
+auto x = 42
 auto &y = &(x)   // Local borrow pointer pointing to the soul of x
 ```
 
@@ -54,13 +56,14 @@ By default, assignment in Toka performs a **copy** (value copy for simple types,
 {{#include ../../examples/ownership.tk:move_copy}}
 ```
 
-This applies to both simple types (like `i32`, `f64`, `bool`) and complex types (like `string`, `Vec`, or custom `shape` types).
+This applies to both simple types (like `i32`, `f64`, `bool`) and complex types (like `String`, `Vec`, or custom `shape` types).
 
 ### Default Move Semantics
 
 By default, **move semantics** apply exclusively to **Unique Pointers (`^`)**. Assignment of a unique pointer transfers exclusive ownership of its heap-allocated resource from the source to the destination:
 
 ```toka
+shape Point(x: i32, y: i32, z: i32)
 auto ^p1 = new Point(x = 10, y = 20, z = 0)
 auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid
 ```
@@ -70,13 +73,14 @@ auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid
 For other types (or to explicitly transfer ownership of any value), you must use the **`cede` keyword** to perform an explicit move. Once a value is ceded, the source variable is no longer valid:
 
 ```toka
+import std/string::String
 auto s1 = String::from("hello")
 auto s2 = cede s1 // Explicit move: s1 is no longer valid
 ```
 
-## Function Parameters (Pass by Value)
+## Function Parameters (Zero-Copy Capture Mechanism)
 
-In Toka, function parameters are immutable by default and passed by value (copied, or shallow-copied for complex types). You don't need special sigils for standard parameter passing:
+In Toka, function parameters are immutable by default and passed via a **zero-copy implicit reference capture mechanism** rather than traditional pass-by-value (copying). The compiler ensures that capturing a parameter has zero runtime overhead and does not consume or copy the original argument. You don't need special pointer sigils for standard parameter passing unless you explicitly intend to pass/rebind pointer handles:
 
 ```toka
 {{#include ../../examples/ownership.tk:borrow_func}}

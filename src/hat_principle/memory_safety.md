@@ -36,6 +36,7 @@ The `unsafe` keyword signals to the PAL Checker that you are taking manual respo
 Shared pointers use runtime reference counting and are fully safe. They allow multiple pointers to share ownership of the same heap-allocated resource.
 
 ```toka
+shape Point(x: i32, y: i32, z: i32)
 auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 {
     auto ~s2# = ~s1 // Shared Copy (ref count increments)
@@ -45,7 +46,7 @@ auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 
 ## Borrowing Safety
 
-In Toka, function parameters are immutable by default and passed by value (copied). Values of both simple types (like `i32`) and complex types (like custom `shape` types) are copied (shallow copied for structures) when passed to a function, keeping the caller's arguments safe from modification:
+In Toka, function parameters are immutable by default and passed via a **zero-copy implicit reference capture mechanism**. Values of both simple types (like `i32`) and complex types (like custom `shape` types) are captured by reference with zero overhead and no cloning, keeping the caller's arguments safe from modification because parameters are immutable by default inside the function:
 
 ```toka
 {{#include ../../examples/memory_safety.tk:borrowing_safe}}

@@ -9,7 +9,7 @@ Toka defines several string types for different encoding needs:
 | Type | Description |
 |------|-------------|
 | `str` | String slice (like Rust `&str` or C++ `string_view`) — immutable, borrowed |
-| `string` | Owned mutable string (UTF-8 by default) |
+| `String` | Owned mutable string (UTF-8 by default, defined in `std/string::String`) |
 
 ## String Literals
 
@@ -57,9 +57,9 @@ auto full# = String::from("Hello, ")
 full#.push_str("World!")
 ```
 
-## Conversion to String
+## Formatting and Printing
 
-Convert other types to string with `str()`:
+You can print other types easily using placeholders without manual conversion:
 
 ```toka
 import std/io::println

@@ -78,7 +78,8 @@ impl Number {
     }
 }
 
-fn main() {
+fn main() -> i32 {
     auto result = Number(val = 5).double()  // result = 10
+    return 0
 }
 ```

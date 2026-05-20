@@ -19,8 +19,8 @@ auto y = identity("hello") // 适用于字符串
 
 使用 trait 约束泛型：
 
-```tokalang
-fn max<'T @PartialOrd>(a: 'T, b: 'T) -> 'T {
+```toka
+fn max<'T: @PartialOrd>(a: 'T, b: 'T) -> 'T {
     if a > b {
         return a
     }
@@ -34,13 +34,13 @@ fn max<'T @PartialOrd>(a: 'T, b: 'T) -> 'T {
 
 ```toka
 pub shape Pair<'A, 'B>(
-    first: 'A,
-    second: 'B
+    'first: 'A,
+    'second: 'B
 )
 
 impl<'A, 'B> Pair<'A, 'B> {
     pub fn new(first: 'A, second: 'B) -> Pair<'A, 'B> {
-        return Pair(first = first, second = second)
+        return Pair('first = first, 'second = second)
     }
     
     pub fn first(self) -> 'A {
@@ -52,6 +52,8 @@ impl<'A, 'B> Pair<'A, 'B> {
     }
 }
 ```
+
+当定义具有 Morphic 泛型类型（那些带有单引号前缀的类型，如 `'A`）的 Shape 时，Toka 强制执行一条严格规则：对应的字段名称也必须带有单引号前缀（例如 `'first: 'A`）。这表明这些字段能够动态接受不同的指针形态状态，从而规避“灵魂塌陷”。但是，在调用方法或获取字段值时，应像往常一样使用常规字段名称进行引用（例如使用 `self.first`，而不是 `self.'first`）。
 
 ## 类型推断
 

@@ -21,8 +21,8 @@ fn find_user(id: i32) -> Option<String> {
 fn main() -> i32 {
     auto result = find_user(1)
     match result {
-        auto Option::Some(&name) => println("Found: {}", name)
-        auto Option::None => println("User not found")
+        auto Option<String>::Some(&name) => println("Found: {}", name)
+        auto Option<String>::None => println("User not found")
     }
     return 0
 }
@@ -64,8 +64,8 @@ fn divide(a: f64, b: f64) -> Result<f64, String> {
 
 fn main() -> i32 {
     match divide(10.0, 2.0) {
-        auto Result::Ok(value) => println("Result: {}", value)
-        auto Result::Err(&msg) => println("Error: {}", msg)
+        auto Result<f64, String>::Ok(value) => println("Result: {}", value)
+        auto Result<f64, String>::Err(&msg) => println("Error: {}", msg)
     }
     return 0
 }

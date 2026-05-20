@@ -52,7 +52,7 @@ Let's break down what each part does:
 For a quick test without creating a file, you can also use:
 
 ```bash
-echo 'import std/io::{println} fn main() { println("Hello, Toka World!") }' > hello.tk
+echo 'import std/io::println fn main() -> i32 { println("Hello, Toka World!") return 0 }' > hello.tk
 toka run hello.tk
 ```
 
