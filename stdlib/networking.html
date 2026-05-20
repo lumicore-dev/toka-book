@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-d067894e.js";
+            window.path_to_searchindex_js = "../searchindex-51e67837.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-e0ac2e83.js"></script>
@@ -180,27 +180,27 @@
                         <h1 id="networking"><a class="header" href="#networking">Networking</a></h1>
 <p>Toka’s networking module provides TCP, UDP, and HTTP capabilities for building networked applications.</p>
 <h2 id="http-client"><a class="header" href="#http-client">HTTP Client</a></h2>
-<p>Make HTTP requests with the <code>net_http</code> module:</p>
+<p>Make HTTP requests with the <code>stdx/net/http</code> module:</p>
 <pre><code class="language-toka">import std/string::String
 import core/result::Result
 
 // Note: HTTP client is under development
 fn fetch(url: String) -&gt; Result&lt;String, String&gt; {
-    // auto response = net_http::get(url)?
+    // auto response = http::get(url)!
     // return Ok(response.body)
     return Result&lt;String, String&gt;::Ok(String::from("Response"))
 }
 </code></pre>
 <h2 id="http-server"><a class="header" href="#http-server">HTTP Server</a></h2>
-<p>Build a simple HTTP server:</p>
+<p>Build a simple HTTP server using the <code>stdx/net/http</code> module:</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpResponse, HttpRequest}
 import std/string::String
 
-// Note: HTTP Server is under development
+// Note: HTTP Server is built by integrating std/net with stdx/net/http
 fn main() -&gt; i32 {
-    // auto server = net_http::Server::new()
-    // server.get("/", |req| =&gt; HttpResponse::html(String::from("&lt;h1&gt;Hello, Toka!&lt;/h1&gt;")))
-    // server.listen(8080)
+    // auto listener# = TcpListener::bind(addr)
+    // auto stream# = listener#.accept()
+    // auto req# = parse_http_request(req_str)
     return 0
 }
 </code></pre>

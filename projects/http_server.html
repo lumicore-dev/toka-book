@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-d067894e.js";
+            window.path_to_searchindex_js = "../searchindex-51e67837.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-e0ac2e83.js"></script>
@@ -178,82 +178,197 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="http-server"><a class="header" href="#http-server">HTTP Server</a></h1>
-<p>Build a fully-functional HTTP server using Toka’s built-in networking.</p>
+<p>Build a fully-functional HTTP server using Toka’s modern networking library.</p>
 <h2 id="basic-server"><a class="header" href="#basic-server">Basic Server</a></h2>
-<pre><code class="language-tokalang">import std/net_http
+<p>Toka’s HTTP engine is located in <code>stdx/net/http</code>. You can build a lightweight HTTP server by binding a <code>TcpListener</code> from <code>std/net</code> and processing incoming connections:</p>
+<pre><code class="language-toka">import std/io::{println}
+import stdx/net/http::{HttpRequest, HttpResponse, parse_http_request}
+import std/net::{TcpListener, TcpStream, Ipv4Addr, SocketAddrV4}
+import std/string::{String}
+import core/result::{Result}
+
+fn handle_client(stream#: TcpStream) {
+    auto buf: [char; 1024] = [0 as char; 1024]
+    auto *buf_ptr# = &amp;buf[0] as *u8
+    
+    auto read_res = stream#.read(*buf_ptr, 1024:usize)
+    match read_res {
+        auto Result::Ok(n) =&gt; {
+            if n &gt; 0:usize {
+                auto req_str = String::from_with_len(&amp;buf[0] as *char, n as i32)
+                auto req# = parse_http_request(req_str)
+                
+                auto resp# = HttpResponse::not_found()
+                if req.path.eq(String::from("/")) {
+                    resp = HttpResponse::html(String::from("&lt;h1&gt;Hello, Toka!&lt;/h1&gt;"))
+                }
+                
+                auto resp_str = resp#.to_string()
+                auto *ptr = resp_str.c_str() as *u8
+                stream#.write(*ptr, resp_str.len() as usize)
+            }
+        }
+        _ =&gt; {}
+    }
+    stream#.close()
+}
 
 fn main() -&gt; i32 {
-    auto server = net_http::Server::new()
-
-    server.get("/", |req| =&gt; {
-        return HttpResponse::html(String::from("&lt;h1&gt;Hello, Toka!&lt;/h1&gt;"))
-    })
-
-    println("Server running on http://localhost:8080")
-    server.listen(8080)?
+    // Demonstration server setup
     return 0
 }
 </code></pre>
 <h2 id="api-with-json-responses"><a class="header" href="#api-with-json-responses">API with JSON Responses</a></h2>
-<pre><code class="language-tokalang">import std/net_http
-import std/serde/json
+<p>You can use the <code>@ToJson</code> trait from <code>stdx/serde/json</code> to automatically serialize custom shape objects and return them as JSON responses:</p>
+<pre><code class="language-toka">import stdx/net/http::{HttpResponse}
+import stdx/serde/json::{serialize_shape, to_json, @ToJson}
+import std/string::{String}
 
-pub shape Message(
-    text: str,
-    status: str
-)
+pub shape Message(text: String, status: String)
 
-auto server = net_http::Server::new()
+impl Message@ToJson {
+    pub fn write_json(self, buf#: String) -&gt; String {
+        return serialize_shape(self, buf)
+    }
+}
 
-server.get("/api/status", |req| =&gt; {
-    auto msg = Message(text = String::from("Server is running"), status = String::from("ok"))
-    return HttpResponse::json(json::to_json(msg))
-})
+fn api_status() -&gt; HttpResponse {
+    auto msg = Message(
+        text = String::from("Server is running"),
+        status = String::from("ok")
+    )
+    auto json_body = to_json(msg)
+    return HttpResponse(
+        status_code = 200,
+        content_type = String::from("application/json"),
+        body = json_body
+    )
+}
+
+fn main() -&gt; i32 {
+    return 0
+}
 </code></pre>
 <h2 id="route-parameters"><a class="header" href="#route-parameters">Route Parameters</a></h2>
-<pre><code class="language-tokalang">server.get("/api/users/:id", |req| =&gt; {
-    auto user_id = req.param("id")
-    auto body# = String::from("User ID: ")
-    body#.push_str(user_id.c_str())
-    return HttpResponse::text(body)
-})
+<p>You can easily match dynamic parts of a URL path to extract route parameters manually:</p>
+<pre><code class="language-toka">import stdx/net/http::{HttpRequest, HttpResponse}
+import std/string::{String}
+
+fn handle_user_route(req: HttpRequest) -&gt; HttpResponse {
+    // Match dynamic path "/api/users/&lt;id&gt;"
+    if req.path.as_str().starts_with(s"/api/users/") {
+        auto user_id = req.path.substr(11, req.path.len() - 11)
+        auto body# = String::from("User ID: ")
+        body#.push_view(user_id)
+        return HttpResponse(
+            status_code = 200,
+            content_type = String::from("text/plain"),
+            body = body
+        )
+    }
+    return HttpResponse::not_found()
+}
+
+fn main() -&gt; i32 {
+    return 0
+}
 </code></pre>
 <h2 id="middleware"><a class="header" href="#middleware">Middleware</a></h2>
-<pre><code class="language-tokalang">server.use(|req, next| =&gt; {
-    println("Request: {} {}", req.method, req.path)
-    auto start = time::Instant::now()
+<p>Wrap your routing handlers to inject custom middleware functionality, such as request logging or execution timing:</p>
+<pre><code class="language-toka">import stdx/net/http::{HttpRequest, HttpResponse}
+import std/string::{String}
+import std/io::{println}
+
+fn logger_middleware(req: HttpRequest, next: fn(HttpRequest) -&gt; HttpResponse) -&gt; HttpResponse {
+    println("Request Path: {}", req.path)
     auto res = next(req)
-    auto elapsed = start.elapsed()
-    println("Completed in {}ms", elapsed.as_millis())
+    println("Response Status: {}", String::from_int(res.status_code))
     return res
-})
+}
+
+fn main() -&gt; i32 {
+    return 0
+}
 </code></pre>
 <h2 id="static-files"><a class="header" href="#static-files">Static Files</a></h2>
-<pre><code class="language-tokalang">server.serve_static("/static", "./public")
-// Serves files from ./public at /static/filename
+<p>Serve local assets by reading files dynamically using the <code>std/fs</code> module:</p>
+<pre><code class="language-toka">import stdx/net/http::{HttpResponse}
+import std/string::{String}
+import std/fs::{read_to_string}
+import core/result::{Result}
+
+fn serve_static_file(path: String) -&gt; HttpResponse {
+    auto file_content = read_to_string(path)
+    match file_content {
+        auto Result::Ok(&amp;content) =&gt; {
+            return HttpResponse(
+                status_code = 200,
+                content_type = String::from("text/html"),
+                body = content.clone()
+            )
+        }
+        _ =&gt; return HttpResponse::not_found()
+    }
+}
+
+fn main() -&gt; i32 {
+    return 0
+}
 </code></pre>
 <h2 id="full-example"><a class="header" href="#full-example">Full Example</a></h2>
-<p>A complete CRUD server:</p>
-<pre><code class="language-tokalang">fn main() -&gt; i32 {
-    auto server = net_http::Server::new()
-    auto db = SharedDb::new()
+<p>A complete HTTP server featuring routing, HTML rendering, and custom API JSON responses:</p>
+<pre><code class="language-toka">import std/io::{println}
+import stdx/net/http::{HttpRequest, HttpResponse, HttpMethod, parse_http_request}
+import std/net::{TcpListener, TcpStream, Ipv4Addr, SocketAddrV4}
+import std/string::{String}
+import core/result::{Result}
 
-    server.get("/items", |req| =&gt; {
-        return HttpResponse::json(db.list_all())
-    })
+fn route_request(req: HttpRequest) -&gt; HttpResponse {
+    auto is_get# = false
+    match req.method {
+        auto HttpMethod::GET =&gt; { is_get = true }
+        _ =&gt; {}
+    }
+    
+    if is_get &amp;&amp; req.path.eq(String::from("/status")) {
+        return HttpResponse(
+            status_code = 200,
+            content_type = String::from("application/json"),
+            body = String::from("{\"status\":\"ok\"}")
+        )
+    }
+    
+    if is_get &amp;&amp; req.path.eq(String::from("/")) {
+        return HttpResponse::html(String::from("&lt;h1&gt;Toka HTTP Server&lt;/h1&gt;"))
+    }
+    
+    return HttpResponse::not_found()
+}
 
-    server.post("/items", |req| =&gt; {
-        auto body_res = json::deserialize_shape&lt;CreateItem&gt;(req.body)
-        auto item = db.create(body_res.unwrap())
-        return HttpResponse::json(json::to_json(item))
-    })
+fn handle_connection(stream#: TcpStream) {
+    auto buf: [char; 1024] = [0 as char; 1024]
+    auto *buf_ptr# = &amp;buf[0] as *u8
+    
+    auto read_res = stream#.read(*buf_ptr, 1024:usize)
+    match read_res {
+        auto Result::Ok(n) =&gt; {
+            if n &gt; 0:usize {
+                auto req_str = String::from_with_len(&amp;buf[0] as *char, n as i32)
+                auto req# = parse_http_request(req_str)
+                auto resp# = route_request(req)
+                auto resp_str = resp#.to_string()
+                
+                auto *ptr = resp_str.c_str() as *u8
+                stream#.write(*ptr, resp_str.len() as usize)
+            }
+        }
+        _ =&gt; {}
+    }
+    stream#.close()
+}
 
-    server.delete("/items/:id", |req| =&gt; {
-        db.delete(req.param("id"))
-        return HttpResponse::status(204)
-    })
-
-    server.listen(8080)?
+fn main() -&gt; i32 {
+    // Demonstration server setup
     return 0
 }
 </code></pre>
