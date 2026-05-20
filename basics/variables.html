@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-c51cd98c.js";
+            window.path_to_searchindex_js = "../searchindex-d067894e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-e0ac2e83.js"></script>
@@ -185,17 +185,40 @@
 auto y = 3.14        // f64 (default float type)
 auto name = "Toka"   // str (string slice)
 </code></pre>
-<h2 id="kebab-case-identifiers"><a class="header" href="#kebab-case-identifiers">Kebab-case Identifiers</a></h2>
-<p>Since Toka v0.9.7, variable and function names natively support <strong>Kebab-case</strong> (hyphens), allowing for more readable and modern naming conventions:</p>
-<pre><code class="language-toka">import std/io::println
+<h2 id="naming-rules--hyphen---resolution"><a class="header" href="#naming-rules--hyphen---resolution">Naming Rules &amp; Hyphen (-) Resolution</a></h2>
+<p>Toka has a strict and elegant rule regarding the hyphen (<code>-</code>) character to achieve both modular naming convenience and unambiguous mathematical syntax:</p>
+<h3 id="package-names--namespaces"><a class="header" href="#package-names--namespaces">Package Names &amp; Namespaces</a></h3>
+<p>Package names and imported namespaces <strong>can</strong> use hyphens freely. This is common when importing nested folders or external libraries that follow a kebab-case directory structure. You can import them and call their functions using their hyphenated namespaces:</p>
+<pre><code class="language-tokalang">import std/io::println
+
+// Package and namespace names can contain hyphens
+import ./nested/toka-ink as toka-ink
 
 fn main() {
-    auto max-size = 1024
-    auto user-name = "Toka"
+    toka-ink::render()
+}
+</code></pre>
+<h3 id="variables--functions"><a class="header" href="#variables--functions">Variables &amp; Functions</a></h3>
+<p>Ordinary variable names, constant names, shape/struct names, and function definitions <strong>cannot</strong> contain hyphens. They must follow standard alphanumeric/underscore naming rules (such as <code>camelCase</code> or <code>snake_case</code>):</p>
+<pre><code class="language-tokalang">fn main() {
+    auto max_size = 1024       // OK (snake_case)
+    auto maxSize = 1024        // OK (camelCase)
+    // auto max-size = 1024    // Error: Hyphens are not allowed in variable names
+}
+</code></pre>
+<h3 id="unambiguous-subtraction"><a class="header" href="#unambiguous-subtraction">Unambiguous Subtraction</a></h3>
+<p>Because hyphens are strictly forbidden in variable and function names, the subtraction operator (<code>-</code>) is completely unambiguous. Ordinary subtraction expressions without spaces are <strong>always</strong> 100% parsed correctly:</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() -&gt; i32 {
+    auto sub1 = 10
+    auto sub2 = 3
     
-    // Warning: Subtraction operator must have spaces around it to avoid ambiguity!
-    auto result = max-size - 100 // Correct
-    // auto error = max-size-100 // Error: "max-size-100" is treated as one identifier
+    // No spaces are needed! Always parsed as subtraction
+    auto result = sub1-sub2    // OK: parsed as sub1 - sub2
+    auto value = 10-3          // OK: parsed as 10 - 3
+    println("Result: {}, Value: {}", result, value)
+    return 0
 }
 </code></pre>
 <h2 id="explicit-type-annotations"><a class="header" href="#explicit-type-annotations">Explicit Type Annotations</a></h2>
