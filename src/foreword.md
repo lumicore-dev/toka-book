@@ -38,6 +38,9 @@ This book is kept up-to-date with the latest Toka compiler development. The curr
 
 Toka is a young but ambitious language. This guide was written alongside the language's development to help early adopters get started. As Toka evolves, this book will evolve with it.
 
+> [!NOTE]
+> Since Toka is still under active development and rapid iteration, some descriptions or features in this book may occasionally have slight discrepancies with the actual behavior of the latest compiler. For absolute accuracy, please always refer to the [official compiler and standard library source code](https://github.com/tokalang/toka) as the ultimate source of truth.
+
 Happy coding!
 
-*— The Toka Documentation Team*
+*— lumicore-dev*

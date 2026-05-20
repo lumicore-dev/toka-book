@@ -38,6 +38,9 @@ Toka 由 [YiZhonghua](https://github.com/zhyi-dp) 创建。官方语言仓库位
 
 Toka 是一门年轻但充满雄心的语言。这本指南伴随语言的开发同步编写，旨在帮助早期采用者快速上手。随着 Toka 的演进，本书也会一同成长。
 
+> [!NOTE]
+> 由于 Toka 仍处于活跃的开发与高速迭代中，本书中的部分表述和特性在稳妥起见下可能与编译器实际行为存在些许出入。若有疑问，请始终以 [官方编译器及标准库的实际代码实现](https://github.com/tokalang/toka) 为准。
+
 祝你编码愉快！
 
-*— Toka 文档团队*
+*— lumicore-dev*
