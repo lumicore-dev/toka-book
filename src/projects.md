@@ -10,11 +10,20 @@ These projects are not detached "toy code." Instead, they directly target the th
 
 The three projects in this chapter progress in a step-by-step fashion to help you gradually build robust system-level development mental models:
 
-```mermaid
-graph TD
-    P1[CLI Tool] -->|Familiarize with standard library APIs & basic OS interactions| P2[High-Concurrency HTTP Server]
-    P2 -->|Master concurrency safety under Hat Principle & TCP I/O| P3[Custom Regex Engine]
-    P3 -->|Train complex data structures & pattern matching algorithms| P4[Full-fledged Systems Developer]
+```text
+            Systems Software Engineering Roadmap
+                            │
+                            ▼
+     [ Step 1: CLI Tool ] ──── Familiarize with stdx/cli/flag standard APIs
+                            │
+                            ▼
+    [ Step 2: HTTP Server ] ── Master raw TCP & Hat concurrency safety
+                            │
+                            ▼
+    [ Step 3: Regex Engine ] ─ Exercise Token stream parsing & pattern matching
+                            │
+                            ▼
+          🏆 【 Full-fledged Systems Developer 】
 ```
 
 ### 1. [CLI Tool with stdx/cli/flag](projects/cli_tool.md)

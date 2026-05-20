@@ -10,17 +10,16 @@ Toka 的高级特性并不是为了“炫技”而设计的复杂语法，而是
 
 本章将带你深入探索以下四个系统开发的核心利器：
 
-```mermaid
-graph TD
-    A[Toka 高级抽象] --> B(泛型 Generics)
-    A --> C(错误处理 Error Handling)
-    A --> D(模式匹配 Pattern Matching)
-    A --> E(并发编程 Concurrency)
-
-    B --> B1["零开销多态 & 规避‘灵魂塌陷’"]
-    C --> C1["Option / Result 代数类型 & 短路传播 !"]
-    D --> D1["Shape 深度解构 & if 守卫过滤"]
-    E --> E1["安全轻量级协程 & 多核并行"]
+```text
+               Toka 高级特性与抽象表达
+                         │
+        ┌────────────────┼────────────────┬────────────────┐
+        ▼                ▼                ▼                ▼
+   泛型 (Generics)   错误处理 (Error)  模式匹配 (Pattern)  并发编程 (Async)
+        │                │                │                │
+        ▼                ▼                ▼                ▼
+   零开销多态表达   代数数据类型契约  解构 Shape 实体  安全轻量协程
+ 规避“灵魂塌陷”约束  短路机制 (!) 传播  配合 if 条件守卫   多核并行狂飙
 ```
 
 ### 1. [泛型（Generics）](advanced/generics.md)

@@ -10,17 +10,16 @@ Toka's advanced features are not complex syntax designed for show. Instead, they
 
 This chapter will guide you through the following four pillars of system development:
 
-```mermaid
-graph TD
-    A[Toka Advanced Abstractions] --> B(Generics)
-    A --> C(Error Handling)
-    A --> D(Pattern Matching)
-    A --> E(Concurrency)
-
-    B --> B1["Zero-overhead Polymorphism & Avoiding 'Soul Collapse'"]
-    C --> C1["Option / Result & Short-circuit Operator !"]
-    D --> D1["Deep Shape Deconstruction & if Guards"]
-    E --> E1["Safe Lightweight Coroutines & Multicore Parallelism"]
+```text
+               Toka Advanced Features & Abstractions
+                         │
+        ┌────────────────┼────────────────┬────────────────┐
+        ▼                ▼                ▼                ▼
+    Generics       Error Handling  Pattern Matching   Concurrency
+        │                │                │                │
+        ▼                ▼                ▼                ▼
+ Zero-overhead ADT representation  Deconstruct Shapes  Lightweight fibers
+ Avoid Soul Collapse  Short-circuit (!)    Combined w/ guards  Multicore scaling
 ```
 
 ### 1. [Generics](advanced/generics.md)
