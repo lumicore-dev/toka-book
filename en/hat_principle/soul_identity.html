@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-caecafef.js";
+            window.path_to_searchindex_js = "../searchindex-7ae3d02e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -195,7 +195,7 @@
 }
 </code></pre>
 <p>This is a massive ergonomic improvement over C (<code>p-&gt;x = 30</code>) or Rust (<code>(*p).x = 30</code>).</p>
-<h2 id="the-three-hats"><a class="header" href="#the-three-hats">The Three Hats</a></h2>
+<h2 id="the-four-hats"><a class="header" href="#the-four-hats">The Four Hats</a></h2>
 <p>Each hat sigil carries different ownership semantics:</p>
 <h3 id="--raw-pointer"><a class="header" href="#--raw-pointer"><code>*</code> — Raw Pointer</a></h3>
 <p>Low-level, unsafe pointer. Requires <code>unsafe</code> keyword or explicit <code>alloc</code>:</p>
@@ -220,6 +220,10 @@
 <pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 auto ~s2# = ~s1 // Shared Copy (ref count increments)
 s2.x = 3000     // Modifies the underlying soul
+</code></pre>
+<h3 id="--borrow-pointer"><a class="header" href="#--borrow-pointer"><code>&amp;</code> — Borrow Pointer</a></h3>
+<p>A reference or borrow pointer to another value. Created explicitly via <code>&amp;</code> to refer to an existing soul:</p>
+<pre><code class="language-toka">auto &amp;y = &amp;(x) // y is a borrow pointer pointing to the soul of x
 </code></pre>
 <h2 id="identity-and-address"><a class="header" href="#identity-and-address">Identity and Address</a></h2>
 <p>To get the raw memory address of a local variable, use the <code>*(expr)</code> syntax:</p>

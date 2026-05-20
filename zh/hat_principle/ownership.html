@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-dbed9934.js";
+            window.path_to_searchindex_js = "../searchindex-d837712e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -179,8 +179,8 @@
                     <main>
                         <h1 id="所有权与帽子"><a class="header" href="#所有权与帽子">所有权与帽子</a></h1>
 <p>Toka 中的所有权由 Hat Principle 支配。每种帽子标记符号通过语法直接传达不同的所有权模型。</p>
-<h2 id="三种所有权模型"><a class="header" href="#三种所有权模型">三种所有权模型</a></h2>
-<p>Toka 定义了三种指针类型，每种具有不同的所有权语义：</p>
+<h2 id="四种所有权模型"><a class="header" href="#四种所有权模型">四种所有权模型</a></h2>
+<p>Toka 定义了四种指针类型，每种具有不同的所有权语义：</p>
 <h3 id="--原始指针不安全"><a class="header" href="#--原始指针不安全"><code>*</code> — 原始指针（不安全）</a></h3>
 <p>原始指针需要显式的 <code>unsafe</code> 或 <code>alloc</code> 来创建和管理：</p>
 <pre><code class="language-toka">fn raw_ptr_example() {
@@ -208,6 +208,10 @@ auto ~s2# = ~s1  // 共享拷贝（引用计数增加）
 s2.x = 3000      // 直接修改底层数据（灵魂）
 </code></pre>
 <p>当最后一个 <code>~</code> 引用离开作用域时，资源被释放。</p>
+<h3 id="--借用指针引用语义"><a class="header" href="#--借用指针引用语义"><code>&amp;</code> — 借用指针（引用语义）</a></h3>
+<p>借用指针表示对其他值的引用，不获取其所有权。它们允许临时、受检地访问数据：</p>
+<pre><code class="language-toka">auto &amp;y = &amp;(x)   // 指向 x 灵魂的局部借用指针
+</code></pre>
 <h2 id="移动-vs-拷贝"><a class="header" href="#移动-vs-拷贝">移动 vs. 拷贝</a></h2>
 <p><strong>简单类型</strong>（如 <code>i32</code>、<code>f64</code>、<code>bool</code>）默认<strong>拷贝</strong>：</p>
 <pre><code class="language-toka">fn move_copy_example() {

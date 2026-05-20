@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-dbed9934.js";
+            window.path_to_searchindex_js = "../searchindex-d837712e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -195,7 +195,7 @@
 }
 </code></pre>
 <p>相比于 C 语言的（<code>p-&gt;x = 30</code>）或 Rust 的（<code>(*p).x = 30</code>），这是一个巨大的人体工程学改进。</p>
-<h2 id="三种帽子"><a class="header" href="#三种帽子">三种帽子</a></h2>
+<h2 id="四种帽子"><a class="header" href="#四种帽子">四种帽子</a></h2>
 <p>每种帽子标记符号携带不同的所有权语义：</p>
 <h3 id="--原始指针"><a class="header" href="#--原始指针"><code>*</code> — 原始指针</a></h3>
 <p>底层的不安全指针。需要 <code>unsafe</code> 关键字或显式 <code>alloc</code>：</p>
@@ -220,6 +220,10 @@
 <pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 auto ~s2# = ~s1 // 共享拷贝（引用计数增加）
 s2.x = 3000     // 直接修改底层数据（灵魂）
+</code></pre>
+<h3 id="--借用指针"><a class="header" href="#--借用指针"><code>&amp;</code> — 借用指针</a></h3>
+<p>对另一个值的引用或借用指针。显式使用 <code>&amp;</code> 创建以引用已有的灵魂：</p>
+<pre><code class="language-toka">auto &amp;y = &amp;(x) // y 是指向 x 灵魂的借用指针
 </code></pre>
 <h2 id="身份与地址"><a class="header" href="#身份与地址">身份与地址</a></h2>
 <p>要获取局部变量的原始内存地址，使用 <code>*(expr)</code> 语法：</p>

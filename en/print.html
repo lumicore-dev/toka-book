@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-caecafef.js";
+            window.path_to_searchindex_js = "searchindex-7ae3d02e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -774,7 +774,7 @@ auto unicode: u32 = 0x4E16:u32
 <h1 id="the-hat-principle"><a class="header" href="#the-hat-principle">The Hat Principle</a></h1>
 <p>The <strong>Hat Principle</strong> is the core concept behind Toka’s memory safety model. Instead of requiring developers to annotate lifetimes or manually manage memory, Toka uses visible syntactic tokens called “hats” to track ownership and memory semantics at compile time.</p>
 <h2 id="what-is-a-hat"><a class="header" href="#what-is-a-hat">What is a Hat?</a></h2>
-<p>A <strong>hat</strong> is a sigil (symbol) attached to an identifier that tells both the programmer and the compiler how that value is stored, owned, and accessed. Toka has three hat types:</p>
+<p>A <strong>hat</strong> is a sigil (symbol) attached to an identifier that tells both the programmer and the compiler how that value is stored, owned, and accessed. Toka has four hat types:</p>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -784,6 +784,7 @@ auto unicode: u32 = 0x4E16:u32
 <tr><td><code>*</code></td><td>Raw Pointer</td><td>Low-level pointer, requires <code>unsafe</code> / <code>alloc</code></td></tr>
 <tr><td><code>^</code></td><td>Unique Pointer</td><td>Exclusive ownership of a heap-allocated resource (like <code>Box</code> in Rust)</td></tr>
 <tr><td><code>~</code></td><td>Shared Pointer</td><td>Reference-counted shared ownership</td></tr>
+<tr><td><code>&amp;</code></td><td>Borrow Pointer</td><td>Reference/borrow of another value</td></tr>
 </tbody>
 </table>
 </div>
@@ -830,7 +831,7 @@ auto unicode: u32 = 0x4E16:u32
 }
 </code></pre>
 <p>This is a massive ergonomic improvement over C (<code>p-&gt;x = 30</code>) or Rust (<code>(*p).x = 30</code>).</p>
-<h2 id="the-three-hats"><a class="header" href="#the-three-hats">The Three Hats</a></h2>
+<h2 id="the-four-hats"><a class="header" href="#the-four-hats">The Four Hats</a></h2>
 <p>Each hat sigil carries different ownership semantics:</p>
 <h3 id="--raw-pointer"><a class="header" href="#--raw-pointer"><code>*</code> — Raw Pointer</a></h3>
 <p>Low-level, unsafe pointer. Requires <code>unsafe</code> keyword or explicit <code>alloc</code>:</p>
@@ -856,6 +857,10 @@ auto unicode: u32 = 0x4E16:u32
 auto ~s2# = ~s1 // Shared Copy (ref count increments)
 s2.x = 3000     // Modifies the underlying soul
 </code></pre>
+<h3 id="--borrow-pointer"><a class="header" href="#--borrow-pointer"><code>&amp;</code> — Borrow Pointer</a></h3>
+<p>A reference or borrow pointer to another value. Created explicitly via <code>&amp;</code> to refer to an existing soul:</p>
+<pre><code class="language-toka">auto &amp;y = &amp;(x) // y is a borrow pointer pointing to the soul of x
+</code></pre>
 <h2 id="identity-and-address"><a class="header" href="#identity-and-address">Identity and Address</a></h2>
 <p>To get the raw memory address of a local variable, use the <code>*(expr)</code> syntax:</p>
 <pre><code class="language-toka">fn address_of_example() {
@@ -868,8 +873,8 @@ s2.x = 3000     // Modifies the underlying soul
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="ownership--hats"><a class="header" href="#ownership--hats">Ownership &amp; Hats</a></h1>
 <p>Ownership in Toka is governed by the Hat Principle. Each hat sigil communicates a different ownership model directly through syntax.</p>
-<h2 id="three-ownership-models"><a class="header" href="#three-ownership-models">Three Ownership Models</a></h2>
-<p>Toka defines three pointer types, each with distinct ownership semantics:</p>
+<h2 id="four-ownership-models"><a class="header" href="#four-ownership-models">Four Ownership Models</a></h2>
+<p>Toka defines four pointer types, each with distinct ownership semantics:</p>
 <h3 id="--raw-pointer-unsafe"><a class="header" href="#--raw-pointer-unsafe"><code>*</code> — Raw Pointer (Unsafe)</a></h3>
 <p>Raw pointers require explicit <code>unsafe</code> or <code>alloc</code> to create and manage:</p>
 <pre><code class="language-toka">fn raw_ptr_example() {
@@ -897,6 +902,10 @@ auto ~s2# = ~s1  // Shared Copy (ref count increments)
 s2.x = 3000      // Modifies the underlying soul
 </code></pre>
 <p>The resource is freed when the last <code>~</code> reference goes out of scope.</p>
+<h3 id="--borrow-pointer-reference-semantics"><a class="header" href="#--borrow-pointer-reference-semantics"><code>&amp;</code> — Borrow Pointer (Reference Semantics)</a></h3>
+<p>Borrow pointers represent references to other values without taking ownership. They allow temporary, checked access to data:</p>
+<pre><code class="language-toka">auto &amp;y = &amp;(x)   // Local borrow pointer pointing to the soul of x
+</code></pre>
 <h2 id="moving-vs-copying"><a class="header" href="#moving-vs-copying">Moving vs Copying</a></h2>
 <p><strong>Simple types</strong> (like <code>i32</code>, <code>f64</code>, <code>bool</code>) are <strong>copied</strong> by default:</p>
 <pre><code class="language-toka">fn move_copy_example() {

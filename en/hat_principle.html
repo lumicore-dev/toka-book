@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-caecafef.js";
+            window.path_to_searchindex_js = "searchindex-7ae3d02e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -180,7 +180,7 @@
                         <h1 id="the-hat-principle"><a class="header" href="#the-hat-principle">The Hat Principle</a></h1>
 <p>The <strong>Hat Principle</strong> is the core concept behind Toka’s memory safety model. Instead of requiring developers to annotate lifetimes or manually manage memory, Toka uses visible syntactic tokens called “hats” to track ownership and memory semantics at compile time.</p>
 <h2 id="what-is-a-hat"><a class="header" href="#what-is-a-hat">What is a Hat?</a></h2>
-<p>A <strong>hat</strong> is a sigil (symbol) attached to an identifier that tells both the programmer and the compiler how that value is stored, owned, and accessed. Toka has three hat types:</p>
+<p>A <strong>hat</strong> is a sigil (symbol) attached to an identifier that tells both the programmer and the compiler how that value is stored, owned, and accessed. Toka has four hat types:</p>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -190,6 +190,7 @@
 <tr><td><code>*</code></td><td>Raw Pointer</td><td>Low-level pointer, requires <code>unsafe</code> / <code>alloc</code></td></tr>
 <tr><td><code>^</code></td><td>Unique Pointer</td><td>Exclusive ownership of a heap-allocated resource (like <code>Box</code> in Rust)</td></tr>
 <tr><td><code>~</code></td><td>Shared Pointer</td><td>Reference-counted shared ownership</td></tr>
+<tr><td><code>&amp;</code></td><td>Borrow Pointer</td><td>Reference/borrow of another value</td></tr>
 </tbody>
 </table>
 </div>
