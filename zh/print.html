@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-0ad52201.js";
+            window.path_to_searchindex_js = "searchindex-b2623d23.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -1065,6 +1065,36 @@ fn borrowing_safe_example() {
 <p>该模型实现了与 Rust 借用检查器相同的安全保证，但无需任何生命周期标注——帽子标记符号直接在语法中使所有权变得可见。</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="高级特性"><a class="header" href="#高级特性">高级特性</a></h1>
+<p>在掌握了变量、控制流等语言基础，并深刻理解了 <strong>帽子原则（Hat Principle）</strong> 关于灵魂（Soul）与肉身（Handle）的管理之后，你已经跨过了 Toka 最陡峭的学习曲线。现在，我们将进入 Toka 的<strong>高级特性</strong>世界。</p>
+<p>Toka 的高级特性并不是为了“炫技”而设计的复杂语法，而是为了在保持<strong>零拷贝隐式引用捕获</strong>和<strong>极致运行效率</strong>的前提下，为开发者提供高层次的抽象表达力。在这里，你将领略到强类型系统与代数数据类型的完美融合。</p>
+<hr>
+<h2 id="本章知识图谱"><a class="header" href="#本章知识图谱">本章知识图谱</a></h2>
+<p>本章将带你深入探索以下四个系统开发的核心利器：</p>
+<pre><code class="language-mermaid">graph TD
+    A[Toka 高级抽象] --&gt; B(泛型 Generics)
+    A --&gt; C(错误处理 Error Handling)
+    A --&gt; D(模式匹配 Pattern Matching)
+    A --&gt; E(并发编程 Concurrency)
+
+    B --&gt; B1["零开销多态 &amp; 规避‘灵魂塌陷’"]
+    C --&gt; C1["Option / Result 代数类型 &amp; 短路传播 !"]
+    D --&gt; D1["Shape 深度解构 &amp; if 守卫过滤"]
+    E --&gt; E1["安全轻量级协程 &amp; 多核并行"]
+</code></pre>
+<h3 id="1-泛型generics"><a class="header" href="#1-泛型generics">1. <a href="#泛型generics">泛型（Generics）</a></a></h3>
+<p>在强类型安全的前提下，提供零运行开销的多态表达。你将学习到极其独特的 <strong>Morphic 泛型类型</strong>（如 <code>'A</code>），以及在定义 Shape 时如何通过对应的 <code>'first</code> 单引号字段前缀来规避 <strong>“灵魂塌陷（Soul Collapse）”</strong> 的底层约束规则。</p>
+<h3 id="2-错误处理"><a class="header" href="#2-错误处理">2. <a href="#错误处理">错误处理</a></a></h3>
+<p>Toka 摒弃了复杂的运行时异常抛出机制，而是从类型系统出发，通过特化的 <code>Option&lt;T&gt;</code> 和 <code>Result&lt;T, E&gt;</code> 代数数据类型优雅地表达和传递错误。配合极其简洁的 <code>!</code> 短路操作符，让你的错误流比传统的嵌套匹配更具美感。</p>
+<h3 id="3-模式匹配"><a class="header" href="#3-模式匹配">3. <a href="#模式匹配">模式匹配</a></a></h3>
+<p>作为 Toka 表达力最强的特性之一，模式匹配允许你以极其直观的方式解构 Shape、分发逻辑。这里你将明确为何 Toka 强制使用 Variable Pattern 判定，并学习如何优雅地结合 <code>if</code> 条件守卫进行精细的范围与边界过滤。</p>
+<h3 id="4-并发编程"><a class="header" href="#4-并发编程">4. <a href="#并发编程">并发编程</a></a></h3>
+<p>如何让你的代码安全地在多核 CPU 上飞驰？Toka 提供了极致轻量且安全的协程与线程基元，帮助你在避免死锁和数据竞争的前提下，构建高吞吐量的并发系统。</p>
+<hr>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p><strong>心智模型转换提醒</strong>
+在阅读本大章时，请暂时忘掉传统面向对象语言（如 Java/C++）中繁琐的继承体系和运行时多态负担。Toka 的多态是通过 <strong>Shape 解构、Trait 约束和模式匹配</strong> 在编译期完成的。用好帽子原则，你的高级代码将兼具极致的安全与惊艳的运行效率。</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="泛型generics"><a class="header" href="#泛型generics">泛型（Generics）</a></h1>
 <p>泛型允许你编写灵活、可复用的代码，适用于任何类型，同时保持编译时安全性。</p>
@@ -2001,6 +2031,37 @@ fn generate_key() -&gt; u64 {
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="实战项目"><a class="header" href="#实战项目">实战项目</a></h1>
+<p>将理论付诸实践，是真正掌握一门系统级编程语言的最佳途径。在完成了 Toka 语言基础、帽子原则和高级抽象的学习之后，本章将带领你通过<strong>三个精心设计的实战项目</strong>，完成从“语法学习者”到“系统开发者”的华丽蜕变。</p>
+<p>这些项目绝非脱离现实的“玩具代码”，而是直击底层软件工程最核心的三个支柱：<strong>系统工具开发、高性能并发网络、语言与文本解析</strong>。</p>
+<hr>
+<h2 id="项目实战阶梯"><a class="header" href="#项目实战阶梯">项目实战阶梯</a></h2>
+<p>本章包含的三个项目呈阶梯状递进，帮助你逐步建立起健壮的系统级开发心智：</p>
+<pre><code class="language-mermaid">graph TD
+    P1[命令行工具 CLI Tool] --&gt;|熟悉 API 与基础命令行系统操作| P2[高并发 Web 服务器 HTTP Server]
+    P2 --&gt;|彻底打通帽子并发安全性与网络I/O| P3[手写正则匹配引擎 Regex Engine]
+    P3 --&gt;|深入锻炼复杂数据结构算法与模式匹配解构| P4[系统级全能开发者]
+</code></pre>
+<h3 id="1-用-stdxcliflag-构建-cli-工具"><a class="header" href="#1-用-stdxcliflag-构建-cli-工具">1. <a href="#用-stdxcliflag-构建-cli-工具">用 stdx/cli/flag 构建 CLI 工具</a></a></h3>
+<ul>
+<li><strong>工程价值</strong>：这是你的第一个实战项目。你将摆脱陈旧的多层链式调用，学习如何使用官方标准的内置 <code>stdx/cli/flag</code> 扩展包，通过非链式可变 <code>self#</code> API 优雅地解析命令行标志、处理布尔选项，以及利用模式匹配安全地收集和过滤定位参数（Positional Arguments）。</li>
+</ul>
+<h3 id="2-高性能-http-服务器"><a class="header" href="#2-高性能-http-服务器">2. <a href="#http-服务器-1">高性能 HTTP 服务器</a></a></h3>
+<ul>
+<li><strong>工程价值</strong>：如何利用 Toka 构建高并发、底层的网络服务？在这个项目中，你将从最底层的 TCP 监听（<code>TcpListener</code>）和连接接受（<code>accept()</code>）开始，结合多线程并发技术，手工编写一个符合 RFC 标准的高并发 HTTP 响应服务器。这是对帽子并发安全机制和 I/O 模块的一次全面大考。</li>
+</ul>
+<h3 id="3-正则匹配引擎"><a class="header" href="#3-正则匹配引擎">3. <a href="#正则引擎">正则匹配引擎</a></a></h3>
+<ul>
+<li><strong>工程价值</strong>：文本匹配和编译器前端是系统开发非常迷人的一环。你将挑战亲手实现一个微型的正则表达式引擎。在这个项目中，你将深入锻炼对 Token 字符流的控制、状态机的转移、树状数据结构的深层表示，以及如何利用 Toka 优雅的 <code>match</code> 模式匹配进行复杂的词法与句法分支匹配。</li>
+</ul>
+<hr>
+<blockquote class="blockquote-tag blockquote-tag-important">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p>
+<p><strong>开发须知与调试准备</strong>
+在开始每个项目前，请确保你已经正确配置了 <code>toka</code> 命令行环境，并且编译器 <code>tokac</code> 可以正常工作。你可以通过以下基础命令快速运行和调试你的项目：</p>
+<pre><code class="language-bash">toka run src/main.tk -- -n Toka
+</code></pre>
+<p>在每个项目章节中，贤弟都为你准备了详细的单元测试和运行示例。建议你亲自动手敲下每一行代码，观察编译器的报错输出，这会让你对 Toka 的“肉身（Handle）”和“灵魂（Soul）”重绑定规则拥有更深骨髓的直觉。</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="用-stdxcliflag-构建-cli-工具"><a class="header" href="#用-stdxcliflag-构建-cli-工具">用 stdx/cli/flag 构建 CLI 工具</a></h1>
 <p>在这个项目中，我们将使用 Toka 以及标准的 <code>stdx/cli/flag</code> 参数解析库来构建一个命令行工具。</p>
@@ -2335,6 +2396,29 @@ fn example() {
 <p>这使得它成为展示 Toka 如何使用清晰、安全的代码实现非平凡算法的一个很好的例子。</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="附录"><a class="header" href="#附录">附录</a></h1>
+<p>为了帮助你全方位地掌握 Toka 语言，本书的<strong>附录</strong>部分为你准备了丰富的参考资料与实用的开发工具库。</p>
+<p>对于带着其他主流语言（如 C++、Rust、Go）背景来到 Toka 的开发者，附录将致力于消除你的<strong>心智模型包袱</strong>，为你提供丝滑无阻的语言转换与平滑迁移指南。</p>
+<hr>
+<h2 id="附录参考指南"><a class="header" href="#附录参考指南">附录参考指南</a></h2>
+<p>本附录包含以下三个核心参考模块：</p>
+<h3 id="1-toka-与其他语言对比"><a class="header" href="#1-toka-与其他语言对比">1. <a href="#toka-与其他语言对比">Toka 与其他语言对比</a></a></h3>
+<ul>
+<li><strong>指南内容</strong>：Toka 吸收了多门现代语言的设计灵感，但也拥有着极其独特的创新性（如解引用的“戴帽与摘帽”与 C++ 恰恰相反）。本章通过清晰的特性对比表格和代码示例，横向对比了 Toka 与 <strong>C/C++、Rust、Go</strong> 之间的核心语法差异与设计哲学考量，帮助你迅速建立起精准的横向认知。</li>
+</ul>
+<h3 id="2-迁移指南"><a class="header" href="#2-迁移指南">2. <a href="#迁移指南">迁移指南</a></a></h3>
+<ul>
+<li><strong>指南内容</strong>：如何将现有的逻辑平滑地迁移到 Toka？本章专为经验丰富的工程师编写，重点介绍如何将传统的“面向对象”或“指令式/指针传递”逻辑，改写为符合 Toka <strong>Shape 实体解构、帽子重绑定与零拷贝隐式引用捕获</strong> 规范的高效系统级代码。</li>
+</ul>
+<h3 id="3-常见问题faq"><a class="header" href="#3-常见问题faq">3. <a href="#常见问题">常见问题（FAQ）</a></a></h3>
+<ul>
+<li><strong>指南内容</strong>：汇总了社区和开发者最常踩的坑。从新手最容易困惑的“为什么不能用大括号定义 Shape”，到深层次的“在方法调用中如何理解指针的重绑定”，本章收集了最直观的解答和最全面的 Diagnostic 编译错误诊断解读，为你扫清编译期的一切迷雾。</li>
+</ul>
+<hr>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p><strong>终书学习与社区支持</strong>
+编程语言是一门实践的艺术，而 Toka 正在蓬勃发展中。如果你在日常编码或阅读本书时遇到了任何未尽之言，或者发现了新的错误，我们非常欢迎你向官方仓库提交 Issue 或 Pull Request。希望这本手册能成为你探索底层系统世界最得力的助手！</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="toka-与其他语言对比"><a class="header" href="#toka-与其他语言对比">Toka 与其他语言对比</a></h1>
 <p>在系统编程领域，Toka 与其他语言相比如何？</p>

@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-0ad52201.js";
+            window.path_to_searchindex_js = "searchindex-b2623d23.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -178,6 +178,36 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="高级特性"><a class="header" href="#高级特性">高级特性</a></h1>
+<p>在掌握了变量、控制流等语言基础，并深刻理解了 <strong>帽子原则（Hat Principle）</strong> 关于灵魂（Soul）与肉身（Handle）的管理之后，你已经跨过了 Toka 最陡峭的学习曲线。现在，我们将进入 Toka 的<strong>高级特性</strong>世界。</p>
+<p>Toka 的高级特性并不是为了“炫技”而设计的复杂语法，而是为了在保持<strong>零拷贝隐式引用捕获</strong>和<strong>极致运行效率</strong>的前提下，为开发者提供高层次的抽象表达力。在这里，你将领略到强类型系统与代数数据类型的完美融合。</p>
+<hr>
+<h2 id="本章知识图谱"><a class="header" href="#本章知识图谱">本章知识图谱</a></h2>
+<p>本章将带你深入探索以下四个系统开发的核心利器：</p>
+<pre><code class="language-mermaid">graph TD
+    A[Toka 高级抽象] --&gt; B(泛型 Generics)
+    A --&gt; C(错误处理 Error Handling)
+    A --&gt; D(模式匹配 Pattern Matching)
+    A --&gt; E(并发编程 Concurrency)
+
+    B --&gt; B1["零开销多态 &amp; 规避‘灵魂塌陷’"]
+    C --&gt; C1["Option / Result 代数类型 &amp; 短路传播 !"]
+    D --&gt; D1["Shape 深度解构 &amp; if 守卫过滤"]
+    E --&gt; E1["安全轻量级协程 &amp; 多核并行"]
+</code></pre>
+<h3 id="1-泛型generics"><a class="header" href="#1-泛型generics">1. <a href="advanced/generics.html">泛型（Generics）</a></a></h3>
+<p>在强类型安全的前提下，提供零运行开销的多态表达。你将学习到极其独特的 <strong>Morphic 泛型类型</strong>（如 <code>'A</code>），以及在定义 Shape 时如何通过对应的 <code>'first</code> 单引号字段前缀来规避 <strong>“灵魂塌陷（Soul Collapse）”</strong> 的底层约束规则。</p>
+<h3 id="2-错误处理"><a class="header" href="#2-错误处理">2. <a href="advanced/error_handling.html">错误处理</a></a></h3>
+<p>Toka 摒弃了复杂的运行时异常抛出机制，而是从类型系统出发，通过特化的 <code>Option&lt;T&gt;</code> 和 <code>Result&lt;T, E&gt;</code> 代数数据类型优雅地表达和传递错误。配合极其简洁的 <code>!</code> 短路操作符，让你的错误流比传统的嵌套匹配更具美感。</p>
+<h3 id="3-模式匹配"><a class="header" href="#3-模式匹配">3. <a href="advanced/pattern_matching.html">模式匹配</a></a></h3>
+<p>作为 Toka 表达力最强的特性之一，模式匹配允许你以极其直观的方式解构 Shape、分发逻辑。这里你将明确为何 Toka 强制使用 Variable Pattern 判定，并学习如何优雅地结合 <code>if</code> 条件守卫进行精细的范围与边界过滤。</p>
+<h3 id="4-并发编程"><a class="header" href="#4-并发编程">4. <a href="advanced/concurrency.html">并发编程</a></a></h3>
+<p>如何让你的代码安全地在多核 CPU 上飞驰？Toka 提供了极致轻量且安全的协程与线程基元，帮助你在避免死锁和数据竞争的前提下，构建高吞吐量的并发系统。</p>
+<hr>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p><strong>心智模型转换提醒</strong>
+在阅读本大章时，请暂时忘掉传统面向对象语言（如 Java/C++）中繁琐的继承体系和运行时多态负担。Toka 的多态是通过 <strong>Shape 解构、Trait 约束和模式匹配</strong> 在编译期完成的。用好帽子原则，你的高级代码将兼具极致的安全与惊艳的运行效率。</p>
+</blockquote>
 
                     </main>
 

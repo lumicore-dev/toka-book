@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-0ad52201.js";
+            window.path_to_searchindex_js = "searchindex-b2623d23.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -178,6 +178,37 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="实战项目"><a class="header" href="#实战项目">实战项目</a></h1>
+<p>将理论付诸实践，是真正掌握一门系统级编程语言的最佳途径。在完成了 Toka 语言基础、帽子原则和高级抽象的学习之后，本章将带领你通过<strong>三个精心设计的实战项目</strong>，完成从“语法学习者”到“系统开发者”的华丽蜕变。</p>
+<p>这些项目绝非脱离现实的“玩具代码”，而是直击底层软件工程最核心的三个支柱：<strong>系统工具开发、高性能并发网络、语言与文本解析</strong>。</p>
+<hr>
+<h2 id="项目实战阶梯"><a class="header" href="#项目实战阶梯">项目实战阶梯</a></h2>
+<p>本章包含的三个项目呈阶梯状递进，帮助你逐步建立起健壮的系统级开发心智：</p>
+<pre><code class="language-mermaid">graph TD
+    P1[命令行工具 CLI Tool] --&gt;|熟悉 API 与基础命令行系统操作| P2[高并发 Web 服务器 HTTP Server]
+    P2 --&gt;|彻底打通帽子并发安全性与网络I/O| P3[手写正则匹配引擎 Regex Engine]
+    P3 --&gt;|深入锻炼复杂数据结构算法与模式匹配解构| P4[系统级全能开发者]
+</code></pre>
+<h3 id="1-用-stdxcliflag-构建-cli-工具"><a class="header" href="#1-用-stdxcliflag-构建-cli-工具">1. <a href="projects/cli_tool.html">用 stdx/cli/flag 构建 CLI 工具</a></a></h3>
+<ul>
+<li><strong>工程价值</strong>：这是你的第一个实战项目。你将摆脱陈旧的多层链式调用，学习如何使用官方标准的内置 <code>stdx/cli/flag</code> 扩展包，通过非链式可变 <code>self#</code> API 优雅地解析命令行标志、处理布尔选项，以及利用模式匹配安全地收集和过滤定位参数（Positional Arguments）。</li>
+</ul>
+<h3 id="2-高性能-http-服务器"><a class="header" href="#2-高性能-http-服务器">2. <a href="projects/http_server.html">高性能 HTTP 服务器</a></a></h3>
+<ul>
+<li><strong>工程价值</strong>：如何利用 Toka 构建高并发、底层的网络服务？在这个项目中，你将从最底层的 TCP 监听（<code>TcpListener</code>）和连接接受（<code>accept()</code>）开始，结合多线程并发技术，手工编写一个符合 RFC 标准的高并发 HTTP 响应服务器。这是对帽子并发安全机制和 I/O 模块的一次全面大考。</li>
+</ul>
+<h3 id="3-正则匹配引擎"><a class="header" href="#3-正则匹配引擎">3. <a href="projects/regex.html">正则匹配引擎</a></a></h3>
+<ul>
+<li><strong>工程价值</strong>：文本匹配和编译器前端是系统开发非常迷人的一环。你将挑战亲手实现一个微型的正则表达式引擎。在这个项目中，你将深入锻炼对 Token 字符流的控制、状态机的转移、树状数据结构的深层表示，以及如何利用 Toka 优雅的 <code>match</code> 模式匹配进行复杂的词法与句法分支匹配。</li>
+</ul>
+<hr>
+<blockquote class="blockquote-tag blockquote-tag-important">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p>
+<p><strong>开发须知与调试准备</strong>
+在开始每个项目前，请确保你已经正确配置了 <code>toka</code> 命令行环境，并且编译器 <code>tokac</code> 可以正常工作。你可以通过以下基础命令快速运行和调试你的项目：</p>
+<pre><code class="language-bash">toka run src/main.tk -- -n Toka
+</code></pre>
+<p>在每个项目章节中，贤弟都为你准备了详细的单元测试和运行示例。建议你亲自动手敲下每一行代码，观察编译器的报错输出，这会让你对 Toka 的“肉身（Handle）”和“灵魂（Soul）”重绑定规则拥有更深骨髓的直觉。</p>
+</blockquote>
 
                     </main>
 

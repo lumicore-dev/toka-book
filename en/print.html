@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-0465bfe5.js";
+            window.path_to_searchindex_js = "searchindex-21a29cfd.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -1064,6 +1064,36 @@ fn borrowing_safe_example() {
 <p>This model achieves the same safety guarantees as Rust’s borrow checker, but without any lifetime annotations — the hat sigils make ownership visible directly in the syntax.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="advanced-features"><a class="header" href="#advanced-features">Advanced Features</a></h1>
+<p>Having mastered the language basics and gained a deep understanding of the <strong>Hat Principle</strong> regarding the management of Soul and Handle, you have already conquered Toka’s steepest learning curve. Now, we enter the world of Toka’s <strong>Advanced Features</strong>.</p>
+<p>Toka’s advanced features are not complex syntax designed for show. Instead, they provide high-level abstract expressiveness while strictly adhering to the <strong>Zero-Copy Capture Mechanism</strong> and <strong>ultimate runtime efficiency</strong>. Here, you will witness the elegant fusion of strong type systems and algebraic data types.</p>
+<hr>
+<h2 id="chapter-map"><a class="header" href="#chapter-map">Chapter Map</a></h2>
+<p>This chapter will guide you through the following four pillars of system development:</p>
+<pre><code class="language-mermaid">graph TD
+    A[Toka Advanced Abstractions] --&gt; B(Generics)
+    A --&gt; C(Error Handling)
+    A --&gt; D(Pattern Matching)
+    A --&gt; E(Concurrency)
+
+    B --&gt; B1["Zero-overhead Polymorphism &amp; Avoiding 'Soul Collapse'"]
+    C --&gt; C1["Option / Result &amp; Short-circuit Operator !"]
+    D --&gt; D1["Deep Shape Deconstruction &amp; if Guards"]
+    E --&gt; E1["Safe Lightweight Coroutines &amp; Multicore Parallelism"]
+</code></pre>
+<h3 id="1-generics"><a class="header" href="#1-generics">1. <a href="#generics">Generics</a></a></h3>
+<p>Achieve zero-overhead polymorphism while maintaining strong type safety. You will learn about Toka’s unique <strong>Morphic Generic Types</strong> (like <code>'A</code>) and the strict rule of prefixing corresponding Shape fields with a single quote (e.g., <code>'first: 'A</code>) to avoid <strong>“Soul Collapse”</strong>.</p>
+<h3 id="2-error-handling"><a class="header" href="#2-error-handling">2. <a href="#error-handling">Error Handling</a></a></h3>
+<p>Toka discards heavy runtime exception-throwing mechanisms. Instead, it leverages algebraic data types, specifically <code>Option&lt;T&gt;</code> and <code>Result&lt;T, E&gt;</code>, to elegantly represent and propagate errors. Together with the concise <code>!</code> short-circuit operator, your error paths will be cleaner and more robust than nested pattern matches.</p>
+<h3 id="3-pattern-matching"><a class="header" href="#3-pattern-matching">3. <a href="#pattern-matching">Pattern Matching</a></a></h3>
+<p>As one of Toka’s most expressive features, pattern matching allows you to deconstruct Shapes and dispatch logic intuitively. Here, you will understand how variable patterns binding and shadowing work under the hood, and learn to combine patterns with <code>if</code> guards for precise range and boundary checks.</p>
+<h3 id="4-concurrency"><a class="header" href="#4-concurrency">4. <a href="#concurrency">Concurrency</a></a></h3>
+<p>How do you make your code run safely across multiple CPU cores? Toka provides extremely lightweight and safe coroutines and threading primitives, helping you build high-throughput concurrent systems without deadlocks or data races.</p>
+<hr>
+<blockquote class="blockquote-tag blockquote-tag-tip">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<p><strong>Mental Model Shift</strong>
+When reading this chapter, forget the heavy inheritance hierarchies and runtime polymorphism overhead of traditional object-oriented languages (like Java/C++). Toka achieves polymorphism at compile time through <strong>Shape deconstruction, Trait constraints, and Pattern Matching</strong>. Combined with the Hat Principle, your advanced code will be both safe and blazing fast.</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="generics"><a class="header" href="#generics">Generics</a></h1>
 <p>Generics allow you to write flexible, reusable code that works with any type while maintaining compile-time safety.</p>
@@ -2005,6 +2035,37 @@ fn generate_key() -&gt; u64 {
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="projects"><a class="header" href="#projects">Projects</a></h1>
+<p>Putting theory into practice is the single best way to truly master a systems programming language. Having mastered Toka’s language basics, the Hat Principle, and advanced abstractions, this chapter will guide you through <strong>three carefully designed practical projects</strong> to complete your transformation from a syntax learner to a systems developer.</p>
+<p>These projects are not detached “toy code.” Instead, they directly target the three pillars of low-level software engineering: <strong>systems tool development, high-performance concurrent networking, and language/text parsing</strong>.</p>
+<hr>
+<h2 id="practical-roadmap"><a class="header" href="#practical-roadmap">Practical Roadmap</a></h2>
+<p>The three projects in this chapter progress in a step-by-step fashion to help you gradually build robust system-level development mental models:</p>
+<pre><code class="language-mermaid">graph TD
+    P1[CLI Tool] --&gt;|Familiarize with standard library APIs &amp; basic OS interactions| P2[High-Concurrency HTTP Server]
+    P2 --&gt;|Master concurrency safety under Hat Principle &amp; TCP I/O| P3[Custom Regex Engine]
+    P3 --&gt;|Train complex data structures &amp; pattern matching algorithms| P4[Full-fledged Systems Developer]
+</code></pre>
+<h3 id="1-cli-tool-with-stdxcliflag"><a class="header" href="#1-cli-tool-with-stdxcliflag">1. <a href="#cli-tool-with-stdxcliflag">CLI Tool with stdx/cli/flag</a></a></h3>
+<ul>
+<li><strong>Engineering Value</strong>: This is your first practical project. You will move away from outdated multi-level chain calls and learn to leverage the official standard <code>stdx/cli/flag</code> extension package. You will elegently parse flags, handle boolean options using the non-chained mutable <code>self#</code> API, and safely collect and filter positional arguments with pattern matching.</li>
+</ul>
+<h3 id="2-high-performance-http-server"><a class="header" href="#2-high-performance-http-server">2. <a href="#http-server-1">High-Performance HTTP Server</a></a></h3>
+<ul>
+<li><strong>Engineering Value</strong>: How do you build highly concurrent, low-level network services in Toka? In this project, you will start with low-level TCP listening (<code>TcpListener</code>) and connection acceptance (<code>accept()</code>). Combined with multi-threaded concurrency, you will handcraft an RFC-compliant concurrent HTTP response server. This is a comprehensive test of your understanding of the Hat Principle and Toka’s I/O modules.</li>
+</ul>
+<h3 id="3-regex-engine"><a class="header" href="#3-regex-engine">3. <a href="#regex-engine">Regex Engine</a></a></h3>
+<ul>
+<li><strong>Engineering Value</strong>: Text matching and compiler frontends are fascinating areas of systems programming. You will challenge yourself to implement a micro regular expression engine from scratch. In this project, you will deeply train your control over token streams, state machine transitions, deep tree structure representations, and learn to leverage Toka’s elegant <code>match</code> pattern matching for complex lexical and syntactic branching.</li>
+</ul>
+<hr>
+<blockquote class="blockquote-tag blockquote-tag-important">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p>
+<p><strong>Development &amp; Debugging Preparation</strong>
+Before starting each project, make sure you have correctly configured your <code>toka</code> command-line environment and that the <code>tokac</code> compiler works properly. You can quickly run and debug your project using the following basic command:</p>
+<pre><code class="language-bash">toka run src/main.tk -- -n Toka
+</code></pre>
+<p>In each project chapter, detailed unit tests and execution examples are provided. It is highly recommended that you type every line of code yourself and observe compiler error outputs. This will give you a deep, visceral intuition for Toka’s “Handle” and “Soul” rebinding rules.</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="cli-tool-with-stdxcliflag"><a class="header" href="#cli-tool-with-stdxcliflag">CLI Tool with stdx/cli/flag</a></h1>
 <p>In this project, we’ll build a command-line tool using Toka and the standard <code>stdx/cli/flag</code> argument parser library.</p>
@@ -2339,6 +2400,29 @@ fn example() {
 <p>This makes it a great example of how Toka can implement non-trivial algorithms with clean, safe code.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="appendix"><a class="header" href="#appendix">Appendix</a></h1>
+<p>To help you fully master the Toka language, this <strong>Appendix</strong> provides a wealth of reference materials and practical development tools.</p>
+<p>For developers coming to Toka from other mainstream languages (such as C++, Rust, or Go), this appendix is dedicated to alleviating your <strong>mental model baggage</strong> and providing a seamless transition and smooth migration guide.</p>
+<hr>
+<h2 id="appendix-reference-directory"><a class="header" href="#appendix-reference-directory">Appendix Reference Directory</a></h2>
+<p>This appendix consists of the following three core reference modules:</p>
+<h3 id="1-toka-vs-other-languages"><a class="header" href="#1-toka-vs-other-languages">1. <a href="#toka-vs-other-languages">Toka vs. Other Languages</a></a></h3>
+<ul>
+<li><strong>Contents</strong>: While Toka draws inspiration from various modern languages, it introduces highly unique concepts (such as dereferencing “wearing/removing a hat,” which is the exact opposite of C++). This chapter provides clear comparison tables and side-by-side code snippets comparing Toka with <strong>C/C++, Rust, and Go</strong> to help you quickly build an accurate comparative mental model.</li>
+</ul>
+<h3 id="2-migration-guide"><a class="header" href="#2-migration-guide">2. <a href="#migration-guide">Migration Guide</a></a></h3>
+<ul>
+<li><strong>Contents</strong>: How do you smoothly migrate existing code logic to Toka? Written for experienced engineers, this chapter focuses on translating traditional “object-oriented” or “imperative pointer-passing” logic into highly efficient systems-level code that conforms to Toka’s <strong>Shape deconstruction, Hat rebinding, and zero-copy implicit reference capture</strong> paradigms.</li>
+</ul>
+<h3 id="3-faq"><a class="header" href="#3-faq">3. <a href="#frequently-asked-questions">FAQ</a></a></h3>
+<ul>
+<li><strong>Contents</strong>: A compilation of the most common pitfalls and questions from the developer community. From beginner confusion like “why can’t I use curly braces to define Shapes” to deeper questions like “how does pointer rebinding work inside method calls,” this chapter offers direct answers and diagnostic compiler error explanations to clear any compiler mist.</li>
+</ul>
+<hr>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p><strong>Continuous Learning &amp; Community Support</strong>
+Programming is an art of practice, and Toka is rapidly evolving. If you encounter any issues or discover bugs while coding or reading this manual, you are highly encouraged to submit an Issue or Pull Request to the official repository. We hope this manual becomes your most trusted companion in exploring the low-level systems world!</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="toka-vs-other-languages"><a class="header" href="#toka-vs-other-languages">Toka vs Other Languages</a></h1>
 <p>How does Toka compare to other languages in the systems programming space?</p>
