@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-6a410e44.js";
+            window.path_to_searchindex_js = "searchindex-0aa3b231.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -1455,24 +1455,44 @@ fn main() -&gt; i32 {
 </table>
 </div>
 <h3 id="libstd--标准库"><a class="header" href="#libstd--标准库"><code>lib/std/</code> — 标准库</a></h3>
-<p>面向应用程序开发的即用型模块：</p>
+<p>面向应用程序开发的即用型标准模块（完整列表）：</p>
 <div class="table-wrapper">
 <table>
 <thead>
 <tr><th>模块</th><th>描述</th></tr>
 </thead>
 <tbody>
-<tr><td><code>io</code></td><td>控制台 I/O</td></tr>
-<tr><td><code>fs</code></td><td>文件系统操作</td></tr>
-<tr><td><code>path</code></td><td>路径操作</td></tr>
-<tr><td><code>net</code></td><td>TCP/UDP 网络编程</td></tr>
-<tr><td><code>time</code></td><td>时间和持续时间</td></tr>
-<tr><td><code>math</code></td><td>数学函数</td></tr>
-<tr><td><code>rand</code></td><td>随机数生成</td></tr>
-<tr><td><code>vec</code></td><td>动态数组</td></tr>
-<tr><td><code>hash_map</code></td><td>哈希映射</td></tr>
-<tr><td><code>btree_map</code></td><td>有序映射</td></tr>
-<tr><td><code>string</code></td><td>UTF-8 字符串类型</td></tr>
+<tr><td><code>prelude</code></td><td>自动导入的标准库预导入模块，包含最常用类型</td></tr>
+<tr><td><code>char</code></td><td>Unicode 字符处理与分类</td></tr>
+<tr><td><code>string</code></td><td>UTF-8 编码的动态字符串类型（<code>String</code> / <code>view_str</code>）</td></tr>
+<tr><td><code>vec</code></td><td>动态增长的顺序数组容器（<code>Vec</code>）</td></tr>
+<tr><td><code>deque</code></td><td>基于循环缓冲区的双端队列（<code>VecDeque</code>）</td></tr>
+<tr><td><code>list</code></td><td>双向链表实现（<code>LinkedList</code>）</td></tr>
+<tr><td><code>hash_map</code></td><td>基于哈希表的高性能映射（<code>HashMap</code>）</td></tr>
+<tr><td><code>hash_set</code></td><td>基于哈希表的唯一元素集合（<code>HashSet</code>）</td></tr>
+<tr><td><code>btree_map</code></td><td>基于 B-Tree 的有序键值映射（<code>BTreeMap</code>）</td></tr>
+<tr><td><code>btree_set</code></td><td>基于 B-Tree 的有序唯一集合（<code>BTreeSet</code>）</td></tr>
+<tr><td><code>heap</code></td><td>最大堆/最小堆实现的优先队列（<code>BinaryHeap</code>）</td></tr>
+<tr><td><code>io</code></td><td>带缓冲的标准控制台 I/O（<code>stdin</code> / <code>stdout</code> / <code>println</code>）</td></tr>
+<tr><td><code>fs</code></td><td>文件系统读写及目录元数据操作</td></tr>
+<tr><td><code>path</code></td><td>跨平台文件路径解析与操作（<code>Path</code> / <code>PathBuf</code>）</td></tr>
+<tr><td><code>env</code></td><td>环境变量获取、进程参数与系统上下文交互</td></tr>
+<tr><td><code>process</code></td><td>子进程的创建、状态控制与管道交互</td></tr>
+<tr><td><code>thread</code></td><td>原生系统级线程管理与生命周期控制（<code>Thread</code>）</td></tr>
+<tr><td><code>sync</code></td><td>线程级同步锁原语（<code>Mutex</code> / <code>Condvar</code> / <code>WaitGroup</code>）</td></tr>
+<tr><td><code>atomic</code></td><td>硬件级原子操作与无锁同步原语</td></tr>
+<tr><td><code>mpsc</code></td><td>多生产者单消费者（MPSC）线程并发通道</td></tr>
+<tr><td><code>task</code></td><td>协程异步任务的调度、上下文管理与运行时</td></tr>
+<tr><td><code>net</code></td><td>TCP 与 UDP 套接字网络通信接口</td></tr>
+<tr><td><code>math</code></td><td>常用数学计算函数与极限常量</td></tr>
+<tr><td><code>rand</code></td><td>伪随机数生成器与随机实用工具</td></tr>
+<tr><td><code>time</code></td><td>系统时间与单调递增持续时间（<code>Duration</code> / <code>Instant</code>）</td></tr>
+<tr><td><code>log</code></td><td>基础日志打印与级别过滤机制</td></tr>
+<tr><td><code>fmt</code></td><td>文本格式化与调试输出工具（<code>Format</code>）</td></tr>
+<tr><td><code>memory</code></td><td>底层内存分配、区域拷贝与裸指针辅助方法</td></tr>
+<tr><td><code>error</code></td><td>通用错误特征（<code>Error</code>）与故障基类定义</td></tr>
+<tr><td><code>panic</code></td><td>运行时致命错误触发、拦截与堆栈挂钩处理</td></tr>
+<tr><td><code>termios</code></td><td>底层 Tty 终端模式与控制属性配置</td></tr>
 </tbody>
 </table>
 </div>

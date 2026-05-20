@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-7b541f2e.js";
+            window.path_to_searchindex_js = "searchindex-c00b5df6.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -200,24 +200,44 @@
 </table>
 </div>
 <h3 id="libstd--standard-library"><a class="header" href="#libstd--standard-library"><code>lib/std/</code> — Standard Library</a></h3>
-<p>Ready-to-use modules for application development:</p>
+<p>Ready-to-use standard modules for application development (Complete List):</p>
 <div class="table-wrapper">
 <table>
 <thead>
 <tr><th>Module</th><th>Description</th></tr>
 </thead>
 <tbody>
-<tr><td><code>io</code></td><td>Console I/O</td></tr>
-<tr><td><code>fs</code></td><td>File system operations</td></tr>
-<tr><td><code>path</code></td><td>Path manipulation</td></tr>
-<tr><td><code>net</code></td><td>TCP/UDP networking</td></tr>
-<tr><td><code>time</code></td><td>Time and duration</td></tr>
-<tr><td><code>math</code></td><td>Mathematical functions</td></tr>
-<tr><td><code>rand</code></td><td>Random number generation</td></tr>
-<tr><td><code>vec</code></td><td>Dynamic array</td></tr>
-<tr><td><code>hash_map</code></td><td>Hash map</td></tr>
-<tr><td><code>btree_map</code></td><td>Ordered map</td></tr>
-<tr><td><code>string</code></td><td>UTF-8 string type</td></tr>
+<tr><td><code>prelude</code></td><td>Auto-imported standard prelude containing the most common types</td></tr>
+<tr><td><code>char</code></td><td>Unicode character handling and classification</td></tr>
+<tr><td><code>string</code></td><td>UTF-8 dynamic dynamic string types (<code>String</code> / <code>view_str</code>)</td></tr>
+<tr><td><code>vec</code></td><td>Dynamically growing sequential array container (<code>Vec</code>)</td></tr>
+<tr><td><code>deque</code></td><td>Double-ended queue based on ring buffers (<code>VecDeque</code>)</td></tr>
+<tr><td><code>list</code></td><td>Doubly-linked list implementation (<code>LinkedList</code>)</td></tr>
+<tr><td><code>hash_map</code></td><td>High-performance hash table based map (<code>HashMap</code>)</td></tr>
+<tr><td><code>hash_set</code></td><td>Hash table based unique element collection (<code>HashSet</code>)</td></tr>
+<tr><td><code>btree_map</code></td><td>B-Tree based ordered key-value map (<code>BTreeMap</code>)</td></tr>
+<tr><td><code>btree_set</code></td><td>B-Tree based ordered unique set (<code>BTreeSet</code>)</td></tr>
+<tr><td><code>heap</code></td><td>Priority queue implemented with max/min binary heap (<code>BinaryHeap</code>)</td></tr>
+<tr><td><code>io</code></td><td>Buffered standard console I/O (<code>stdin</code> / <code>stdout</code> / <code>println</code>)</td></tr>
+<tr><td><code>fs</code></td><td>File system read/write and directory metadata operations</td></tr>
+<tr><td><code>path</code></td><td>Cross-platform file path parsing and manipulation (<code>Path</code> / <code>PathBuf</code>)</td></tr>
+<tr><td><code>env</code></td><td>Environment variables, process arguments, and system context interaction</td></tr>
+<tr><td><code>process</code></td><td>Subprocess spawning, state control, and pipe communication</td></tr>
+<tr><td><code>thread</code></td><td>Native system-level thread management and lifecycle control (<code>Thread</code>)</td></tr>
+<tr><td><code>sync</code></td><td>Thread synchronization primitives (<code>Mutex</code> / <code>Condvar</code> / <code>WaitGroup</code>)</td></tr>
+<tr><td><code>atomic</code></td><td>Hardware-level atomic operations and lock-free sync primitives</td></tr>
+<tr><td><code>mpsc</code></td><td>Multi-producer single-consumer (MPSC) thread concurrency channel</td></tr>
+<tr><td><code>task</code></td><td>Coroutine task scheduling, context management, and async runtime</td></tr>
+<tr><td><code>net</code></td><td>TCP &amp; UDP socket network communication interfaces</td></tr>
+<tr><td><code>math</code></td><td>Common mathematical functions and limit constants</td></tr>
+<tr><td><code>rand</code></td><td>Pseudo-random number generator and random utilities</td></tr>
+<tr><td><code>time</code></td><td>System time and monotonic durations (<code>Duration</code> / <code>Instant</code>)</td></tr>
+<tr><td><code>log</code></td><td>Basic logging utilities and severity filtering</td></tr>
+<tr><td><code>fmt</code></td><td>Text formatting and debug printing utilities (<code>Format</code>)</td></tr>
+<tr><td><code>memory</code></td><td>Low-level memory allocation, region copying, and raw pointer helpers</td></tr>
+<tr><td><code>error</code></td><td>Common error traits (<code>Error</code>) and failure base definitions</td></tr>
+<tr><td><code>panic</code></td><td>Runtime fatal error triggering, intercepting, and stack hooks</td></tr>
+<tr><td><code>termios</code></td><td>Low-level Tty terminal mode and control attributes configuration</td></tr>
 </tbody>
 </table>
 </div>
