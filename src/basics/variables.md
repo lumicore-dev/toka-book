@@ -12,20 +12,53 @@ auto y = 3.14        // f64 (default float type)
 auto name = "Toka"   // str (string slice)
 ```
 
-## Kebab-case Identifiers
+## Naming Rules & Hyphen (-) Resolution
 
-Since Toka v0.9.7, variable and function names natively support **Kebab-case** (hyphens), allowing for more readable and modern naming conventions:
+Toka has a strict and elegant rule regarding the hyphen (`-`) character to achieve both modular naming convenience and unambiguous mathematical syntax:
+
+### Package Names & Namespaces
+
+Package names and imported namespaces **can** use hyphens freely. This is common when importing nested folders or external libraries that follow a kebab-case directory structure. You can import them and call their functions using their hyphenated namespaces:
+
+```tokalang
+import std/io::println
+
+// Package and namespace names can contain hyphens
+import ./nested/toka-ink as toka-ink
+
+fn main() {
+    toka-ink::render()
+}
+```
+
+### Variables & Functions
+
+Ordinary variable names, constant names, shape/struct names, and function definitions **cannot** contain hyphens. They must follow standard alphanumeric/underscore naming rules (such as `camelCase` or `snake_case`):
+
+```tokalang
+fn main() {
+    auto max_size = 1024       // OK (snake_case)
+    auto maxSize = 1024        // OK (camelCase)
+    // auto max-size = 1024    // Error: Hyphens are not allowed in variable names
+}
+```
+
+### Unambiguous Subtraction
+
+Because hyphens are strictly forbidden in variable and function names, the subtraction operator (`-`) is completely unambiguous. Ordinary subtraction expressions without spaces are **always** 100% parsed correctly:
 
 ```toka
 import std/io::println
 
-fn main() {
-    auto max-size = 1024
-    auto user-name = "Toka"
+fn main() -> i32 {
+    auto sub1 = 10
+    auto sub2 = 3
     
-    // Warning: Subtraction operator must have spaces around it to avoid ambiguity!
-    auto result = max-size - 100 // Correct
-    // auto error = max-size-100 // Error: "max-size-100" is treated as one identifier
+    // No spaces are needed! Always parsed as subtraction
+    auto result = sub1-sub2    // OK: parsed as sub1 - sub2
+    auto value = 10-3          // OK: parsed as 10 - 3
+    println("Result: {}, Value: {}", result, value)
+    return 0
 }
 ```
 
