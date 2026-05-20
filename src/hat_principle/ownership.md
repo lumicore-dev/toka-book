@@ -48,23 +48,35 @@ auto &y = &(x)   // Local borrow pointer pointing to the soul of x
 
 ## Moving vs Copying
 
-**Simple types** (like `i32`, `f64`, `bool`) are **copied** by default:
+By default, assignment in Toka performs a **copy** (value copy for simple types, and shallow copy for shapes and complex types):
 
 ```toka
 {{#include ../../examples/ownership.tk:move_copy}}
 ```
 
-**Complex types** (like `string`, `Vec`, custom `shape` types) are **moved** by default. In Toka, assignment of a complex type transfers ownership from the source to the destination:
+This applies to both simple types (like `i32`, `f64`, `bool`) and complex types (like `string`, `Vec`, or custom `shape` types).
+
+### Default Move Semantics
+
+By default, **move semantics** apply exclusively to **Unique Pointers (`^`)**. Assignment of a unique pointer transfers exclusive ownership of its heap-allocated resource from the source to the destination:
 
 ```toka
-// Complex types use move semantics:
-//   auto moved = original  — ownership transfers to `moved`
-//   `original` is no longer valid after the move
+auto ^p1 = new Point(x = 10, y = 20, z = 0)
+auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid
 ```
 
-## Borrowing (In-Place Capture)
+### Explicit Move with `cede`
 
-Toka uses **implicit borrow** for function parameters by default. You don't need special sigils for standard borrowing:
+For other types (or to explicitly transfer ownership of any value), you must use the **`cede` keyword** to perform an explicit move. Once a value is ceded, the source variable is no longer valid:
+
+```toka
+auto s1 = String::from("hello")
+auto s2 = cede s1 // Explicit move: s1 is no longer valid
+```
+
+## Function Parameters (Pass by Value)
+
+In Toka, function parameters are immutable by default and passed by value (copied, or shallow-copied for complex types). You don't need special sigils for standard parameter passing:
 
 ```toka
 {{#include ../../examples/ownership.tk:borrow_func}}

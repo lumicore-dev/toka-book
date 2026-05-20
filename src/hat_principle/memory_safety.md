@@ -45,7 +45,7 @@ auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 
 ## Borrowing Safety
 
-Toka uses **implicit borrow** (in-place capture) as the default for function parameters. Values of simple types like `i32` are passed by value (copied), while complex types would be borrowed:
+In Toka, function parameters are immutable by default and passed by value (copied). Values of both simple types (like `i32`) and complex types (like custom `shape` types) are copied (shallow copied for structures) when passed to a function, keeping the caller's arguments safe from modification:
 
 ```toka
 {{#include ../../examples/memory_safety.tk:borrowing_safe}}
