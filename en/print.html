@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-7ae3d02e.js";
+            window.path_to_searchindex_js = "searchindex-df341337.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -907,7 +907,7 @@ s2.x = 3000      // Modifies the underlying soul
 <pre><code class="language-toka">auto &amp;y = &amp;(x)   // Local borrow pointer pointing to the soul of x
 </code></pre>
 <h2 id="moving-vs-copying"><a class="header" href="#moving-vs-copying">Moving vs Copying</a></h2>
-<p><strong>Simple types</strong> (like <code>i32</code>, <code>f64</code>, <code>bool</code>) are <strong>copied</strong> by default:</p>
+<p>By default, assignment in Toka performs a <strong>copy</strong> (value copy for simple types, and shallow copy for shapes and complex types):</p>
 <pre><code class="language-toka">fn move_copy_example() {
     auto a# = 42
     auto b = a
@@ -915,13 +915,19 @@ s2.x = 3000      // Modifies the underlying soul
     println("a: {}, b: {}", a, b)
 }
 </code></pre>
-<p><strong>Complex types</strong> (like <code>string</code>, <code>Vec</code>, custom <code>shape</code> types) are <strong>moved</strong> by default. In Toka, assignment of a complex type transfers ownership from the source to the destination:</p>
-<pre><code class="language-toka">// Complex types use move semantics:
-//   auto moved = original  — ownership transfers to `moved`
-//   `original` is no longer valid after the move
+<p>This applies to both simple types (like <code>i32</code>, <code>f64</code>, <code>bool</code>) and complex types (like <code>string</code>, <code>Vec</code>, or custom <code>shape</code> types).</p>
+<h3 id="default-move-semantics"><a class="header" href="#default-move-semantics">Default Move Semantics</a></h3>
+<p>By default, <strong>move semantics</strong> apply exclusively to <strong>Unique Pointers (<code>^</code>)</strong>. Assignment of a unique pointer transfers exclusive ownership of its heap-allocated resource from the source to the destination:</p>
+<pre><code class="language-toka">auto ^p1 = new Point(x = 10, y = 20, z = 0)
+auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid
 </code></pre>
-<h2 id="borrowing-in-place-capture"><a class="header" href="#borrowing-in-place-capture">Borrowing (In-Place Capture)</a></h2>
-<p>Toka uses <strong>implicit borrow</strong> for function parameters by default. You don’t need special sigils for standard borrowing:</p>
+<h3 id="explicit-move-with-cede"><a class="header" href="#explicit-move-with-cede">Explicit Move with <code>cede</code></a></h3>
+<p>For other types (or to explicitly transfer ownership of any value), you must use the <strong><code>cede</code> keyword</strong> to perform an explicit move. Once a value is ceded, the source variable is no longer valid:</p>
+<pre><code class="language-toka">auto s1 = String::from("hello")
+auto s2 = cede s1 // Explicit move: s1 is no longer valid
+</code></pre>
+<h2 id="function-parameters-pass-by-value"><a class="header" href="#function-parameters-pass-by-value">Function Parameters (Pass by Value)</a></h2>
+<p>In Toka, function parameters are immutable by default and passed by value (copied, or shallow-copied for complex types). You don’t need special sigils for standard parameter passing:</p>
 <pre><code class="language-toka">fn process(data: i32) {
     println("data: {}", data)
 }
@@ -1007,7 +1013,7 @@ fn main() -&gt; i32 {
 } // Ref count decrements when s2 goes out of scope
 </code></pre>
 <h2 id="borrowing-safety"><a class="header" href="#borrowing-safety">Borrowing Safety</a></h2>
-<p>Toka uses <strong>implicit borrow</strong> (in-place capture) as the default for function parameters. Values of simple types like <code>i32</code> are passed by value (copied), while complex types would be borrowed:</p>
+<p>In Toka, function parameters are immutable by default and passed by value (copied). Values of both simple types (like <code>i32</code>) and complex types (like custom <code>shape</code> types) are copied (shallow copied for structures) when passed to a function, keeping the caller’s arguments safe from modification:</p>
 <pre><code class="language-toka">fn show(x: i32) {
     println("x: {}", x)
 }

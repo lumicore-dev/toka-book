@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-d837712e.js";
+            window.path_to_searchindex_js = "../searchindex-6ea16065.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -216,7 +216,7 @@
 } // 当 s2 离开作用域时，引用计数减少
 </code></pre>
 <h2 id="借用安全"><a class="header" href="#借用安全">借用安全</a></h2>
-<p>Toka 默认对函数参数使用<strong>隐式借用</strong>（原位捕获）。像 <code>i32</code> 这样的简单类型的值按值传递（拷贝），而复杂类型则会被借用：</p>
+<p>在 Toka 中，函数参数默认是不可变的，并且是按值传递（拷贝）的。无论是简单类型（如 <code>i32</code>）还是复杂类型（如自定义 <code>shape</code> 类型），在传递给函数时都会执行拷贝（结构体执行浅拷贝），从而保护调用方的参数不被修改：</p>
 <pre><code class="language-toka">fn show(x: i32) {
     println("x: {}", x)
 }
