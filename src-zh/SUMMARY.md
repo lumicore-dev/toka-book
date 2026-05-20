@@ -1,7 +1,6 @@
 # Toka 编程语言指南
 
 [前言](foreword.md)
-[🏠 返回 tokalang.dev](return_to_website.md)
 
 - [快速入门](./getting_started.md)
   - [安装 Toka](./getting_started/installation.md)
