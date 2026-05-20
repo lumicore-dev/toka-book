@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-26c5a164.js";
+            window.path_to_searchindex_js = "../searchindex-dbed9934.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -208,8 +208,12 @@
 </code></pre>
 <p><code>unsafe</code> 关键字向 PAL Checker 发出信号，表示你在手动承担内存安全的责任。</p>
 <h2 id="共享指针-引用计数"><a class="header" href="#共享指针-引用计数">共享指针（<code>~</code>）— 引用计数</a></h2>
-<p>共享指针使用运行时引用计数，但仍然是安全的。支持已规划，将在未来的版本中发布。</p>
-<pre><code class="language-toka">// v0.9.6 中尚未实现——即将推出
+<p>共享指针使用运行时引用计数，并且是完全安全的。它们允许多个指针共享对同一堆分配资源的所有权。</p>
+<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+{
+    auto ~s2# = ~s1 // 共享拷贝（引用计数增加）
+    s2.x = 3000     // 直接修改底层数据（灵魂）
+} // 当 s2 离开作用域时，引用计数减少
 </code></pre>
 <h2 id="借用安全"><a class="header" href="#借用安全">借用安全</a></h2>
 <p>Toka 默认对函数参数使用<strong>隐式借用</strong>（原位捕获）。像 <code>i32</code> 这样的简单类型的值按值传递（拷贝），而复杂类型则会被借用：</p>

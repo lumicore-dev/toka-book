@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-26c5a164.js";
+            window.path_to_searchindex_js = "../searchindex-dbed9934.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -226,7 +226,7 @@ fn example() {
     println("{}", encoded)  // SGVsbG8sIFRva2Eh
     
     // 注意：base64::decode 正在开发中
-    // auto decoded = base64::decode(encoded)?
+    // auto decoded = base64::decode(encoded)!
 }
 </code></pre>
 <h2 id="hex-编码"><a class="header" href="#hex-编码">Hex 编码</a></h2>
@@ -239,7 +239,7 @@ fn example() {
     println("{}", hex_str)  // 48656C6C6F
     
     // 注意：hex::decode 正在开发中
-    // auto decoded = hex::decode(hex_str)?
+    // auto decoded = hex::decode(hex_str)!
 }
 </code></pre>
 <h2 id="自定义序列化"><a class="header" href="#自定义序列化">自定义序列化</a></h2>

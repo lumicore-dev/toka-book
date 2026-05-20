@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-26c5a164.js";
+            window.path_to_searchindex_js = "../searchindex-dbed9934.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -216,8 +216,10 @@
 }
 </code></pre>
 <h3 id="--共享指针"><a class="header" href="#--共享指针"><code>~</code> — 共享指针</a></h3>
-<p>基于引用计数的共享所有权已规划，将在未来的版本中发布。</p>
-<pre><code class="language-toka">// v0.9.6 中尚未实现——即将推出
+<p>通过指针帽子形态实现的基于引用计数的共享所有权。</p>
+<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s2# = ~s1 // 共享拷贝（引用计数增加）
+s2.x = 3000     // 直接修改底层数据（灵魂）
 </code></pre>
 <h2 id="身份与地址"><a class="header" href="#身份与地址">身份与地址</a></h2>
 <p>要获取局部变量的原始内存地址，使用 <code>*(expr)</code> 语法：</p>

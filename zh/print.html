@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-26c5a164.js";
+            window.path_to_searchindex_js = "searchindex-dbed9934.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -783,7 +783,7 @@ auto unicode: u32 = 0x4E16:u32
 <tbody>
 <tr><td><code>*</code></td><td>原始指针</td><td>底层指针，需要 <code>unsafe</code> / <code>alloc</code></td></tr>
 <tr><td><code>^</code></td><td>独占指针</td><td>对堆分配资源的独占所有权（类似 Rust 的 <code>Box</code>）</td></tr>
-<tr><td><code>~</code></td><td>共享指针</td><td>基于引用计数的共享所有权（规划中）</td></tr>
+<tr><td><code>~</code></td><td>共享指针</td><td>基于引用计数的共享所有权</td></tr>
 </tbody>
 </table>
 </div>
@@ -851,8 +851,10 @@ auto unicode: u32 = 0x4E16:u32
 }
 </code></pre>
 <h3 id="--共享指针"><a class="header" href="#--共享指针"><code>~</code> — 共享指针</a></h3>
-<p>基于引用计数的共享所有权已规划，将在未来的版本中发布。</p>
-<pre><code class="language-toka">// v0.9.6 中尚未实现——即将推出
+<p>通过指针帽子形态实现的基于引用计数的共享所有权。</p>
+<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s2# = ~s1 // 共享拷贝（引用计数增加）
+s2.x = 3000     // 直接修改底层数据（灵魂）
 </code></pre>
 <h2 id="身份与地址"><a class="header" href="#身份与地址">身份与地址</a></h2>
 <p>要获取局部变量的原始内存地址，使用 <code>*(expr)</code> 语法：</p>
@@ -889,8 +891,10 @@ auto unicode: u32 = 0x4E16:u32
 </code></pre>
 <p><code>^</code> 标记的作用类似于 Rust 的 <code>Box</code> 或 C++ 的 <code>std::unique_ptr</code>。当独占指针离开作用域时，其资源会自动释放。</p>
 <h3 id="--共享指针引用计数"><a class="header" href="#--共享指针引用计数"><code>~</code> — 共享指针（引用计数）</a></h3>
-<p>共享指针通过引用计数支持多个所有者。支持已规划，将在未来的版本中发布。</p>
-<pre><code class="language-toka">// v0.9.6 中尚未实现——即将推出
+<p>共享指针允许多个所有者通过引用计数共享所有权：</p>
+<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s2# = ~s1  // 共享拷贝（引用计数增加）
+s2.x = 3000      // 直接修改底层数据（灵魂）
 </code></pre>
 <p>当最后一个 <code>~</code> 引用离开作用域时，资源被释放。</p>
 <h2 id="移动-vs-拷贝"><a class="header" href="#移动-vs-拷贝">移动 vs. 拷贝</a></h2>
@@ -943,7 +947,7 @@ fn main() -&gt; i32 {
 <p>当一个函数返回一个派生自其参数的引用时，PAL Checker 要求你显式声明这种关系。<code>&lt;- c</code> 标记告诉编译器：<em>“返回的引用严格绑定到 <code>c</code> 的生命周期”</em>。</p>
 <p>如果你省略此标注，Toka 会主动阻止编译（<code>error[E0454]</code>），以防止意外的悬垂指针。这实现了与 Rust 的生命周期参数（<code>&lt;'a&gt;</code>）相同的严格内存安全保证，但语法更轻量、更直观。</p>
 <blockquote>
-<p><strong>注意：</strong> 此关系也可以使用 Toka 的 <strong>effects</strong> 标注风格来表达。对高级借用检查引用的支持正在持续演进中。</p>
+<p><strong>注意：</strong> 此关系也可以使用 Toka 的 <strong>effects</strong> 标注风格来表达。对高级借用检查引用的设计正在持续演进中。</p>
 </blockquote>
 <h2 id="pal-checker-的实际运作"><a class="header" href="#pal-checker-的实际运作">PAL Checker 的实际运作</a></h2>
 <p>PAL Checker 在编译时验证：</p>
@@ -986,8 +990,12 @@ fn main() -&gt; i32 {
 </code></pre>
 <p><code>unsafe</code> 关键字向 PAL Checker 发出信号，表示你在手动承担内存安全的责任。</p>
 <h2 id="共享指针-引用计数"><a class="header" href="#共享指针-引用计数">共享指针（<code>~</code>）— 引用计数</a></h2>
-<p>共享指针使用运行时引用计数，但仍然是安全的。支持已规划，将在未来的版本中发布。</p>
-<pre><code class="language-toka">// v0.9.6 中尚未实现——即将推出
+<p>共享指针使用运行时引用计数，并且是完全安全的。它们允许多个指针共享对同一堆分配资源的所有权。</p>
+<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+{
+    auto ~s2# = ~s1 // 共享拷贝（引用计数增加）
+    s2.x = 3000     // 直接修改底层数据（灵魂）
+} // 当 s2 离开作用域时，引用计数减少
 </code></pre>
 <h2 id="借用安全"><a class="header" href="#借用安全">借用安全</a></h2>
 <p>Toka 默认对函数参数使用<strong>隐式借用</strong>（原位捕获）。像 <code>i32</code> 这样的简单类型的值按值传递（拷贝），而复杂类型则会被借用：</p>
@@ -1865,7 +1873,7 @@ fn example() {
     println("{}", encoded)  // SGVsbG8sIFRva2Eh
     
     // 注意：base64::decode 正在开发中
-    // auto decoded = base64::decode(encoded)?
+    // auto decoded = base64::decode(encoded)!
 }
 </code></pre>
 <h2 id="hex-编码"><a class="header" href="#hex-编码">Hex 编码</a></h2>
@@ -1878,7 +1886,7 @@ fn example() {
     println("{}", hex_str)  // 48656C6C6F
     
     // 注意：hex::decode 正在开发中
-    // auto decoded = hex::decode(hex_str)?
+    // auto decoded = hex::decode(hex_str)!
 }
 </code></pre>
 <h2 id="自定义序列化"><a class="header" href="#自定义序列化">自定义序列化</a></h2>
@@ -2362,7 +2370,7 @@ fn example() {
 <tr><td>哲学</td><td>更好的 C</td><td>无需标注的内存安全</td></tr>
 <tr><td>内存管理</td><td>手动（传递分配器）</td><td>自动（编译时追踪）</td></tr>
 <tr><td>元编程</td><td><code>comptime</code></td><td>编译时特性</td></tr>
-<tr><td>错误处理</td><td>错误联合类型</td><td>Result/Option + <code>?</code> 操作符</td></tr>
+<tr><td>错误处理</td><td>错误联合类型</td><td>Result/Option + <code>!</code> 操作符</td></tr>
 <tr><td>构建系统</td><td>内置</td><td>package.tk（声明式）</td></tr>
 </tbody>
 </table>
@@ -2379,7 +2387,7 @@ fn example() {
 <p><strong>错误处理：</strong></p>
 <ul>
 <li>Rust：<code>Result&lt;T, E&gt;</code> + <code>?</code> 操作符</li>
-<li>Toka：同样的 <code>Result&lt;T, E&gt;</code> + <code>?</code> 操作符</li>
+<li>Toka：同样的 <code>Result&lt;T, E&gt;</code> + <code>!</code> 操作符</li>
 </ul>
 <p><strong>模式匹配：</strong></p>
 <ul>
@@ -2395,7 +2403,7 @@ fn example() {
 <p><strong>错误处理：</strong></p>
 <ul>
 <li>Go：到处都是 <code>if err != nil</code></li>
-<li>Toka：<code>Result/Option</code> + <code>?</code> 操作符——更简洁、更安全</li>
+<li>Toka：<code>Result/Option</code> + <code>!</code> 操作符——更简洁、更安全</li>
 </ul>
 <p><strong>并发模型：</strong></p>
 <ul>

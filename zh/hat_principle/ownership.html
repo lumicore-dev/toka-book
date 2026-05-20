@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-26c5a164.js";
+            window.path_to_searchindex_js = "../searchindex-dbed9934.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -202,8 +202,10 @@
 </code></pre>
 <p><code>^</code> 标记的作用类似于 Rust 的 <code>Box</code> 或 C++ 的 <code>std::unique_ptr</code>。当独占指针离开作用域时，其资源会自动释放。</p>
 <h3 id="--共享指针引用计数"><a class="header" href="#--共享指针引用计数"><code>~</code> — 共享指针（引用计数）</a></h3>
-<p>共享指针通过引用计数支持多个所有者。支持已规划，将在未来的版本中发布。</p>
-<pre><code class="language-toka">// v0.9.6 中尚未实现——即将推出
+<p>共享指针允许多个所有者通过引用计数共享所有权：</p>
+<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s2# = ~s1  // 共享拷贝（引用计数增加）
+s2.x = 3000      // 直接修改底层数据（灵魂）
 </code></pre>
 <p>当最后一个 <code>~</code> 引用离开作用域时，资源被释放。</p>
 <h2 id="移动-vs-拷贝"><a class="header" href="#移动-vs-拷贝">移动 vs. 拷贝</a></h2>
@@ -256,7 +258,7 @@ fn main() -&gt; i32 {
 <p>当一个函数返回一个派生自其参数的引用时，PAL Checker 要求你显式声明这种关系。<code>&lt;- c</code> 标记告诉编译器：<em>“返回的引用严格绑定到 <code>c</code> 的生命周期”</em>。</p>
 <p>如果你省略此标注，Toka 会主动阻止编译（<code>error[E0454]</code>），以防止意外的悬垂指针。这实现了与 Rust 的生命周期参数（<code>&lt;'a&gt;</code>）相同的严格内存安全保证，但语法更轻量、更直观。</p>
 <blockquote>
-<p><strong>注意：</strong> 此关系也可以使用 Toka 的 <strong>effects</strong> 标注风格来表达。对高级借用检查引用的支持正在持续演进中。</p>
+<p><strong>注意：</strong> 此关系也可以使用 Toka 的 <strong>effects</strong> 标注风格来表达。对高级借用检查引用的设计正在持续演进中。</p>
 </blockquote>
 <h2 id="pal-checker-的实际运作"><a class="header" href="#pal-checker-的实际运作">PAL Checker 的实际运作</a></h2>
 <p>PAL Checker 在编译时验证：</p>

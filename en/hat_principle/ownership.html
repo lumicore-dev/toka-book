@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-33c1bd73.js";
+            window.path_to_searchindex_js = "../searchindex-caecafef.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -202,8 +202,10 @@
 </code></pre>
 <p>The <code>^</code> token operates like Rust’s <code>Box</code> or C++’s <code>std::unique_ptr</code>. When a unique pointer goes out of scope, its resource is automatically freed.</p>
 <h3 id="--shared-pointer-reference-counted"><a class="header" href="#--shared-pointer-reference-counted"><code>~</code> — Shared Pointer (Reference-Counted)</a></h3>
-<p>Shared pointers enable multiple owners via reference counting. Support is planned for an upcoming release.</p>
-<pre><code class="language-toka">// Not yet implemented in v0.9.6 — coming soon
+<p>Shared pointers enable multiple owners via reference counting:</p>
+<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s2# = ~s1  // Shared Copy (ref count increments)
+s2.x = 3000      // Modifies the underlying soul
 </code></pre>
 <p>The resource is freed when the last <code>~</code> reference goes out of scope.</p>
 <h2 id="moving-vs-copying"><a class="header" href="#moving-vs-copying">Moving vs Copying</a></h2>
@@ -256,7 +258,7 @@ fn main() -&gt; i32 {
 <p>When a function returns a reference derived from its parameters, the PAL Checker requires you to explicitly declare this relationship. The <code>&lt;- c</code> notation tells the compiler: <em>“The returned reference is strictly bound to the lifetime of <code>c</code>”</em>.</p>
 <p>If you omit this annotation, Toka will proactively block compilation (<code>error[E0454]</code>) to prevent accidental dangling pointers. This achieves the same rigorous memory safety as Rust’s lifetime parameters (<code>&lt;'a&gt;</code>), but with a much lighter and more intuitive syntax.</p>
 <blockquote>
-<p><strong>Note:</strong> This relationship can also be expressed using Toka’s <strong>effects</strong> annotation style. Support for advanced borrow-checked references continues to evolve.</p>
+<p><strong>Note:</strong> This relationship can also be expressed using Toka’s <strong>effects</strong> annotation style. Design for advanced borrow-checked references continues to evolve.</p>
 </blockquote>
 <h2 id="the-pal-checker-in-action"><a class="header" href="#the-pal-checker-in-action">The PAL Checker in Action</a></h2>
 <p>The PAL Checker verifies at compile time that:</p>

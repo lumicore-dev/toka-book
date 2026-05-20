@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-33c1bd73.js";
+            window.path_to_searchindex_js = "../searchindex-caecafef.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -226,7 +226,7 @@ fn example() {
     println("{}", encoded)  // SGVsbG8sIFRva2Eh
     
     // Note: base64::decode is under development
-    // auto decoded = base64::decode(encoded)?
+    // auto decoded = base64::decode(encoded)!
 }
 </code></pre>
 <h2 id="hex-encoding"><a class="header" href="#hex-encoding">Hex Encoding</a></h2>
@@ -239,7 +239,7 @@ fn example() {
     println("{}", hex_str)  // 48656C6C6F
     
     // Note: hex::decode is under development
-    // auto decoded = hex::decode(hex_str)?
+    // auto decoded = hex::decode(hex_str)!
 }
 </code></pre>
 <h2 id="custom-serialization"><a class="header" href="#custom-serialization">Custom Serialization</a></h2>

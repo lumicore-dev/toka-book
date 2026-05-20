@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-33c1bd73.js";
+            window.path_to_searchindex_js = "searchindex-caecafef.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -783,7 +783,7 @@ auto unicode: u32 = 0x4E16:u32
 <tbody>
 <tr><td><code>*</code></td><td>Raw Pointer</td><td>Low-level pointer, requires <code>unsafe</code> / <code>alloc</code></td></tr>
 <tr><td><code>^</code></td><td>Unique Pointer</td><td>Exclusive ownership of a heap-allocated resource (like <code>Box</code> in Rust)</td></tr>
-<tr><td><code>~</code></td><td>Shared Pointer</td><td>Reference-counted shared ownership (planned)</td></tr>
+<tr><td><code>~</code></td><td>Shared Pointer</td><td>Reference-counted shared ownership</td></tr>
 </tbody>
 </table>
 </div>
@@ -851,8 +851,10 @@ auto unicode: u32 = 0x4E16:u32
 }
 </code></pre>
 <h3 id="--shared-pointer"><a class="header" href="#--shared-pointer"><code>~</code> — Shared Pointer</a></h3>
-<p>Reference-counted, shared ownership is planned for an upcoming release.</p>
-<pre><code class="language-toka">// Not yet implemented in v0.9.6 — coming soon
+<p>Reference-counted, shared ownership via pointer morphology.</p>
+<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s2# = ~s1 // Shared Copy (ref count increments)
+s2.x = 3000     // Modifies the underlying soul
 </code></pre>
 <h2 id="identity-and-address"><a class="header" href="#identity-and-address">Identity and Address</a></h2>
 <p>To get the raw memory address of a local variable, use the <code>*(expr)</code> syntax:</p>
@@ -889,8 +891,10 @@ auto unicode: u32 = 0x4E16:u32
 </code></pre>
 <p>The <code>^</code> token operates like Rust’s <code>Box</code> or C++’s <code>std::unique_ptr</code>. When a unique pointer goes out of scope, its resource is automatically freed.</p>
 <h3 id="--shared-pointer-reference-counted"><a class="header" href="#--shared-pointer-reference-counted"><code>~</code> — Shared Pointer (Reference-Counted)</a></h3>
-<p>Shared pointers enable multiple owners via reference counting. Support is planned for an upcoming release.</p>
-<pre><code class="language-toka">// Not yet implemented in v0.9.6 — coming soon
+<p>Shared pointers enable multiple owners via reference counting:</p>
+<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s2# = ~s1  // Shared Copy (ref count increments)
+s2.x = 3000      // Modifies the underlying soul
 </code></pre>
 <p>The resource is freed when the last <code>~</code> reference goes out of scope.</p>
 <h2 id="moving-vs-copying"><a class="header" href="#moving-vs-copying">Moving vs Copying</a></h2>
@@ -943,7 +947,7 @@ fn main() -&gt; i32 {
 <p>When a function returns a reference derived from its parameters, the PAL Checker requires you to explicitly declare this relationship. The <code>&lt;- c</code> notation tells the compiler: <em>“The returned reference is strictly bound to the lifetime of <code>c</code>”</em>.</p>
 <p>If you omit this annotation, Toka will proactively block compilation (<code>error[E0454]</code>) to prevent accidental dangling pointers. This achieves the same rigorous memory safety as Rust’s lifetime parameters (<code>&lt;'a&gt;</code>), but with a much lighter and more intuitive syntax.</p>
 <blockquote>
-<p><strong>Note:</strong> This relationship can also be expressed using Toka’s <strong>effects</strong> annotation style. Support for advanced borrow-checked references continues to evolve.</p>
+<p><strong>Note:</strong> This relationship can also be expressed using Toka’s <strong>effects</strong> annotation style. Design for advanced borrow-checked references continues to evolve.</p>
 </blockquote>
 <h2 id="the-pal-checker-in-action"><a class="header" href="#the-pal-checker-in-action">The PAL Checker in Action</a></h2>
 <p>The PAL Checker verifies at compile time that:</p>
@@ -986,8 +990,12 @@ fn main() -&gt; i32 {
 </code></pre>
 <p>The <code>unsafe</code> keyword signals to the PAL Checker that you are taking manual responsibility for memory safety.</p>
 <h2 id="shared-pointers---reference-counting"><a class="header" href="#shared-pointers---reference-counting">Shared Pointers (<code>~</code>) — Reference Counting</a></h2>
-<p>Shared pointers use runtime reference counting but are still safe. Support is planned for an upcoming release.</p>
-<pre><code class="language-toka">// Not yet implemented in v0.9.6 — coming soon
+<p>Shared pointers use runtime reference counting and are fully safe. They allow multiple pointers to share ownership of the same heap-allocated resource.</p>
+<pre><code class="language-toka">auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+{
+    auto ~s2# = ~s1 // Shared Copy (ref count increments)
+    s2.x = 3000     // Modifies the underlying soul
+} // Ref count decrements when s2 goes out of scope
 </code></pre>
 <h2 id="borrowing-safety"><a class="header" href="#borrowing-safety">Borrowing Safety</a></h2>
 <p>Toka uses <strong>implicit borrow</strong> (in-place capture) as the default for function parameters. Values of simple types like <code>i32</code> are passed by value (copied), while complex types would be borrowed:</p>
@@ -1865,7 +1873,7 @@ fn example() {
     println("{}", encoded)  // SGVsbG8sIFRva2Eh
     
     // Note: base64::decode is under development
-    // auto decoded = base64::decode(encoded)?
+    // auto decoded = base64::decode(encoded)!
 }
 </code></pre>
 <h2 id="hex-encoding"><a class="header" href="#hex-encoding">Hex Encoding</a></h2>
@@ -1878,7 +1886,7 @@ fn example() {
     println("{}", hex_str)  // 48656C6C6F
     
     // Note: hex::decode is under development
-    // auto decoded = hex::decode(hex_str)?
+    // auto decoded = hex::decode(hex_str)!
 }
 </code></pre>
 <h2 id="custom-serialization"><a class="header" href="#custom-serialization">Custom Serialization</a></h2>
@@ -2362,7 +2370,7 @@ fn example() {
 <tr><td>Philosophy</td><td>Better C</td><td>Memory safety without annotations</td></tr>
 <tr><td>Memory</td><td>Manual (allocator passed)</td><td>Automatic (compile-time tracking)</td></tr>
 <tr><td>Metaprogramming</td><td><code>comptime</code></td><td>Compile-time features</td></tr>
-<tr><td>Error handling</td><td>Error union types</td><td>Result/Option with <code>?</code> operator</td></tr>
+<tr><td>Error handling</td><td>Error union types</td><td>Result/Option with <code>!</code> operator</td></tr>
 <tr><td>Build system</td><td>Built-in</td><td>package.tk (declarative)</td></tr>
 </tbody>
 </table>
@@ -2379,7 +2387,7 @@ fn example() {
 <p><strong>Error handling:</strong></p>
 <ul>
 <li>Rust: <code>Result&lt;T, E&gt;</code> with <code>?</code> operator</li>
-<li>Toka: Same <code>Result&lt;T, E&gt;</code> with <code>?</code> operator</li>
+<li>Toka: Same <code>Result&lt;T, E&gt;</code> with <code>!</code> operator</li>
 </ul>
 <p><strong>Pattern matching:</strong></p>
 <ul>
@@ -2395,7 +2403,7 @@ fn example() {
 <p><strong>Error handling:</strong></p>
 <ul>
 <li>Go: <code>if err != nil</code> everywhere</li>
-<li>Toka: <code>Result/Option</code> with <code>?</code> operator — cleaner and safer</li>
+<li>Toka: <code>Result/Option</code> with <code>!</code> operator — cleaner and safer</li>
 </ul>
 <p><strong>Concurrency:</strong></p>
 <ul>
