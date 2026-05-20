@@ -16,8 +16,8 @@
         <link rel="icon" href="favicon-de23e50b.svg">
         <link rel="shortcut icon" href="favicon-8114d1fc.png">
         <link rel="stylesheet" href="css/variables-8adf115d.css">
-        <link rel="stylesheet" href="css/general-2459343d.css">
-        <link rel="stylesheet" href="css/chrome-ae938929.css">
+        <link rel="stylesheet" href="css/general-0392ca55.css">
+        <link rel="stylesheet" href="css/chrome-fc474251.css">
         <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
 
         <!-- Fonts -->
@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-63a71c15.js";
+            window.path_to_searchindex_js = "searchindex-c51cd98c.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-f379f7f0.js"></script>
+        <script src="toc-e0ac2e83.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -200,6 +200,13 @@
 <h2 id="how-to-use-this-book"><a class="header" href="#how-to-use-this-book">How to Use This Book</a></h2>
 <p>If you’re new to Toka, start from the beginning and work your way through. Each chapter builds on the previous one.</p>
 <p>If you’re an experienced developer, feel free to jump to specific topics using the sidebar navigation.</p>
+<h2 id="language-version-alignment"><a class="header" href="#language-version-alignment">Language Version Alignment</a></h2>
+<p>This book is kept up-to-date with the latest Toka compiler development. The current version of this documentation is aligned with:</p>
+<ul>
+<li><strong>Compiler Version</strong>: <code>v0.9.7</code></li>
+<li><strong>Toka Commit</strong>: <code>a062d19</code> (Fix fake Shape escape vulnerability in Sema and add subtraction ambiguity diagnostic note for kebab-case identifiers)</li>
+<li><strong>Tag</strong>: <code>v0.9.7-23-ga062d19</code></li>
+</ul>
 <h2 id="a-note-from-the-author"><a class="header" href="#a-note-from-the-author">A Note From the Author</a></h2>
 <p>Toka is a young but ambitious language. This guide was written alongside the language’s development to help early adopters get started. As Toka evolves, this book will evolve with it.</p>
 <p>Happy coding!</p>
@@ -1064,30 +1071,36 @@ auto p = pair(1, "world")  // Pair&lt;i32, str&gt;
 <p>Toka provides robust error handling through the Result and Option types, inspired by Rust but with a cleaner syntax.</p>
 <h2 id="the-option-type"><a class="header" href="#the-option-type">The Option Type</a></h2>
 <p>Use <code>Option</code> for values that may or may not exist:</p>
-<pre><code class="language-tokalang">import core/option::{Maybe}
+<pre><code class="language-toka">import core/option::{Option}
+import std/string::String
+import std/io::println
 
-fn find_user(id: i32) -&gt; Maybe&lt;String&gt; {
+fn find_user(id: i32) -&gt; Option&lt;String&gt; {
     if id == 1 {
-        return Maybe&lt;String&gt;::Some(String::from("Alice"))
+        return Option&lt;String&gt;::Some(String::from("Alice"))
     }
-    return Maybe&lt;String&gt;::None
+    return Option&lt;String&gt;::None
 }
 
-auto result = find_user(1)
-match result {
-    auto Maybe::Some(&amp;name) =&gt; println("Found: {}", name),
-    auto Maybe::None =&gt; println("User not found")
+fn main() -&gt; i32 {
+    auto result = find_user(1)
+    match result {
+        auto Option::Some(&amp;name) =&gt; println("Found: {}", name)
+        auto Option::None =&gt; println("User not found")
+    }
+    return 0
 }
 </code></pre>
 <h2 id="the-result-type"><a class="header" href="#the-result-type">The Result Type</a></h2>
 <p>Use <code>Result</code> for operations that can succeed or fail:</p>
-<pre><code class="language-tokalang">import core/result::{Okay}
+<pre><code class="language-toka">import core/result::{Result}
+import std/string::String
 
-fn divide(a: f64, b: f64) -&gt; Okay&lt;f64, String&gt; {
+fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
     if b == 0.0 {
-        return Okay&lt;f64, String&gt;::Err(String::from("Division by zero"))
+        return Result&lt;f64, String&gt;::Err(String::from("Division by zero"))
     }
-    return Okay&lt;f64, String&gt;::Ok(a / b)
+    return Result&lt;f64, String&gt;::Ok(a / b)
 }
 </code></pre>
 <p>The Result type is generic over two parameters:</p>
@@ -1096,17 +1109,46 @@ fn divide(a: f64, b: f64) -&gt; Okay&lt;f64, String&gt; {
 <li><code>E</code> — The error type</li>
 </ul>
 <h2 id="pattern-matching-on-results"><a class="header" href="#pattern-matching-on-results">Pattern Matching on Results</a></h2>
-<pre><code class="language-tokalang">match divide(10.0, 2.0) {
-    auto Okay::Ok(value) =&gt; println("Result: {}", value),
-    auto Okay::Err(&amp;msg) =&gt; println("Error: {}", msg)
+<pre><code class="language-toka">import core/result::{Result}
+import std/string::String
+import std/io::println
+
+fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
+    if b == 0.0 {
+        return Result&lt;f64, String&gt;::Err(String::from("Division by zero"))
+    }
+    return Result&lt;f64, String&gt;::Ok(a / b)
+}
+
+fn main() -&gt; i32 {
+    match divide(10.0, 2.0) {
+        auto Result::Ok(value) =&gt; println("Result: {}", value)
+        auto Result::Err(&amp;msg) =&gt; println("Error: {}", msg)
+    }
+    return 0
 }
 </code></pre>
-<h2 id="short-circuiting-with-"><a class="header" href="#short-circuiting-with-">Short-Circuiting with <code>?</code></a></h2>
-<p>Use the <code>?</code> operator to propagate errors automatically:</p>
-<pre><code class="language-tokalang">fn process_file(path: String) -&gt; Okay&lt;String, String&gt; {
-    auto content = read_file(path)?  // Returns early on error
-    auto parsed = parse(content)?    // Same here
-    return Okay&lt;String, String&gt;::Ok(format_result(parsed))
+<h2 id="short-circuiting-with-"><a class="header" href="#short-circuiting-with-">Short-Circuiting with <code>!</code></a></h2>
+<p>Use the <code>!</code> operator to propagate errors automatically:</p>
+<pre><code class="language-toka">import core/result::{Result}
+import std/string::String
+
+fn read_file(path: String) -&gt; Result&lt;String, String&gt; {
+    return Result&lt;String, String&gt;::Ok(path)
+}
+
+fn parse(content: String) -&gt; Result&lt;String, String&gt; {
+    return Result&lt;String, String&gt;::Ok(content)
+}
+
+fn format_result(parsed: String) -&gt; String {
+    return parsed
+}
+
+fn process_file(path: String) -&gt; Result&lt;String, String&gt; {
+    auto content = read_file(path)!  // Returns early on error
+    auto parsed = parse(content)!    // Same here
+    return Result&lt;String, String&gt;::Ok(format_result(parsed))
 }
 </code></pre>
 <p>This is much cleaner than nested <code>match</code> statements.</p>
@@ -1116,17 +1158,22 @@ fn divide(a: f64, b: f64) -&gt; Okay&lt;f64, String&gt; {
 </code></pre>
 <h2 id="custom-error-types"><a class="header" href="#custom-error-types">Custom Error Types</a></h2>
 <p>You can define structured errors:</p>
-<pre><code class="language-tokalang">pub shape ParseError(
+<pre><code class="language-toka">import core/result::{Result}
+import std/string::String
+
+pub shape Config()
+
+pub shape ParseError(
     line: i32,
     col: i32,
     message: String
 )
 
-fn parse_config(text: String) -&gt; Okay&lt;Config, ParseError&gt; {
+fn parse_config(text: String) -&gt; Result&lt;Config, ParseError&gt; {
     if text.len() == 0 {
-        return Okay&lt;Config, ParseError&gt;::Err(ParseError(line = 0, col = 0, message = String::from("Empty input")))
+        return Result&lt;Config, ParseError&gt;::Err(ParseError(line = 0, col = 0, message = String::from("Empty input")))
     }
-    // ... parsing logic
+    return Result&lt;Config, ParseError&gt;::Ok(Config())
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -1474,7 +1521,7 @@ fn example() {
 </code></pre>
 <h2 id="map-hash-map"><a class="header" href="#map-hash-map">Map (Hash Map)</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/map::HashMap
+import std/hash_map::HashMap
 import core/option::Option
 import core/primitives
 
@@ -1564,7 +1611,7 @@ fn example() {
 </code></pre>
 <h2 id="set"><a class="header" href="#set">Set</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/set::HashSet
+import std/hash_set::HashSet
 import core/primitives
 
 fn example() {
@@ -1595,7 +1642,7 @@ fn fetch(url: String) -&gt; Result&lt;String, String&gt; {
 </code></pre>
 <h2 id="http-server"><a class="header" href="#http-server">HTTP Server</a></h2>
 <p>Build a simple HTTP server:</p>
-<pre><code class="language-toka">import std/net_http::{HttpResponse, HttpRequest}
+<pre><code class="language-toka">import stdx/net/http::{HttpResponse, HttpRequest}
 import std/string::String
 
 // Note: HTTP Server is under development
@@ -1642,11 +1689,20 @@ fn echo_server() {
 <h2 id="url-parsing"><a class="header" href="#url-parsing">URL Parsing</a></h2>
 <pre><code class="language-toka">import std/io::println
 import std/string::String
+import core/result::Result
+import stdx/net/url::{Url, parse_url}
 
-// Note: URL parsing is under development
-fn parse_url() {
-    // auto url = net::Url::parse("https://api.example.com/data?id=1")
-    // println("Host: {}", url.host)
+fn example() {
+    auto url_res = parse_url(String::from("https://api.example.com:8080/data?id=1#top"))
+    match url_res {
+        auto Result::Ok(&amp;url) =&gt; {
+            println("Host: {}", url.host)
+            println("Port: {}", String::from_int(url.port as i32))
+        }
+        auto Result::Err(&amp;err) =&gt; {
+            println("Error: {}", err)
+        }
+    }
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -1735,7 +1791,7 @@ fn dummy_limits() {}
 <p>Toka provides built-in support for serializing and deserializing data, with JSON support out of the box.</p>
 <h2 id="json-encoding"><a class="header" href="#json-encoding">JSON Encoding</a></h2>
 <p>Serialize data to JSON:</p>
-<pre><code class="language-toka">import std/serde/json
+<pre><code class="language-toka">import stdx/serde/json
 import std/string::String
 import std/io::println
 
@@ -1753,10 +1809,10 @@ fn encode() {
 </code></pre>
 <h2 id="json-decoding"><a class="header" href="#json-decoding">JSON Decoding</a></h2>
 <p>Parse JSON back into Toka types:</p>
-<pre><code class="language-toka">import std/serde/json
+<pre><code class="language-toka">import stdx/serde/json
 import std/string::String
 import std/io::println
-import core/result::Okay
+import core/result::Result
 
 pub shape Person(
     name: String,
@@ -1770,7 +1826,7 @@ fn decode() {
 }
 </code></pre>
 <h2 id="base64-encoding"><a class="header" href="#base64-encoding">Base64 Encoding</a></h2>
-<pre><code class="language-toka">import std/encoding/base64
+<pre><code class="language-toka">import stdx/encoding/base64
 import std/string::String
 import std/io::println
 
@@ -1784,7 +1840,7 @@ fn example() {
 }
 </code></pre>
 <h2 id="hex-encoding"><a class="header" href="#hex-encoding">Hex Encoding</a></h2>
-<pre><code class="language-toka">import std/encoding/hex
+<pre><code class="language-toka">import stdx/encoding/hex
 import std/io::println
 
 fn example() {
@@ -1798,7 +1854,7 @@ fn example() {
 </code></pre>
 <h2 id="custom-serialization"><a class="header" href="#custom-serialization">Custom Serialization</a></h2>
 <p>Implement the <code>@Serialize</code> trait for custom types:</p>
-<pre><code class="language-toka">import std/serde/json::{@ToJson}
+<pre><code class="language-toka">import stdx/serde/json::{@ToJson}
 import std/string::String
 
 pub shape Person(name: String, age: i32, active: bool)
@@ -1819,7 +1875,7 @@ impl Person@ToJson {
 <p>Toka provides a standard cryptography module with support for common hash algorithms.</p>
 <h2 id="md5-hashing"><a class="header" href="#md5-hashing">MD5 Hashing</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/crypto/md5::Md5
+import stdx/crypto/md5::Md5
 
 fn example() {
     auto md5# = Md5::new()
@@ -1830,7 +1886,7 @@ fn example() {
 </code></pre>
 <h2 id="sha-1"><a class="header" href="#sha-1">SHA-1</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/crypto/sha1::Sha1
+import stdx/crypto/sha1::Sha1
 
 fn example() {
     auto sha1# = Sha1::new()
@@ -1841,7 +1897,7 @@ fn example() {
 </code></pre>
 <h2 id="sha-256"><a class="header" href="#sha-256">SHA-256</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/crypto/sha256::Sha256
+import stdx/crypto/sha256::Sha256
 
 fn example() {
     auto sha256# = Sha256::new()
@@ -1854,7 +1910,7 @@ fn example() {
 <p>Hash the contents of a file:</p>
 <pre><code class="language-toka">import std/fs
 import std/string::String
-import std/crypto/sha256::Sha256
+import stdx/crypto/sha256::Sha256
 import core/result::Result
 
 fn verify_file(path: String) -&gt; Result&lt;bool, String&gt; {
@@ -2316,11 +2372,11 @@ fn example() {
 
         <script src="elasticlunr-ef4e11c1.min.js"></script>
         <script src="mark-09e88c2c.min.js"></script>
-        <script src="searcher-c2a407aa.js"></script>
+        <script src="searcher-09f2665d.js"></script>
 
         <script src="clipboard-1626706a.min.js"></script>
         <script src="highlight-abc7f01d.js"></script>
-        <script src="book-a0b12cfe.js"></script>
+        <script src="book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
         <script src="theme/toka-8ba2d2ab.js"></script>

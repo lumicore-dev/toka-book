@@ -15,8 +15,8 @@
         <link rel="icon" href="../favicon-de23e50b.svg">
         <link rel="shortcut icon" href="../favicon-8114d1fc.png">
         <link rel="stylesheet" href="../css/variables-8adf115d.css">
-        <link rel="stylesheet" href="../css/general-2459343d.css">
-        <link rel="stylesheet" href="../css/chrome-ae938929.css">
+        <link rel="stylesheet" href="../css/general-0392ca55.css">
+        <link rel="stylesheet" href="../css/chrome-fc474251.css">
         <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
 
         <!-- Fonts -->
@@ -35,10 +35,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-63a71c15.js";
+            window.path_to_searchindex_js = "../searchindex-c51cd98c.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-f379f7f0.js"></script>
+        <script src="../toc-e0ac2e83.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -193,7 +193,7 @@ fn fetch(url: String) -&gt; Result&lt;String, String&gt; {
 </code></pre>
 <h2 id="http-server"><a class="header" href="#http-server">HTTP Server</a></h2>
 <p>Build a simple HTTP server:</p>
-<pre><code class="language-toka">import std/net_http::{HttpResponse, HttpRequest}
+<pre><code class="language-toka">import stdx/net/http::{HttpResponse, HttpRequest}
 import std/string::String
 
 // Note: HTTP Server is under development
@@ -240,11 +240,20 @@ fn echo_server() {
 <h2 id="url-parsing"><a class="header" href="#url-parsing">URL Parsing</a></h2>
 <pre><code class="language-toka">import std/io::println
 import std/string::String
+import core/result::Result
+import stdx/net/url::{Url, parse_url}
 
-// Note: URL parsing is under development
-fn parse_url() {
-    // auto url = net::Url::parse("https://api.example.com/data?id=1")
-    // println("Host: {}", url.host)
+fn example() {
+    auto url_res = parse_url(String::from("https://api.example.com:8080/data?id=1#top"))
+    match url_res {
+        auto Result::Ok(&amp;url) =&gt; {
+            println("Host: {}", url.host)
+            println("Port: {}", String::from_int(url.port as i32))
+        }
+        auto Result::Err(&amp;err) =&gt; {
+            println("Error: {}", err)
+        }
+    }
 }
 </code></pre>
 
@@ -292,11 +301,11 @@ fn parse_url() {
 
         <script src="../elasticlunr-ef4e11c1.min.js"></script>
         <script src="../mark-09e88c2c.min.js"></script>
-        <script src="../searcher-c2a407aa.js"></script>
+        <script src="../searcher-09f2665d.js"></script>
 
         <script src="../clipboard-1626706a.min.js"></script>
         <script src="../highlight-abc7f01d.js"></script>
-        <script src="../book-a0b12cfe.js"></script>
+        <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
         <script src="../theme/toka-8ba2d2ab.js"></script>

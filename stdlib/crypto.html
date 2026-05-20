@@ -15,8 +15,8 @@
         <link rel="icon" href="../favicon-de23e50b.svg">
         <link rel="shortcut icon" href="../favicon-8114d1fc.png">
         <link rel="stylesheet" href="../css/variables-8adf115d.css">
-        <link rel="stylesheet" href="../css/general-2459343d.css">
-        <link rel="stylesheet" href="../css/chrome-ae938929.css">
+        <link rel="stylesheet" href="../css/general-0392ca55.css">
+        <link rel="stylesheet" href="../css/chrome-fc474251.css">
         <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
 
         <!-- Fonts -->
@@ -35,10 +35,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-63a71c15.js";
+            window.path_to_searchindex_js = "../searchindex-c51cd98c.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-f379f7f0.js"></script>
+        <script src="../toc-e0ac2e83.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,7 +181,7 @@
 <p>Toka provides a standard cryptography module with support for common hash algorithms.</p>
 <h2 id="md5-hashing"><a class="header" href="#md5-hashing">MD5 Hashing</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/crypto/md5::Md5
+import stdx/crypto/md5::Md5
 
 fn example() {
     auto md5# = Md5::new()
@@ -192,7 +192,7 @@ fn example() {
 </code></pre>
 <h2 id="sha-1"><a class="header" href="#sha-1">SHA-1</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/crypto/sha1::Sha1
+import stdx/crypto/sha1::Sha1
 
 fn example() {
     auto sha1# = Sha1::new()
@@ -203,7 +203,7 @@ fn example() {
 </code></pre>
 <h2 id="sha-256"><a class="header" href="#sha-256">SHA-256</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/crypto/sha256::Sha256
+import stdx/crypto/sha256::Sha256
 
 fn example() {
     auto sha256# = Sha256::new()
@@ -216,7 +216,7 @@ fn example() {
 <p>Hash the contents of a file:</p>
 <pre><code class="language-toka">import std/fs
 import std/string::String
-import std/crypto/sha256::Sha256
+import stdx/crypto/sha256::Sha256
 import core/result::Result
 
 fn verify_file(path: String) -&gt; Result&lt;bool, String&gt; {
@@ -290,11 +290,11 @@ fn generate_key() -&gt; u64 {
 
         <script src="../elasticlunr-ef4e11c1.min.js"></script>
         <script src="../mark-09e88c2c.min.js"></script>
-        <script src="../searcher-c2a407aa.js"></script>
+        <script src="../searcher-09f2665d.js"></script>
 
         <script src="../clipboard-1626706a.min.js"></script>
         <script src="../highlight-abc7f01d.js"></script>
-        <script src="../book-a0b12cfe.js"></script>
+        <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
         <script src="../theme/toka-8ba2d2ab.js"></script>
