@@ -5,5 +5,4 @@ language = "zh"
 
 [output.html]
 git-repository-url = "https://github.com/tokalang/toka"
-destination = "zh"
 additional-js = ["theme/toka.js"]

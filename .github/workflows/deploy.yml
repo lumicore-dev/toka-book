@@ -27,6 +27,8 @@ jobs:
         run: |
           mkdir -p /tmp/zh-book
           cp -r src-zh /tmp/zh-book/src
+          cp -r examples /tmp/zh-book/examples
+          cp -r theme /tmp/zh-book/theme
           cp book-zh.toml /tmp/zh-book/book.toml
           mdbook build /tmp/zh-book --dest-dir ${{ github.workspace }}/book/zh
 

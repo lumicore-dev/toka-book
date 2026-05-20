@@ -22,7 +22,7 @@ One of Toka's most elegant design features is the **Handle vs. Soul** distinctio
 When you want to read or modify the value a pointer points to, you simply operate on the **soul** directly — no dereference token needed:
 
 ```toka
-{{#include ../../examples/ownership.tk:raw_ptr}}
+{{#include ../examples/ownership.tk:raw_ptr}}
 ```
 
 This is a major quality-of-life improvement over C's `*p = 200` or Rust's `*p = 200`. Toka's approach makes pointer-heavy code much more readable.

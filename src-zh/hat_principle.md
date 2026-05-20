@@ -22,7 +22,7 @@ Toka 最优雅的设计特性之一是**手柄（Handle）vs. 灵魂（Soul）**
 当你想要读取或修改指针指向的值时，你直接在**灵魂**上操作——不需要解引用标记：
 
 ```toka
-{{#include ../../examples/ownership.tk:raw_ptr}}
+{{#include ../examples/ownership.tk:raw_ptr}}
 ```
 
 这是对 C 语言的 `*p = 200` 或 Rust 的 `*p = 200` 的重大生活质量改进。Toka 的方法使指针密集型代码更加可读。
