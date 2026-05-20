@@ -33,10 +33,14 @@ The `unsafe` keyword signals to the PAL Checker that you are taking manual respo
 
 ## Shared Pointers (`~`) — Reference Counting
 
-Shared pointers use runtime reference counting but are still safe. Support is planned for an upcoming release.
+Shared pointers use runtime reference counting and are fully safe. They allow multiple pointers to share ownership of the same heap-allocated resource.
 
 ```toka
-// Not yet implemented in v0.9.6 — coming soon
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+{
+    auto ~s2# = ~s1 // Shared Copy (ref count increments)
+    s2.x = 3000     // Modifies the underlying soul
+} // Ref count decrements when s2 goes out of scope
 ```
 
 ## Borrowing Safety

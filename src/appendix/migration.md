@@ -10,7 +10,7 @@ Migrating from other languages to Toka? Here's what you need to know.
 
 **Error handling:**
 - Rust: `Result<T, E>` with `?` operator
-- Toka: Same `Result<T, E>` with `?` operator
+- Toka: Same `Result<T, E>` with `!` operator
 
 **Pattern matching:**
 - Rust: `match` with exhaustive checking
@@ -24,7 +24,7 @@ Migrating from other languages to Toka? Here's what you need to know.
 
 **Error handling:**
 - Go: `if err != nil` everywhere
-- Toka: `Result/Option` with `?` operator — cleaner and safer
+- Toka: `Result/Option` with `!` operator — cleaner and safer
 
 **Concurrency:**
 - Go: Goroutines + channels

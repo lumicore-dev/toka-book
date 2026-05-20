@@ -10,7 +10,7 @@
 
 **错误处理：**
 - Rust：`Result<T, E>` + `?` 操作符
-- Toka：同样的 `Result<T, E>` + `?` 操作符
+- Toka：同样的 `Result<T, E>` + `!` 操作符
 
 **模式匹配：**
 - Rust：`match` 穷尽性检查
@@ -24,7 +24,7 @@
 
 **错误处理：**
 - Go：到处都是 `if err != nil`
-- Toka：`Result/Option` + `?` 操作符——更简洁、更安全
+- Toka：`Result/Option` + `!` 操作符——更简洁、更安全
 
 **并发模型：**
 - Go：Goroutines + 通道

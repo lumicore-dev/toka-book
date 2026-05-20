@@ -28,10 +28,12 @@ The `^` token operates like Rust's `Box` or C++'s `std::unique_ptr`. When a uniq
 
 ### `~` — Shared Pointer (Reference-Counted)
 
-Shared pointers enable multiple owners via reference counting. Support is planned for an upcoming release.
+Shared pointers enable multiple owners via reference counting:
 
 ```toka
-// Not yet implemented in v0.9.6 — coming soon
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s2# = ~s1  // Shared Copy (ref count increments)
+s2.x = 3000      // Modifies the underlying soul
 ```
 
 The resource is freed when the last `~` reference goes out of scope.
@@ -90,7 +92,7 @@ When a function returns a reference derived from its parameters, the PAL Checker
 
 If you omit this annotation, Toka will proactively block compilation (`error[E0454]`) to prevent accidental dangling pointers. This achieves the same rigorous memory safety as Rust's lifetime parameters (`<'a>`), but with a much lighter and more intuitive syntax.
 
-> **Note:** This relationship can also be expressed using Toka's **effects** annotation style. Support for advanced borrow-checked references continues to evolve.
+> **Note:** This relationship can also be expressed using Toka's **effects** annotation style. Design for advanced borrow-checked references continues to evolve.
 
 ## The PAL Checker in Action
 

@@ -10,7 +10,7 @@ A **hat** is a sigil (symbol) attached to an identifier that tells both the prog
 |-----|------|---------|
 | `*` | Raw Pointer | Low-level pointer, requires `unsafe` / `alloc` |
 | `^` | Unique Pointer | Exclusive ownership of a heap-allocated resource (like `Box` in Rust) |
-| `~` | Shared Pointer | Reference-counted shared ownership (planned) |
+| `~` | Shared Pointer | Reference-counted shared ownership |
 
 ## Handle vs. Soul
 

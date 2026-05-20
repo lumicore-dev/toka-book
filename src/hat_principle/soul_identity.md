@@ -38,10 +38,12 @@ Exclusive ownership of a heap-allocated resource. Created with `new`:
 ```
 
 ### `~` — Shared Pointer
-Reference-counted, shared ownership is planned for an upcoming release.
+Reference-counted, shared ownership via pointer morphology.
 
 ```toka
-// Not yet implemented in v0.9.6 — coming soon
+auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s2# = ~s1 // Shared Copy (ref count increments)
+s2.x = 3000     // Modifies the underlying soul
 ```
 
 ## Identity and Address

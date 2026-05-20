@@ -39,5 +39,5 @@ How does Toka compare to other languages in the systems programming space?
 | Philosophy | Better C | Memory safety without annotations |
 | Memory | Manual (allocator passed) | Automatic (compile-time tracking) |
 | Metaprogramming | `comptime` | Compile-time features |
-| Error handling | Error union types | Result/Option with `?` operator |
+| Error handling | Error union types | Result/Option with `!` operator |
 | Build system | Built-in | package.tk (declarative) |

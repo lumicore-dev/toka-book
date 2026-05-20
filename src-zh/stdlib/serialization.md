@@ -59,7 +59,7 @@ fn example() {
     println("{}", encoded)  // SGVsbG8sIFRva2Eh
     
     // 注意：base64::decode 正在开发中
-    // auto decoded = base64::decode(encoded)?
+    // auto decoded = base64::decode(encoded)!
 }
 ```
 
@@ -75,7 +75,7 @@ fn example() {
     println("{}", hex_str)  // 48656C6C6F
     
     // 注意：hex::decode 正在开发中
-    // auto decoded = hex::decode(hex_str)?
+    // auto decoded = hex::decode(hex_str)!
 }
 ```
 
