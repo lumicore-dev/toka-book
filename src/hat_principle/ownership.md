@@ -2,9 +2,9 @@
 
 Ownership in Toka is governed by the Hat Principle. Each hat sigil communicates a different ownership model directly through syntax.
 
-## Three Ownership Models
+## Four Ownership Models
 
-Toka defines three pointer types, each with distinct ownership semantics:
+Toka defines four pointer types, each with distinct ownership semantics:
 
 ### `*` — Raw Pointer (Unsafe)
 
@@ -37,6 +37,14 @@ s2.x = 3000      // Modifies the underlying soul
 ```
 
 The resource is freed when the last `~` reference goes out of scope.
+
+### `&` — Borrow Pointer (Reference Semantics)
+
+Borrow pointers represent references to other values without taking ownership. They allow temporary, checked access to data:
+
+```toka
+auto &y = &(x)   // Local borrow pointer pointing to the soul of x
+```
 
 ## Moving vs Copying
 

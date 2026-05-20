@@ -4,13 +4,14 @@ The **Hat Principle** is the core concept behind Toka's memory safety model. Ins
 
 ## What is a Hat?
 
-A **hat** is a sigil (symbol) attached to an identifier that tells both the programmer and the compiler how that value is stored, owned, and accessed. Toka has three hat types:
+A **hat** is a sigil (symbol) attached to an identifier that tells both the programmer and the compiler how that value is stored, owned, and accessed. Toka has four hat types:
 
 | Hat | Name | Meaning |
 |-----|------|---------|
 | `*` | Raw Pointer | Low-level pointer, requires `unsafe` / `alloc` |
 | `^` | Unique Pointer | Exclusive ownership of a heap-allocated resource (like `Box` in Rust) |
 | `~` | Shared Pointer | Reference-counted shared ownership |
+| `&` | Borrow Pointer | Reference/borrow of another value |
 
 ## Handle vs. Soul
 

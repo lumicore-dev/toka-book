@@ -19,7 +19,7 @@ Toka's killer feature is **implicit dereferencing**: you never need a `*` or `->
 
 This is a massive ergonomic improvement over C (`p->x = 30`) or Rust (`(*p).x = 30`).
 
-## The Three Hats
+## The Four Hats
 
 Each hat sigil carries different ownership semantics:
 
@@ -44,6 +44,13 @@ Reference-counted, shared ownership via pointer morphology.
 auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
 auto ~s2# = ~s1 // Shared Copy (ref count increments)
 s2.x = 3000     // Modifies the underlying soul
+```
+
+### `&` — Borrow Pointer
+A reference or borrow pointer to another value. Created explicitly via `&` to refer to an existing soul:
+
+```toka
+auto &y = &(x) // y is a borrow pointer pointing to the soul of x
 ```
 
 ## Identity and Address
