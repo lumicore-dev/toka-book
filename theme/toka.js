@@ -152,3 +152,166 @@ hljs.registerLanguage('toka', function(hljs) {
     injectReturnLink();
   }
 })();
+
+// GitHub-style Alerts Parser and CSS styling
+(function() {
+  function renderAlerts() {
+    var blockquotes = document.querySelectorAll('blockquote');
+    if (blockquotes.length === 0) return;
+
+    // Define color palettes and SVG icons for each alert type
+    var alertTypes = {
+      'NOTE': {
+        color: '#2f80ed',
+        bg: 'rgba(47, 128, 237, 0.08)',
+        titleEn: 'Note',
+        titleZh: '提示',
+        svg: '<svg class="alert-icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" style="display:inline-block;vertical-align:text-bottom;"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-3a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm1.5 6.5a.5.5 0 0 0 0-1H9V8a.5.5 0 0 0-1 0v3h-.5a.5.5 0 0 0 0 1h2Z"></path></svg>'
+      },
+      'TIP': {
+        color: '#27ae60',
+        bg: 'rgba(39, 174, 96, 0.08)',
+        titleEn: 'Tip',
+        titleZh: '建议',
+        svg: '<svg class="alert-icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" style="display:inline-block;vertical-align:text-bottom;"><path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 11h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1Zm1.5-6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm-1.5 3a.5.5 0 0 1-.5-.5V6a.5.5 0 0 1 1 0v1.5a.5.5 0 0 1-.5.5Z"></path></svg>'
+      },
+      'IMPORTANT': {
+        color: '#8e44ad',
+        bg: 'rgba(142, 68, 173, 0.08)',
+        titleEn: 'Important',
+        titleZh: '重要',
+        svg: '<svg class="alert-icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" style="display:inline-block;vertical-align:text-bottom;"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8.5-4.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0v-5Zm0 7a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path></svg>'
+      },
+      'WARNING': {
+        color: '#d35400',
+        bg: 'rgba(211, 84, 0, 0.08)',
+        titleEn: 'Warning',
+        titleZh: '警告',
+        svg: '<svg class="alert-icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" style="display:inline-block;vertical-align:text-bottom;"><path d="M6.457 1.047a2 2 0 0 1 3.086 0L15.35 8.16a2 2 0 0 1 0 2.68L9.543 14.95a2 2 0 0 1-3.086 0L.65 10.84a2 2 0 0 1 0-2.68L6.457 1.047ZM8 4a.75.75 0 0 0-.75.75v3.5a.75.75 0 0 0 1.5 0v-3.5A.75.75 0 0 0 8 4Zm0 7a.998 9.998 0 1 0 0-1.996A.998 9.998 0 0 0 8 11Z"></path></svg>'
+      },
+      'CAUTION': {
+        color: '#c0392b',
+        bg: 'rgba(192, 57, 43, 0.08)',
+        titleEn: 'Caution',
+        titleZh: '注意',
+        svg: '<svg class="alert-icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" style="display:inline-block;vertical-align:text-bottom;"><path d="M8.22 1.754a1 1 0 0 0-1.76 0l-6.23 10.6a1 1 0 0 0 .88 1.486h12.46a1 1 0 0 0 .88-1.486l-6.23-10.6ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 7a.998 9.998 0 1 1 0-1.996A.998 9.998 0 0 1 8 11Z"></path></svg>'
+      }
+    };
+
+    var isZh = window.location.pathname.indexOf('/zh/') !== -1;
+
+    // Inject alert styles into head if they don't exist
+    if (!document.getElementById('mdbook-alerts-style')) {
+      var style = document.createElement('style');
+      style.id = 'mdbook-alerts-style';
+      style.textContent = `
+        blockquote.markdown-alert {
+          border-left: 0.25em solid transparent !important;
+          padding: 1em 1.25em !important;
+          margin: 1.5em 0 !important;
+          border-radius: 6px !important;
+          font-size: 0.95rem !important;
+          line-height: 1.6 !important;
+        }
+        blockquote.markdown-alert p:first-child {
+          margin-top: 0 !important;
+        }
+        blockquote.markdown-alert p:last-child {
+          margin-bottom: 0 !important;
+        }
+        .markdown-alert-title {
+          display: flex;
+          align-items: center;
+          font-weight: 700;
+          margin-bottom: 0.5em;
+          font-size: 0.95rem;
+          text-transform: uppercase;
+        }
+        .markdown-alert-title svg {
+          margin-right: 8px;
+          flex-shrink: 0;
+        }
+        
+        /* NOTE Alert */
+        blockquote.markdown-alert-note {
+          border-left-color: ${alertTypes.NOTE.color} !important;
+          background-color: ${alertTypes.NOTE.bg} !important;
+        }
+        blockquote.markdown-alert-note .markdown-alert-title {
+          color: ${alertTypes.NOTE.color};
+        }
+        
+        /* TIP Alert */
+        blockquote.markdown-alert-tip {
+          border-left-color: ${alertTypes.TIP.color} !important;
+          background-color: ${alertTypes.TIP.bg} !important;
+        }
+        blockquote.markdown-alert-tip .markdown-alert-title {
+          color: ${alertTypes.TIP.color};
+        }
+        
+        /* IMPORTANT Alert */
+        blockquote.markdown-alert-important {
+          border-left-color: ${alertTypes.IMPORTANT.color} !important;
+          background-color: ${alertTypes.IMPORTANT.bg} !important;
+        }
+        blockquote.markdown-alert-important .markdown-alert-title {
+          color: ${alertTypes.IMPORTANT.color};
+        }
+        
+        /* WARNING Alert */
+        blockquote.markdown-alert-warning {
+          border-left-color: ${alertTypes.WARNING.color} !important;
+          background-color: ${alertTypes.WARNING.bg} !important;
+        }
+        blockquote.markdown-alert-warning .markdown-alert-title {
+          color: ${alertTypes.WARNING.color};
+        }
+        
+        /* CAUTION Alert */
+        blockquote.markdown-alert-caution {
+          border-left-color: ${alertTypes.CAUTION.color} !important;
+          background-color: ${alertTypes.CAUTION.bg} !important;
+        }
+        blockquote.markdown-alert-caution .markdown-alert-title {
+          color: ${alertTypes.CAUTION.color};
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    blockquotes.forEach(function(bq) {
+      // Find the first paragraph
+      var p = bq.querySelector('p:first-child');
+      if (!p) return;
+
+      var rawHtml = p.innerHTML;
+      // Match pattern "[!NOTE]" or "[!TIP]" etc. at the start of the blockquote
+      var match = rawHtml.match(/^\\s*\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\\](?:\\s|<br>|\\n)?/i);
+      if (!match) return;
+
+      var type = match[1].toUpperCase();
+      var config = alertTypes[type];
+      if (!config) return;
+
+      // Clean the "[!NOTE]" prefix from the HTML
+      p.innerHTML = rawHtml.replace(/^\\s*\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\\](?:\\s|<br>|\\n)?/i, '');
+
+      // Add appropriate CSS classes to the blockquote
+      bq.classList.add('markdown-alert');
+      bq.classList.add('markdown-alert-' + type.toLowerCase());
+
+      // Create and prepend the Alert Title element
+      var titleDiv = document.createElement('div');
+      titleDiv.className = 'markdown-alert-title';
+      titleDiv.innerHTML = config.svg + (isZh ? config.titleZh : config.titleEn);
+      bq.insertBefore(titleDiv, bq.firstChild);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderAlerts);
+  } else {
+    renderAlerts();
+  }
+})();
