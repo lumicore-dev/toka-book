@@ -1,130 +1,101 @@
 # Ownership & Hats
 
-Ownership in Toka is governed by the Hat Principle. Each hat sigil communicates a different ownership model directly through syntax.
+Ownership in Toka is governed entirely by the Hat Principle. Rather than hiding allocations behind a generic type system, Toka uses distinct hat sigils to make a value's ownership model, copy/move semantics, and access permissions immediately clear directly in the syntax.
+
+---
 
 ## Four Ownership Models
 
-Toka defines four pointer types, each with distinct ownership semantics:
+Toka defines four pointer typologies, each supporting a distinct resource management strategy:
 
-### `*` — Raw Pointer (Unsafe)
-
-Raw pointers require explicit `unsafe` or `alloc` to create and manage:
-
+### 1. `*` — Raw Pointer (Manual Lifecycle)
+Low-level raw pointers provide zero compile-time safety and must be managed manually within an `unsafe` block:
 ```toka
 {{#include ../../examples/ownership.tk:raw_ptr}}
 ```
 
-Raw pointers are used when interfacing with C code or implementing low-level data structures.
-
-### `^` — Unique Pointer (Move Semantics)
-
-Unique pointers provide exclusive ownership. Only one `^` can point to a given resource at any time. Ownership is transferred via **move**:
-
+### 2. `^` — Unique Pointer (Exclusive Heap Ownership)
+Unique pointers enforce strict exclusive ownership. Only one `^` handle can point to a heap resource at a time. When a unique pointer exits its scope, its bound memory is automatically freed:
 ```toka
 {{#include ../../examples/ownership.tk:unique_ptr}}
 ```
 
-The `^` token operates like Rust's `Box` or C++'s `std::unique_ptr`. When a unique pointer goes out of scope, its resource is automatically freed.
-
-### `~` — Shared Pointer (Reference-Counted)
-
-Shared pointers enable multiple owners via reference counting:
-
+### 3. `~` — Shared Pointer (Reference-Counted Heap Ownership)
+Shared pointers allow multiple handles to share ownership of the same heap-allocated resource via thread-safe reference counting. The resource is automatically freed when the last `~` handle goes out of scope:
 ```toka
 shape Point(x: i32, y: i32, z: i32)
-auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s1# = new Point(x = 100, y = 200, z = 0)
 auto ~s2# = ~s1  // Shared Copy (ref count increments)
-s2.x = 3000      // Modifies the underlying soul
+s2.x = 300       // Directly mutates the underlying soul
 ```
 
-The resource is freed when the last `~` reference goes out of scope.
+### 4. `&` — Borrow Pointer (Reference Semantics)
+Borrow pointers represent temporary, compiler-checked references to existing souls without taking ownership, strictly governed by the Pointer Analysis Layer (PAL).
 
-### `&` — Borrow Pointer (Reference Semantics)
+---
 
-Borrow pointers represent references to other values without taking ownership. They allow temporary, checked access to data:
+## Moving vs. Copying
 
-```toka
-auto x = 42
-auto &y = &(x)   // Local borrow pointer pointing to the soul of x
-```
+Toka has clear rules to distinguish between copying data and transferring ownership:
 
-## Moving vs Copying
-
-By default, assignment in Toka performs a **copy** (value copy for simple types, and shallow copy for shapes and complex types):
-
+### Default Copy Semantics
+By default, standard assignments in Toka perform a **copy** (value copies for simple scalar types like `i32`/`bool`, and shallow copies for standard complex `shape` types):
 ```toka
 {{#include ../../examples/ownership.tk:move_copy}}
 ```
 
-This applies to both simple types (like `i32`, `f64`, `bool`) and complex types (like `String`, `Vec`, or custom `shape` types).
-
-### Default Move Semantics
-
-By default, **move semantics** apply exclusively to **Unique Pointers (`^`)**. Assignment of a unique pointer transfers exclusive ownership of its heap-allocated resource from the source to the destination:
-
+### Default Move Semantics (Unique Pointers)
+Move semantics apply **by default** exclusively to **Unique Pointers (`^`)**. Assigning one unique pointer to another automatically transfers exclusive ownership from the source to the destination, rendering the source handle immediately invalid:
 ```toka
 shape Point(x: i32, y: i32, z: i32)
 auto ^p1 = new Point(x = 10, y = 20, z = 0)
-auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid
+auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid!
 ```
 
 ### Explicit Move with `cede`
-
-For other types (or to explicitly transfer ownership of any value), you must use the **`cede` keyword** to perform an explicit move. Once a value is ceded, the source variable is no longer valid:
-
+For other types (such as custom shapes or `String`), copy semantics are used by default. To explicitly transfer ownership of such a value (avoiding copies), you must use the **`cede` keyword**. Ceding transfers the resource to the destination and invalidates the source variable:
 ```toka
 import std/string::String
 auto s1 = String::from("hello")
-auto s2 = cede s1 // Explicit move: s1 is no longer valid
+auto s2 = cede s1 // Explicit move: s1 is invalidated
 ```
 
-## Function Parameters (Zero-Copy Capture Mechanism)
+---
 
-In Toka, function parameters are immutable by default and passed via a **zero-copy implicit reference capture mechanism** rather than traditional pass-by-value (copying). The compiler ensures that capturing a parameter has zero runtime overhead and does not consume or copy the original argument. You don't need special pointer sigils for standard parameter passing unless you explicitly intend to pass/rebind pointer handles:
+## Function Parameters: Zero-Copy Capture
 
+In Toka, function parameters are immutable by default and passed via an incredibly efficient **zero-copy implicit reference capture mechanism**. 
+
+The compiler automatically passes arguments by reference under the hood with zero runtime overhead and zero copying. Therefore, you do not need special pointer sigils for standard parameter passing unless you explicitly intend to pass or rebind pointer handles:
 ```toka
 {{#include ../../examples/ownership.tk:borrow_func}}
 ```
 
-For **mutable access**, use `#` on the variable declaration. Note that `#` is restricted to declarations and cannot be used at call sites:
+---
 
+## The `#` Mutability Marker & Permission Views
+
+Toka introduces the `#` marker to explicitly declare and track mutable access. Its usage is governed by strict compiler lifecycles to eliminate redundant code noise while maximizing visual safety.
+
+### 1. Declaring Mutability
+To declare a local variable mutable, you must append `#` to the identifier at its **declaration site**:
 ```toka
 {{#include ../../examples/ownership.tk:mutable_local}}
 ```
 
-## Explicit Local Borrow with `&`
-
-The `&` sigil is used when **explicitly declaring a local borrow pointer** or returning a reference:
-
+### 2. Forbidden in Everyday Contexts (Assignments)
+Once a variable is declared mutable, its mutable state is registered in its **Permission View** (type system). Therefore, you must **NOT** append `#` to the variable in ordinary assignments or expressions:
 ```toka
-shape Container(val: i32)
-fn borrow_example(c: Container) -> &i32 <- c {
-    return &(c.val)
-}
-fn main() -> i32 {
-    auto c = Container(val = 10)
-    auto &y = borrow_example(c)
-    return 0
-}
+auto val# = 42
+val = 99 // Everyday assignment: NO '#' allowed! Writing 'val# = 99' is a compiler error.
 ```
+This prevents useless syntactic noise in everyday code.
 
-### Lifetime Dependency Annotation
+### 3. Required at Mutating Method Call Sites (Receiver Suffix)
+Toka's most elegant safety feature is that **mutating method calls must be explicitly flagged at the call site**. 
 
-In the example above, the syntax `-> &i32 <- c` introduces Toka's **Lifetime Dependency Annotation**. 
-
-When a function returns a reference derived from its parameters, the PAL Checker requires you to explicitly declare this relationship. The `<- c` notation tells the compiler: *"The returned reference is strictly bound to the lifetime of `c`"*. 
-
-If you omit this annotation, Toka will proactively block compilation (`error[E0454]`) to prevent accidental dangling pointers. This achieves the same rigorous memory safety as Rust's lifetime parameters (`<'a>`), but with a much lighter and more intuitive syntax.
-
-> **Note:** This relationship can also be expressed using Toka's **effects** annotation style. Design for advanced borrow-checked references continues to evolve.
-
-## The PAL Checker in Action
-
-The PAL Checker verifies at compile time that:
-
-1. **No use after move** — A `^` value cannot be accessed after ownership transfer
-2. **No dangling references** — Borrowed references cannot outlive the borrowed value
-3. **No double-free** — Each value is freed exactly once
-4. **No data races** — Mutable access is exclusive; shared access is read-only
-
-All of this happens **without any lifetime annotations**. The Hat Principle makes ownership visible in the syntax itself.
+When invoking a method that mutates a shape, the compiler requires you to append the `#` suffix to the receiver object (e.g. `obj#.mutate()`). This acts as an extremely visible "mutation alarm," signaling to readers and code auditors exactly where a resource's soul is being modified:
+```toka
+{{#include ../../examples/ownership.tk:mutable_method}}
+```
+By enforcing the `#` suffix strictly on *declarations* and *method receiver mutation sites*, Toka achieves a perfect balance between syntactic cleanlines and high-fidelity safety visibility.

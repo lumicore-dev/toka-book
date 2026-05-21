@@ -42,10 +42,37 @@ fn borrow_func_example() {
 // ANCHOR: mutable_local
 fn mutable_local_example() {
     auto val# = 42
-    val = 99
+    val = 99 // Everyday context assignment: NO '#' suffix allowed here!
     println("val: {}", val)
 }
 // ANCHOR_END: mutable_local
+
+// ANCHOR: mutable_method
+shape Counter (
+    val#: i32 = 0
+)
+
+
+impl Counter@encap {
+    pub fn clone(self) -> Counter {
+        return Counter(val = self.val)
+    }
+
+    fn drop(self#) {}
+
+    pub fn increment(self#) {
+        self.val = self.val + 1
+    }
+}
+
+
+
+fn mutable_method_example() {
+    auto c# = Counter(val = 10) // Declaration: '#' is required for mutability
+    c#.increment()             // Mutation Site: '#' receiver suffix is required and highly visible!
+    println("c.val: {}", c.val)
+}
+// ANCHOR_END: mutable_method
 
 fn main() -> i32 {
     raw_ptr_example()
@@ -53,5 +80,7 @@ fn main() -> i32 {
     move_copy_example()
     borrow_func_example()
     mutable_local_example()
+    mutable_method_example()
     return 0
 }
+

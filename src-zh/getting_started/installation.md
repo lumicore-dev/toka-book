@@ -40,7 +40,7 @@ tokac --version
 你应该会看到类似如下的输出：
 
 ```
-toka version 0.9.6 (Built: May 17 2026)
+toka version 0.9.7 (Built: May 21 2026)
 ```
 
 ## 从源码编译

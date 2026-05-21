@@ -42,7 +42,7 @@ println("{}{}成功！{}", green, "构建完成", reset)
 import std/io::println
 
 auto name = "Toka"
-auto version = "0.9.6"
+auto version = "0.9.7"
 println("欢迎使用 {} 版本 {}！", name, version)
 ```
 

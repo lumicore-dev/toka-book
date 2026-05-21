@@ -51,11 +51,30 @@ fn address_of_example() {
 }
 // ANCHOR_END: address_of
 
+// ANCHOR: borrow_ptr
+fn borrow_example() {
+    auto x = 42
+    auto &y = &x // Clean local variable borrow, no parentheses needed!
+    
+    auto pt = Point(x = 10, y = 20)
+    
+    // Member borrow Path A: standard parentheses
+    auto &rx1 = &(pt.x)
+    
+    // Member borrow Path B: Hat-Terminal Morphology (Toka's signature aesthetic)
+    auto &rx2 = pt.&x
+    
+    println("y: {}, rx1: {}, rx2: {}", y, rx1, rx2)
+}
+// ANCHOR_END: borrow_ptr
+
 fn main() -> i32 {
     handle_soul_example()
     implicit_deref_example()
     raw_pointer_example()
     unique_pointer_example()
     address_of_example()
+    borrow_example()
     return 0
 }
+

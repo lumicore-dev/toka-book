@@ -31,8 +31,8 @@ If you're an experienced developer, feel free to jump to specific topics using t
 
 This book is kept up-to-date with the latest Toka compiler development. The current version of this documentation is aligned with:
 - **Compiler Version**: `v0.9.7`
-- **Toka Commit**: `13f032a` (Support kebab-case package names and namespace parsing while enforcing hyphen-free variable declarations)
-- **Tag**: `v0.9.7-26-g13f032a`
+- **Toka Commit**: `b3f8940` (Complete termios and prelude audit refactoring, support kebab-case package names and namespace parsing, and enforce hyphen-free variable declarations)
+- **Tag**: `v0.9.7-02`
 
 ## A Note From the Author
 

@@ -42,7 +42,7 @@ Use `{}` placeholders with `println` for clean formatting:
 import std/io::println
 
 auto name = "Toka"
-auto version = "0.9.6"
+auto version = "0.9.7"
 println("Welcome to {} version {}!", name, version)
 ```
 
