@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-de7ac38e.js";
+            window.path_to_searchindex_js = "../searchindex-1fcc17d6.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -178,7 +178,7 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="错误处理"><a class="header" href="#错误处理">错误处理</a></h1>
-<p>Toka 通过 Result 和 Option 类型提供强大的错误处理能力，灵感来自 Rust，但语法更简洁。</p>
+<p>Toka 通过 <code>Result</code> 和 <code>Option</code> 类型提供强大的类型安全错误处理能力。这种基于代数数据类型（ADT）的错误处理模型源远流长，最早可追溯到 ML 语言家族（如 Standard ML、OCaml）中的 <code>option</code> 类型，并由 Haskell 作为 Monad（<code>Maybe</code> / <code>Either</code>）进行了形式化推广。近来，Rust 将这一优雅的模型成功引入到了现代系统级编程中。Toka 继承了这一优秀的学术与工程传统，并通过更具表现力的语言级语法（如用于错误传播的 <code>!</code> 操作符）使其更加简洁易用。</p>
 <h2 id="option-类型"><a class="header" href="#option-类型">Option 类型</a></h2>
 <p>使用 <code>Option</code> 表示可能存在或不存在的值：</p>
 <pre><code class="language-toka">import core/option::{Option}

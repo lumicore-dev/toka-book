@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1c4fdd59.js";
+            window.path_to_searchindex_js = "../searchindex-39f8f015.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -178,7 +178,7 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h1>
-<p>Toka provides robust error handling through the Result and Option types, inspired by Rust but with a cleaner syntax.</p>
+<p>Toka provides robust, type-safe error handling through the <code>Result</code> and <code>Option</code> types. This model, rooted in Algebraic Data Types (ADTs), traces its origins back to the ML language family (such as Standard ML and OCaml) and was later formalized in Haskell as the Monadic <code>Maybe</code> and <code>Either</code> types. More recently, Rust popularized this elegant approach within modern systems programming. Toka inherits this rich academic and engineering heritage, further refining it with highly expressive language-level syntax—such as the <code>!</code> operator for error propagation—to deliver a cleaner, more concise developer experience.</p>
 <h2 id="the-option-type"><a class="header" href="#the-option-type">The Option Type</a></h2>
 <p>Use <code>Option</code> for values that may or may not exist:</p>
 <pre><code class="language-toka">import core/option::{Option}
