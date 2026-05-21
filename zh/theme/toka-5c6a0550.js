@@ -322,10 +322,12 @@ hljs.registerLanguage('toka', function(hljs) {
     var mermaidCodes = document.querySelectorAll('pre code.language-mermaid');
     if (mermaidCodes.length === 0) return;
 
-    // Load mermaid.js dynamically from CDN
+    // Load traditional UMD version of mermaid.js (v9.4.3) to safely populate window.mermaid
     var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
+    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js';
     script.onload = function() {
+      if (typeof mermaid === 'undefined') return;
+
       // Check mdBook theme to adapt Mermaid's style
       var isDark = document.documentElement.classList.contains('coal') ||
                    document.documentElement.classList.contains('navy') ||
@@ -355,7 +357,12 @@ hljs.registerLanguage('toka', function(hljs) {
         pre.parentElement.replaceChild(div, pre);
       });
 
-      mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+      // Dual-API compatible initialization
+      if (typeof mermaid.run === 'function') {
+        mermaid.run({ querySelector: '.mermaid' });
+      } else if (typeof mermaid.init === 'function') {
+        mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+      }
     };
     document.head.appendChild(script);
   }
