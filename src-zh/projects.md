@@ -10,20 +10,16 @@
 
 本章包含的三个项目呈阶梯状递进，帮助你逐步建立起健壮 of 系统级开发心智：
 
-```text
-           系统级软件工程的实战阶梯（Roadmap）
-                            │
-                            ▼
-   [ 阶梯一：命令行工具 ]  ─── 熟悉官方 stdx/cli/flag 标准扩展 API
-                            │
-                            ▼
-   [ 阶梯二：HTTP 服务器 ] ─── 打通原始 TCP 与 Hat Concurrency 并发安全
-                            │
-                            ▼
-   [ 阶梯三：手写正则引擎 ] ─── 锻炼字符 Token 流控制与树状模式匹配算法
-                            │
-                            ▼
-           🏆 【 进阶为系统级全能开发者 】
+```mermaid
+flowchart TD
+    Step1("**阶梯一：命令行工具**<br>熟悉官方 stdx/cli/flag 标准扩展 API")
+    Step2("**阶梯二：HTTP 服务器**<br>打通原始 TCP 与 Hat Concurrency 并发安全")
+    Step3("**阶梯三：手写正则引擎**<br>锻炼字符 Token 流控制与树状模式匹配算法")
+    Champ("🏆 **进阶为系统级全能开发者**")
+
+    Step1 --> Step2 --> Step3 --> Champ
+
+    style Champ stroke:#a855f7,stroke-width:2px;
 ```
 
 ### 1. [用 stdx/cli/flag 构建 CLI 工具](projects/cli_tool.md)

@@ -10,20 +10,16 @@ These projects are not detached "toy code." Instead, they directly target the th
 
 The three projects in this chapter progress in a step-by-step fashion to help you gradually build robust system-level development mental models:
 
-```text
-            Systems Software Engineering Roadmap
-                            │
-                            ▼
-     [ Step 1: CLI Tool ] ──── Familiarize with stdx/cli/flag standard APIs
-                            │
-                            ▼
-    [ Step 2: HTTP Server ] ── Master raw TCP & Hat concurrency safety
-                            │
-                            ▼
-    [ Step 3: Regex Engine ] ─ Exercise Token stream parsing & pattern matching
-                            │
-                            ▼
-          🏆 【 Full-fledged Systems Developer 】
+```mermaid
+flowchart TD
+    Step1("**Step 1: CLI Tool**<br>Familiarize with stdx/cli/flag standard APIs")
+    Step2("**Step 2: HTTP Server**<br>Master raw TCP & Hat concurrency safety")
+    Step3("**Step 3: Regex Engine**<br>Exercise Token stream parsing & pattern matching")
+    Champ("🏆 **Full-fledged Systems Developer**")
+
+    Step1 --> Step2 --> Step3 --> Champ
+
+    style Champ stroke:#a855f7,stroke-width:2px;
 ```
 
 ### 1. [CLI Tool with stdx/cli/flag](projects/cli_tool.md)
