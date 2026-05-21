@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-4bafd0e2.js";
+            window.path_to_searchindex_js = "searchindex-0197c344.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -183,15 +183,31 @@
 <hr>
 <h2 id="chapter-map"><a class="header" href="#chapter-map">Chapter Map</a></h2>
 <p>This chapter will guide you through the following four pillars of system development:</p>
-<pre><code class="language-text">               Toka Advanced Features &amp; Abstractions
-                         │
-        ┌────────────────┼────────────────┬────────────────┐
-        ▼                ▼                ▼                ▼
-    Generics       Error Handling  Pattern Matching   Concurrency
-        │                │                │                │
-        ▼                ▼                ▼                ▼
- Zero-overhead ADT representation  Deconstruct Shapes  Lightweight fibers
- Avoid Soul Collapse  Short-circuit (!)    Combined w/ guards  Multicore scaling
+<pre><code class="language-mermaid">flowchart TD
+    Root("Toka Advanced Features &amp; Abstractions")
+
+    Generics("**Generics**")
+    Error("**Error Handling**")
+    Pattern("**Pattern Matching**")
+    Concurrency("**Concurrency**")
+
+    GenericsDesc("Zero-overhead ADT representation&lt;br&gt;Avoid Soul Collapse")
+    ErrorDesc("Algebraic data type contracts&lt;br&gt;Short-circuit (!) propagation")
+    PatternDesc("Deconstruct Shapes&lt;br&gt;Combined w/ guards")
+    ConcurrencyDesc("Lightweight fibers&lt;br&gt;Multicore scaling")
+
+    Root --&gt; Generics &amp; Error &amp; Pattern &amp; Concurrency
+    
+    Generics --&gt; GenericsDesc
+    Error --&gt; ErrorDesc
+    Pattern --&gt; PatternDesc
+    Concurrency --&gt; ConcurrencyDesc
+
+    style Root fill:#1e1b4b,stroke:#a855f7,stroke-width:2px;
+    style Generics stroke:#3b82f6,stroke-width:1.5px;
+    style Error stroke:#10b981,stroke-width:1.5px;
+    style Pattern stroke:#f59e0b,stroke-width:1.5px;
+    style Concurrency stroke:#ec4899,stroke-width:1.5px;
 </code></pre>
 <h3 id="1-generics"><a class="header" href="#1-generics">1. <a href="advanced/generics.html">Generics</a></a></h3>
 <p>Achieve zero-overhead polymorphism while maintaining strong type safety. You will learn about Toka’s unique <strong>Morphic Generic Types</strong> (like <code>'A</code>) and the strict rule of prefixing corresponding Shape fields with a single quote (e.g., <code>'first: 'A</code>) to avoid <strong>“Soul Collapse”</strong>.</p>
