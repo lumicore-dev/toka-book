@@ -10,16 +10,32 @@ Toka's advanced features provide high-level abstract expressiveness while strict
 
 This chapter will guide you through the following four pillars of system development:
 
-```text
-               Toka Advanced Features & Abstractions
-                         │
-        ┌────────────────┼────────────────┬────────────────┐
-        ▼                ▼                ▼                ▼
-    Generics       Error Handling  Pattern Matching   Concurrency
-        │                │                │                │
-        ▼                ▼                ▼                ▼
- Zero-overhead ADT representation  Deconstruct Shapes  Lightweight fibers
- Avoid Soul Collapse  Short-circuit (!)    Combined w/ guards  Multicore scaling
+```mermaid
+flowchart TD
+    Root("Toka Advanced Features & Abstractions")
+
+    Generics("**Generics**")
+    Error("**Error Handling**")
+    Pattern("**Pattern Matching**")
+    Concurrency("**Concurrency**")
+
+    GenericsDesc("Zero-overhead ADT representation<br>Avoid Soul Collapse")
+    ErrorDesc("Algebraic data type contracts<br>Short-circuit (!) propagation")
+    PatternDesc("Deconstruct Shapes<br>Combined w/ guards")
+    ConcurrencyDesc("Lightweight fibers<br>Multicore scaling")
+
+    Root --> Generics & Error & Pattern & Concurrency
+    
+    Generics --> GenericsDesc
+    Error --> ErrorDesc
+    Pattern --> PatternDesc
+    Concurrency --> ConcurrencyDesc
+
+    style Root fill:#1e1b4b,stroke:#a855f7,stroke-width:2px;
+    style Generics stroke:#3b82f6,stroke-width:1.5px;
+    style Error stroke:#10b981,stroke-width:1.5px;
+    style Pattern stroke:#f59e0b,stroke-width:1.5px;
+    style Concurrency stroke:#ec4899,stroke-width:1.5px;
 ```
 
 ### 1. [Generics](advanced/generics.md)

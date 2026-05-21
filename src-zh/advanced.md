@@ -10,16 +10,32 @@ Toka 的高级特性是为了在保持**零拷贝隐式引用捕获**和**运行
 
 本章将带你深入探索以下四个系统开发的核心利器：
 
-```text
-               Toka 高级特性与抽象表达
-                         │
-        ┌────────────────┼────────────────┬────────────────┐
-        ▼                ▼                ▼                ▼
-   泛型 (Generics)   错误处理 (Error)  模式匹配 (Pattern)  并发编程 (Async)
-        │                │                │                │
-        ▼                ▼                ▼                ▼
-   零开销多态表达   代数数据类型契约  解构 Shape 实体  安全轻量协程
-  规避“灵魂塌陷”约束  短路机制 (!) 传播  配合 if 条件守卫   多核并发并行
+```mermaid
+flowchart TD
+    Root("Toka 高级特性与抽象表达")
+
+    Generics("**泛型 Generics**")
+    Error("**错误处理 Error**")
+    Pattern("**模式匹配 Pattern**")
+    Async("**并发编程 Async**")
+
+    GenericsDesc("零开销多态表达<br>规避“灵魂塌陷”约束")
+    ErrorDesc("代数数据类型契约<br>短路机制 (!) 传播")
+    PatternDesc("解构 Shape 实体<br>配合 if 条件守卫")
+    AsyncDesc("安全轻量协程<br>多核并发并行")
+
+    Root --> Generics & Error & Pattern & Async
+    
+    Generics --> GenericsDesc
+    Error --> ErrorDesc
+    Pattern --> PatternDesc
+    Async --> AsyncDesc
+
+    style Root fill:#1e1b4b,stroke:#a855f7,stroke-width:2px;
+    style Generics stroke:#3b82f6,stroke-width:1.5px;
+    style Error stroke:#10b981,stroke-width:1.5px;
+    style Pattern stroke:#f59e0b,stroke-width:1.5px;
+    style Async stroke:#ec4899,stroke-width:1.5px;
 ```
 
 ### 1. [泛型（Generics）](advanced/generics.md)
