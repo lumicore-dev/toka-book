@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-3d2aecac.js";
+            window.path_to_searchindex_js = "searchindex-864ead7c.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -197,8 +197,8 @@
 </table>
 </div>
 <hr>
-<h2 id="手柄-vs-灵魂无解引用美学"><a class="header" href="#手柄-vs-灵魂无解引用美学">手柄 vs. 灵魂：无解引用美学</a></h2>
-<p>帽子原则最伟大的易用性突破在于将指针容器与底层数据进行了严格的语法分立：</p>
+<h2 id="手柄-vs-灵魂隐式解引用设计"><a class="header" href="#手柄-vs-灵魂隐式解引用设计">手柄 vs. 灵魂：隐式解引用设计</a></h2>
+<p>帽子原则在设计上的一个重要特点是将指针容器与底层数据进行了严格的语法分立：</p>
 <ul>
 <li><strong>手柄（Handle，即帽子）</strong>：<strong>带有</strong>标记符号的标识符（<code>^ptr</code>, <code>*ptr</code>, <code>~ptr</code>）表示<em>指针容器本身</em>（保存地址的元数据内存）。</li>
 <li><strong>灵魂（Soul，即数据）</strong>：<strong>不带</strong>标记符号的标识符（<code>ptr</code>）表示<em>底层数据</em>（实际值本身）。</li>
@@ -217,8 +217,8 @@
 <h2 id="学习路线"><a class="header" href="#学习路线">学习路线</a></h2>
 <p>要彻底掌握帽子原则，请依次深入探索以下子章节：</p>
 <ul>
-<li><strong><a href="hat_principle/soul_identity.html">灵魂与身份</a></strong>：精通手柄与灵魂的分立、隐式解引用，以及成员链借用（包括标准括号与标志性的帽子终端形态）的语法艺术。</li>
-<li><strong><a href="hat_principle/ownership.html">所有权与帽子</a></strong>：深入剖析四种所有权模型、默认移动与拷贝、<code>cede</code> 关键字，以及局部变量可变声明与方法调用接收者可变标注的编译器底层设计哲学。</li>
+<li><strong><a href="hat_principle/soul_identity.html">灵魂与身份</a></strong>：精通手柄与灵魂的分立、隐式解引用，以及成员链借用（包括标准括号与标志性的帽子终端形态）的语法规则。</li>
+<li><strong><a href="hat_principle/ownership.html">所有权与帽子</a></strong>：深入剖析四种所有权模型、默认移动与拷贝、<code>cede</code> 关键字，以及局部变量可变声明与方法调用接收者可变标注的编译器设计。</li>
 <li><strong><a href="hat_principle/memory_safety.html">内存安全与 PAL</a></strong>：深度剖析指针分析层静态安全分析器如何实现零开销的编译期安全验证。</li>
 </ul>
 

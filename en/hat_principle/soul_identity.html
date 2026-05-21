@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-fcd3b1ba.js";
+            window.path_to_searchindex_js = "../searchindex-46feb1f5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -178,7 +178,7 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="soul--identity"><a class="header" href="#soul--identity">Soul &amp; Identity</a></h1>
-<p>Toka’s Hat Principle introduces a strict, beautiful distinction between a pointer’s <strong>Handle</strong> (its syntactic container) and its <strong>Soul</strong> (its underlying data). Mastering this separation is essential to understanding Toka’s modern, dereference-free memory aesthetics.</p>
+<p>Toka’s Hat Principle introduces a strict, clear distinction between a pointer’s <strong>Handle</strong> (its syntactic container) and its <strong>Soul</strong> (its underlying data). Mastering this separation is essential to understanding Toka’s memory management model.</p>
 <hr>
 <h2 id="handle-vs-soul"><a class="header" href="#handle-vs-soul">Handle vs. Soul</a></h2>
 <p>Every pointer identifier in Toka possesses two distinct aspects in syntax and memory:</p>
@@ -231,12 +231,12 @@ auto &amp;y = &amp;x // y is a borrow pointer pointing directly to the soul of x
 </code></pre>
 <h3 id="the-member-access-chain-borrow-ambiguity"><a class="header" href="#the-member-access-chain-borrow-ambiguity">The Member Access Chain Borrow Ambiguity</a></h3>
 <p>When attempting to borrow a specific field within a struct or shape (a member access chain), writing <code>&amp;pt.x</code> is <strong>syntactically ambiguous</strong>. It is unclear whether you want to borrow the entire member chain <code>&amp;(pt.x)</code> or access the member <code>x</code> on a borrowed pointer <code>(&amp;pt).x</code>.</p>
-<p>To protect readability and safety, the Toka compiler rejects <code>&amp;pt.x</code> with a compile error and requires one of two extremely elegant and legal options:</p>
+<p>To ensure clarity and type safety, the Toka compiler rejects <code>&amp;pt.x</code> with a compile error and requires one of two clear and legal options:</p>
 <ol>
 <li><strong>Option A (Standard Parentheses)</strong>: Explicitly wrap the member chain in parentheses: <code>&amp;(pt.x)</code>.</li>
 <li><strong>Option B (Hat-Terminal Morphology)</strong>: Place the <code>&amp;</code> borrow sigil directly before the terminal field name: <strong><code>pt.&amp;x</code></strong>.</li>
 </ol>
-<p><code>pt.&amp;x</code> is Toka’s signature aesthetic, showcasing how pointer morphology seamlessly integrates into member access chains.</p>
+<p><code>pt.&amp;x</code> is an intuitive form, allowing the borrow operation to integrate directly into the member access chain.</p>
 <pre><code class="language-toka">fn borrow_example() {
     auto x = 42
     auto &amp;y = &amp;x // Clean local variable borrow, no parentheses needed!

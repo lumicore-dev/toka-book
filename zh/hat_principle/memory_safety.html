@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-3d2aecac.js";
+            window.path_to_searchindex_js = "../searchindex-864ead7c.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -214,10 +214,10 @@ fn borrowing_safe_example() {
     println("val: {}", val)
 }
 </code></pre>
-<p>如果函数确需修改传入的参数，则必须在函数签名中将该参数显式声明为可变（<code>#</code>），此时 PAL Checker 将在调用点强制执行排他性的可变借用规则校验。</p>
+<p>如果函数需修改参数，需在函数签名中将参数显式声明为可变（<code>#</code>），此时 PAL Checker 将在调用点强制执行排他性的可变借用规则校验。</p>
 <hr>
 <h2 id="pal-静态保障一览表"><a class="header" href="#pal-静态保障一览表">PAL 静态保障一览表</a></h2>
-<p>PAL Checker 充当了无声的代码卫士，在您的 binary 构建之前便提供了绝对的内存安全屏障：</p>
+<p>PAL Checker 在编译阶段对内存安全进行静态分析与检查：</p>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -228,12 +228,12 @@ fn borrowing_safe_example() {
 <tr><td style="text-align: left">当灵魂（Soul）被销毁后，依然持有其借用 <code>&amp;</code></td><td style="text-align: center">❌ <strong>编译期静态报错</strong></td><td>彻底消灭悬垂指针与使用已释放内存（use-after-free）</td></tr>
 <tr><td style="text-align: left">在原始指针 <code>*</code> 上触发双重手动 <code>unsafe free</code></td><td style="text-align: center">❌ <strong>编译期静态报错</strong></td><td>静态拦截人工垃圾清理的遗留错误</td></tr>
 <tr><td style="text-align: left">将可变借用 <code>obj#.mutate()</code> 与只读借用重叠</td><td style="text-align: center">❌ <strong>编译期静态报错</strong></td><td>确保多线程环境下的线程安全，消灭数据竞争</td></tr>
-<tr><td style="text-align: left">常规借用参数传递</td><td style="text-align: center">✅ <strong>完美通过</strong></td><td>高性能、零拷贝的极速只读访问</td></tr>
-<tr><td style="text-align: left">拥有所有权的指针手柄离开其作用域</td><td style="text-align: center">✅ <strong>完美通过</strong></td><td>自动产生零运行时开销的确定性垃圾回收与资源清理</td></tr>
+<tr><td style="text-align: left">常规借用参数传递</td><td style="text-align: center">✅ <strong>安全通过</strong></td><td>高性能、零拷贝的极速只读访问</td></tr>
+<tr><td style="text-align: left">拥有所有权的指针手柄离开其作用域</td><td style="text-align: center">✅ <strong>安全通过</strong></td><td>自动产生零运行时开销的确定性垃圾回收与资源清理</td></tr>
 </tbody>
 </table>
 </div>
-<p>通过将内存安全的重担从运行时（Garbage Collector）或开发者的心智心流（手动追踪复杂的生命周期标注）转移到编译器的<strong>指针分析层（PAL）</strong>，Toka 在干净、纯粹、高可视化的现代语法中，完美实现了比肩 C++ 的极致速度与等同 Rust 的终极安全。</p>
+<p>通过将内存安全的检查工作转移到编译器的<strong>指针分析层（PAL）</strong>，Toka 在无需手动标注生命周期的同时，为开发者提供了兼顾运行效率与内存安全的开发体验。</p>
 
                     </main>
 

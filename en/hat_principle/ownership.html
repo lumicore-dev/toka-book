@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-fcd3b1ba.js";
+            window.path_to_searchindex_js = "../searchindex-46feb1f5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -265,8 +265,8 @@ val = 99 // Everyday assignment: NO '#' allowed! Writing 'val# = 99' is a compil
 </code></pre>
 <p>This prevents useless syntactic noise in everyday code.</p>
 <h3 id="3-required-at-mutating-method-call-sites-receiver-suffix"><a class="header" href="#3-required-at-mutating-method-call-sites-receiver-suffix">3. Required at Mutating Method Call Sites (Receiver Suffix)</a></h3>
-<p>Toka’s most elegant safety feature is that <strong>mutating method calls must be explicitly flagged at the call site</strong>.</p>
-<p>When invoking a method that mutates a shape, the compiler requires you to append the <code>#</code> suffix to the receiver object (e.g. <code>obj#.mutate()</code>). This acts as an extremely visible “mutation alarm,” signaling to readers and code auditors exactly where a resource’s soul is being modified:</p>
+<p>A key safety feature in Toka is that <strong>mutating method calls must be explicitly flagged at the call site</strong>.</p>
+<p>When invoking a method that mutates a shape, the compiler requires you to append the <code>#</code> suffix to the receiver object (e.g. <code>obj#.mutate()</code>). This makes the state mutation explicit, aiding code readability and auditing:</p>
 <pre><code class="language-toka">shape Counter (
     val#: i32 = 0
 )
@@ -292,7 +292,7 @@ fn mutable_method_example() {
     println("c.val: {}", c.val)
 }
 </code></pre>
-<p>By enforcing the <code>#</code> suffix strictly on <em>declarations</em> and <em>method receiver mutation sites</em>, Toka achieves a perfect balance between syntactic cleanlines and high-fidelity safety visibility.</p>
+<p>By restricting the <code>#</code> suffix to declarations and mutating method call sites, Toka keeps the syntax intuitive while providing clear safety visibility.</p>
 
                     </main>
 

@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-fcd3b1ba.js";
+            window.path_to_searchindex_js = "../searchindex-46feb1f5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -217,7 +217,7 @@ fn borrowing_safe_example() {
 <p>To allow a function to modify a parameter, the parameter must be declared mutable (<code>#</code>) in the function signature, and the PAL Checker will then enforce exclusive borrowing at the call site.</p>
 <hr>
 <h2 id="pal-static-assurances-at-a-glance"><a class="header" href="#pal-static-assurances-at-a-glance">PAL Static Assurances at a Glance</a></h2>
-<p>The PAL Checker acts as a silent guardian, providing absolute safety guarantees before your binary is even built:</p>
+<p>The PAL Checker statically analyzes and verifies memory safety during compilation:</p>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -233,7 +233,7 @@ fn borrowing_safe_example() {
 </tbody>
 </table>
 </div>
-<p>By shifting the burden of memory safety from the runtime (GC) or the programmer’s brain (manual lifetimes) to the <strong>Pointer Analysis Layer (PAL)</strong>, Toka provides the performance of C++ with the safety of Rust, wrapped in a clean and visual syntax.</p>
+<p>By shifting the verification of memory safety to the <strong>Pointer Analysis Layer (PAL)</strong>, Toka allows developers to write safe, high-performance code without the need for manual lifetime annotations.</p>
 
                     </main>
 

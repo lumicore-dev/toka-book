@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-3d2aecac.js";
+            window.path_to_searchindex_js = "searchindex-864ead7c.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -180,7 +180,7 @@
                         <h1 id="标准库概览"><a class="header" href="#标准库概览">标准库概览</a></h1>
 <p>Toka 的标准库提供了全面的模块集，满足日常编程任务的需求。</p>
 <h2 id="模块结构"><a class="header" href="#模块结构">模块结构</a></h2>
-<p>标准库分为三个层级：</p>
+<p>标准库分为四个层级：</p>
 <h3 id="libcore--核心语言原语"><a class="header" href="#libcore--核心语言原语"><code>lib/core/</code> — 核心语言原语</a></h3>
 <p>这些模块提供了语言本身所依赖的基础类型和 trait：</p>
 <div class="table-wrapper">
@@ -199,8 +199,24 @@
 </tbody>
 </table>
 </div>
+<h3 id="libsys--底层系统原语"><a class="header" href="#libsys--底层系统原语"><code>lib/sys/</code> — 底层系统原语</a></h3>
+<p>这些模块提供了与操作系统和底层运行时的直接绑定与原语：</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>模块</th><th>描述</th></tr>
+</thead>
+<tbody>
+<tr><td><code>libc</code></td><td>平台相关的 C 标准库 API 声明与绑定</td></tr>
+<tr><td><code>termios</code></td><td>底层 Tty 终端模式与控制属性配置</td></tr>
+<tr><td><code>thread</code></td><td>操作系统原生线程底层接口</td></tr>
+<tr><td><code>sync</code></td><td>操作系统级同步原语及锁实现</td></tr>
+<tr><td><code>linux</code> / <code>macos</code> / <code>windows</code></td><td>针对特定操作系统的底层系统调用与绑定</td></tr>
+</tbody>
+</table>
+</div>
 <h3 id="libstd--标准库"><a class="header" href="#libstd--标准库"><code>lib/std/</code> — 标准库</a></h3>
-<p>面向应用程序开发的即用型标准模块（完整列表）：</p>
+<p>面向应用程序开发的即用型标准模块：</p>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -223,7 +239,7 @@
 <tr><td><code>path</code></td><td>跨平台文件路径解析与操作（<code>Path</code> / <code>PathBuf</code>）</td></tr>
 <tr><td><code>env</code></td><td>环境变量获取、进程参数与系统上下文交互</td></tr>
 <tr><td><code>process</code></td><td>子进程的创建、状态控制与管道交互</td></tr>
-<tr><td><code>thread</code></td><td>原生系统级线程管理与生命周期控制（<code>Thread</code>）</td></tr>
+<tr><td><code>thread</code></td><td>操作系统原生线程管理与生命周期控制（<code>Thread</code>）</td></tr>
 <tr><td><code>sync</code></td><td>线程级同步锁原语（<code>Mutex</code> / <code>Condvar</code> / <code>WaitGroup</code>）</td></tr>
 <tr><td><code>atomic</code></td><td>硬件级原子操作与无锁同步原语</td></tr>
 <tr><td><code>mpsc</code></td><td>多生产者单消费者（MPSC）线程并发通道</td></tr>
@@ -232,12 +248,10 @@
 <tr><td><code>math</code></td><td>常用数学计算函数与极限常量</td></tr>
 <tr><td><code>rand</code></td><td>伪随机数生成器与随机实用工具</td></tr>
 <tr><td><code>time</code></td><td>系统时间与单调递增持续时间（<code>Duration</code> / <code>Instant</code>）</td></tr>
-<tr><td><code>log</code></td><td>基础日志打印与级别过滤机制</td></tr>
 <tr><td><code>fmt</code></td><td>文本格式化与调试输出工具（<code>Format</code>）</td></tr>
 <tr><td><code>memory</code></td><td>底层内存分配、区域拷贝与裸指针辅助方法</td></tr>
 <tr><td><code>error</code></td><td>通用错误特征（<code>Error</code>）与故障基类定义</td></tr>
 <tr><td><code>panic</code></td><td>运行时致命错误触发、拦截与堆栈挂钩处理</td></tr>
-<tr><td><code>termios</code></td><td>底层 Tty 终端模式与控制属性配置</td></tr>
 </tbody>
 </table>
 </div>
@@ -249,6 +263,7 @@
 <tr><th>模块</th><th>描述</th></tr>
 </thead>
 <tbody>
+<tr><td><code>log</code></td><td>基础日志打印与级别过滤机制</td></tr>
 <tr><td><code>net/http</code></td><td>HTTP 客户端和服务器</td></tr>
 <tr><td><code>net/url</code></td><td>URL 解析</td></tr>
 <tr><td><code>serde/json</code></td><td>JSON 序列化</td></tr>

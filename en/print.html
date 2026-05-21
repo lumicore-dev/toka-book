@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-fcd3b1ba.js";
+            window.path_to_searchindex_js = "searchindex-46feb1f5.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -217,7 +217,7 @@
 <p><em>— lumicore-dev</em></p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
-<p>Welcome to Toka! Toka is a modern, expressive systems programming language designed for absolute safety, high performance, and minimal mental overhead. It implements the innovative <strong>Hat Principle</strong> to achieve compile-time memory safety without the need for a garbage collector or manual lifetime annotations.</p>
+<p>Welcome to Toka! Toka is a modern systems programming language designed for memory safety, high performance, and intuitive development. It implements the <strong>Hat Principle</strong> to achieve compile-time memory safety without a garbage collector or manual lifetime annotations.</p>
 <p>To help you get up and running as quickly as possible, this chapter is divided into three logical steps. We recommend following them in order:</p>
 <h2 id="-your-path-to-toka"><a class="header" href="#-your-path-to-toka">🧭 Your Path to Toka</a></h2>
 <ol>
@@ -411,7 +411,7 @@ fn main() -&gt; i32 {
 <li><strong>Safety by default</strong> — Variables are immutable unless explicitly marked.</li>
 <li><strong>No hidden runtime</strong> — What you write is what gets executed. No garbage collector, no VM.</li>
 <li><strong>C-like performance</strong> — Built on LLVM 20, Toka generates optimized native code.</li>
-<li><strong>Modern syntax</strong> — Clean, readable, with powerful pattern matching and error handling.</li>
+<li><strong>Modern syntax</strong> — Clean, readable, with intuitive pattern matching and error handling.</li>
 </ol>
 <h2 id="comment-syntax"><a class="header" href="#comment-syntax">Comment Syntax</a></h2>
 <p>Comments in Toka use the standard <code>//</code> syntax:</p>
@@ -454,7 +454,7 @@ fn main() -&gt; i32 {
 }
 </code></pre>
 <h3 id="unambiguous-subtraction"><a class="header" href="#unambiguous-subtraction">Unambiguous Subtraction</a></h3>
-<p>Because hyphens are strictly forbidden in variable and function names, the subtraction operator (<code>-</code>) is completely unambiguous. Ordinary subtraction expressions without spaces are <strong>always</strong> 100% parsed correctly:</p>
+<p>Because hyphens are strictly forbidden in variable and function names, the subtraction operator (<code>-</code>) is completely unambiguous. Ordinary subtraction expressions without spaces are <strong>always</strong> parsed correctly without ambiguity:</p>
 <pre><code class="language-toka">import std/io::println
 
 fn main() -&gt; i32 {
@@ -672,7 +672,7 @@ while iter &lt; 100 {
 }
 </code></pre>
 <h2 id="match-pattern-matching"><a class="header" href="#match-pattern-matching">Match (Pattern Matching)</a></h2>
-<p>Toka provides powerful pattern matching with the <code>match</code> expression:</p>
+<p>Toka provides intuitive pattern matching with the <code>match</code> expression:</p>
 <pre><code class="language-toka">fn describe(value: i32) -&gt; cstring {
     return match value {
         0 =&gt; pass "zero"
@@ -777,8 +777,8 @@ auto unicode: u32 = 0x4E16:u32
 </table>
 </div>
 <hr>
-<h2 id="handle-vs-soul-dereference-free-aesthetics"><a class="header" href="#handle-vs-soul-dereference-free-aesthetics">Handle vs. Soul: Dereference-Free Aesthetics</a></h2>
-<p>A major ergonomic breakthrough of the Hat Principle is the strict bifurcation between a pointer’s container and its underlying data:</p>
+<h2 id="handle-vs-soul-implicit-dereferencing"><a class="header" href="#handle-vs-soul-implicit-dereferencing">Handle vs. Soul: Implicit Dereferencing</a></h2>
+<p>One of the key usability features of the Hat Principle is the strict bifurcation between a pointer’s container and its underlying data:</p>
 <ul>
 <li><strong>Handle (The Hat)</strong>: An identifier <strong>with</strong> its sigil (<code>^ptr</code>, <code>*ptr</code>, <code>~ptr</code>) represents the <em>pointer container</em> itself (the metadata holding the address).</li>
 <li><strong>Soul (The Data)</strong>: An identifier <strong>without</strong> its sigil (<code>ptr</code>) represents the <em>underlying data</em> (the actual value).</li>
@@ -803,7 +803,7 @@ auto unicode: u32 = 0x4E16:u32
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="soul--identity"><a class="header" href="#soul--identity">Soul &amp; Identity</a></h1>
-<p>Toka’s Hat Principle introduces a strict, beautiful distinction between a pointer’s <strong>Handle</strong> (its syntactic container) and its <strong>Soul</strong> (its underlying data). Mastering this separation is essential to understanding Toka’s modern, dereference-free memory aesthetics.</p>
+<p>Toka’s Hat Principle introduces a strict, clear distinction between a pointer’s <strong>Handle</strong> (its syntactic container) and its <strong>Soul</strong> (its underlying data). Mastering this separation is essential to understanding Toka’s memory management model.</p>
 <hr>
 <h2 id="handle-vs-soul"><a class="header" href="#handle-vs-soul">Handle vs. Soul</a></h2>
 <p>Every pointer identifier in Toka possesses two distinct aspects in syntax and memory:</p>
@@ -856,12 +856,12 @@ auto &amp;y = &amp;x // y is a borrow pointer pointing directly to the soul of x
 </code></pre>
 <h3 id="the-member-access-chain-borrow-ambiguity"><a class="header" href="#the-member-access-chain-borrow-ambiguity">The Member Access Chain Borrow Ambiguity</a></h3>
 <p>When attempting to borrow a specific field within a struct or shape (a member access chain), writing <code>&amp;pt.x</code> is <strong>syntactically ambiguous</strong>. It is unclear whether you want to borrow the entire member chain <code>&amp;(pt.x)</code> or access the member <code>x</code> on a borrowed pointer <code>(&amp;pt).x</code>.</p>
-<p>To protect readability and safety, the Toka compiler rejects <code>&amp;pt.x</code> with a compile error and requires one of two extremely elegant and legal options:</p>
+<p>To ensure clarity and type safety, the Toka compiler rejects <code>&amp;pt.x</code> with a compile error and requires one of two clear and legal options:</p>
 <ol>
 <li><strong>Option A (Standard Parentheses)</strong>: Explicitly wrap the member chain in parentheses: <code>&amp;(pt.x)</code>.</li>
 <li><strong>Option B (Hat-Terminal Morphology)</strong>: Place the <code>&amp;</code> borrow sigil directly before the terminal field name: <strong><code>pt.&amp;x</code></strong>.</li>
 </ol>
-<p><code>pt.&amp;x</code> is Toka’s signature aesthetic, showcasing how pointer morphology seamlessly integrates into member access chains.</p>
+<p><code>pt.&amp;x</code> is an intuitive form, allowing the borrow operation to integrate directly into the member access chain.</p>
 <pre><code class="language-toka">fn borrow_example() {
     auto x = 42
     auto &amp;y = &amp;x // Clean local variable borrow, no parentheses needed!
@@ -966,8 +966,8 @@ val = 99 // Everyday assignment: NO '#' allowed! Writing 'val# = 99' is a compil
 </code></pre>
 <p>This prevents useless syntactic noise in everyday code.</p>
 <h3 id="3-required-at-mutating-method-call-sites-receiver-suffix"><a class="header" href="#3-required-at-mutating-method-call-sites-receiver-suffix">3. Required at Mutating Method Call Sites (Receiver Suffix)</a></h3>
-<p>Toka’s most elegant safety feature is that <strong>mutating method calls must be explicitly flagged at the call site</strong>.</p>
-<p>When invoking a method that mutates a shape, the compiler requires you to append the <code>#</code> suffix to the receiver object (e.g. <code>obj#.mutate()</code>). This acts as an extremely visible “mutation alarm,” signaling to readers and code auditors exactly where a resource’s soul is being modified:</p>
+<p>A key safety feature in Toka is that <strong>mutating method calls must be explicitly flagged at the call site</strong>.</p>
+<p>When invoking a method that mutates a shape, the compiler requires you to append the <code>#</code> suffix to the receiver object (e.g. <code>obj#.mutate()</code>). This makes the state mutation explicit, aiding code readability and auditing:</p>
 <pre><code class="language-toka">shape Counter (
     val#: i32 = 0
 )
@@ -993,7 +993,7 @@ fn mutable_method_example() {
     println("c.val: {}", c.val)
 }
 </code></pre>
-<p>By enforcing the <code>#</code> suffix strictly on <em>declarations</em> and <em>method receiver mutation sites</em>, Toka achieves a perfect balance between syntactic cleanlines and high-fidelity safety visibility.</p>
+<p>By restricting the <code>#</code> suffix to declarations and mutating method call sites, Toka keeps the syntax intuitive while providing clear safety visibility.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="memory-safety--pal"><a class="header" href="#memory-safety--pal">Memory Safety &amp; PAL</a></h1>
 <p>Toka achieves rigorous, compile-time memory safety without the heavy runtime overhead of a Garbage Collector, and <strong>without requiring complex, verbose lifetime annotations</strong>.</p>
@@ -1035,7 +1035,7 @@ fn borrowing_safe_example() {
 <p>To allow a function to modify a parameter, the parameter must be declared mutable (<code>#</code>) in the function signature, and the PAL Checker will then enforce exclusive borrowing at the call site.</p>
 <hr>
 <h2 id="pal-static-assurances-at-a-glance"><a class="header" href="#pal-static-assurances-at-a-glance">PAL Static Assurances at a Glance</a></h2>
-<p>The PAL Checker acts as a silent guardian, providing absolute safety guarantees before your binary is even built:</p>
+<p>The PAL Checker statically analyzes and verifies memory safety during compilation:</p>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -1051,11 +1051,11 @@ fn borrowing_safe_example() {
 </tbody>
 </table>
 </div>
-<p>By shifting the burden of memory safety from the runtime (GC) or the programmer’s brain (manual lifetimes) to the <strong>Pointer Analysis Layer (PAL)</strong>, Toka provides the performance of C++ with the safety of Rust, wrapped in a clean and visual syntax.</p>
+<p>By shifting the verification of memory safety to the <strong>Pointer Analysis Layer (PAL)</strong>, Toka allows developers to write safe, high-performance code without the need for manual lifetime annotations.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="advanced-features"><a class="header" href="#advanced-features">Advanced Features</a></h1>
 <p>Having mastered the language basics and gained a deep understanding of the <strong>Hat Principle</strong> regarding the management of Soul and Handle, you have already conquered Toka’s steepest learning curve. Now, we enter the world of Toka’s <strong>Advanced Features</strong>.</p>
-<p>Toka’s advanced features are not complex syntax designed for show. Instead, they provide high-level abstract expressiveness while strictly adhering to the <strong>Zero-Copy Capture Mechanism</strong> and <strong>ultimate runtime efficiency</strong>. Here, you will witness the elegant fusion of strong type systems and algebraic data types.</p>
+<p>Toka’s advanced features provide high-level abstract expressiveness while strictly adhering to the <strong>Zero-Copy Capture Mechanism</strong> and <strong>runtime efficiency</strong>. Here, you will see the integration of strong type systems and algebraic data types.</p>
 <hr>
 <h2 id="chapter-map"><a class="header" href="#chapter-map">Chapter Map</a></h2>
 <p>This chapter will guide you through the following four pillars of system development:</p>
@@ -1072,16 +1072,16 @@ fn borrowing_safe_example() {
 <h3 id="1-generics"><a class="header" href="#1-generics">1. <a href="#generics">Generics</a></a></h3>
 <p>Achieve zero-overhead polymorphism while maintaining strong type safety. You will learn about Toka’s unique <strong>Morphic Generic Types</strong> (like <code>'A</code>) and the strict rule of prefixing corresponding Shape fields with a single quote (e.g., <code>'first: 'A</code>) to avoid <strong>“Soul Collapse”</strong>.</p>
 <h3 id="2-error-handling"><a class="header" href="#2-error-handling">2. <a href="#error-handling">Error Handling</a></a></h3>
-<p>Toka discards heavy runtime exception-throwing mechanisms. Instead, it leverages algebraic data types, specifically <code>Option&lt;T&gt;</code> and <code>Result&lt;T, E&gt;</code>, to elegantly represent and propagate errors. Together with the concise <code>!</code> short-circuit operator, your error paths will be cleaner and more robust than nested pattern matches.</p>
+<p>Toka discards runtime exception-throwing mechanisms. Instead, it leverages algebraic data types, specifically <code>Option&lt;T&gt;</code> and <code>Result&lt;T, E&gt;</code>, to represent and propagate errors. Together with the concise <code>!</code> short-circuit operator, your error handling will be clearer and more direct than nested pattern matches.</p>
 <h3 id="3-pattern-matching"><a class="header" href="#3-pattern-matching">3. <a href="#pattern-matching">Pattern Matching</a></a></h3>
-<p>As one of Toka’s most expressive features, pattern matching allows you to deconstruct Shapes and dispatch logic intuitively. Here, you will understand how variable patterns binding and shadowing work under the hood, and learn to combine patterns with <code>if</code> guards for precise range and boundary checks.</p>
+<p>Pattern matching allows you to deconstruct Shapes and dispatch logic intuitively. Here, you will understand how variable patterns binding and shadowing work under the hood, and learn to combine patterns with <code>if</code> guards for precise range and boundary checks.</p>
 <h3 id="4-concurrency"><a class="header" href="#4-concurrency">4. <a href="#concurrency">Concurrency</a></a></h3>
-<p>How do you make your code run safely across multiple CPU cores? Toka provides extremely lightweight and safe coroutines and threading primitives, helping you build high-throughput concurrent systems without deadlocks or data races.</p>
+<p>Toka provides coroutines and threading primitives to build concurrent systems safely.</p>
 <hr>
 <blockquote class="blockquote-tag blockquote-tag-tip">
 <p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
 <p><strong>Mental Model Shift</strong>
-When reading this chapter, forget the heavy inheritance hierarchies and runtime polymorphism overhead of traditional object-oriented languages (like Java/C++). Toka achieves polymorphism at compile time through <strong>Shape deconstruction, Trait constraints, and Pattern Matching</strong>. Combined with the Hat Principle, your advanced code will be both safe and blazing fast.</p>
+When reading this chapter, focus on alternative solutions to inheritance and runtime polymorphism. Toka achieves polymorphism at compile time through <strong>Shape deconstruction, Trait constraints, and Pattern Matching</strong>. Combined with the Hat Principle, your code will be both safe and highly efficient.</p>
 </blockquote>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="generics"><a class="header" href="#generics">Generics</a></h1>
@@ -1155,7 +1155,7 @@ auto p = pair(1, "world")  // Pair&lt;i32, str&gt;
 </div>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h1>
-<p>Toka provides robust, type-safe error handling through the <code>Result</code> and <code>Option</code> types. This model, rooted in Algebraic Data Types (ADTs), traces its origins back to the ML language family (such as Standard ML and OCaml) and was later formalized in Haskell as the Monadic <code>Maybe</code> and <code>Either</code> types. More recently, Rust popularized this elegant approach within modern systems programming. Toka inherits this rich academic and engineering heritage, further refining it with highly expressive language-level syntax—such as the <code>!</code> operator for error propagation—to deliver a cleaner, more concise developer experience.</p>
+<p>Toka provides type-safe error handling through the <code>Result</code> and <code>Option</code> types. This model, rooted in Algebraic Data Types (ADTs), traces its origins back to the ML language family (such as Standard ML and OCaml) and Haskell. Rust later popularized this approach within modern systems programming. Toka adopts this model, combining it with language-level syntax—such as the <code>!</code> operator for error propagation—to deliver a concise developer experience.</p>
 <h2 id="the-option-type"><a class="header" href="#the-option-type">The Option Type</a></h2>
 <p>Use <code>Option</code> for values that may or may not exist:</p>
 <pre><code class="language-toka">import core/option::{Option}
@@ -1429,7 +1429,7 @@ fn main() -&gt; i32 {
 <h1 id="standard-library-overview"><a class="header" href="#standard-library-overview">Standard Library Overview</a></h1>
 <p>Toka’s standard library provides a comprehensive set of modules for everyday programming tasks.</p>
 <h2 id="module-structure"><a class="header" href="#module-structure">Module Structure</a></h2>
-<p>The standard library is organized into three tiers:</p>
+<p>The standard library is organized into four tiers:</p>
 <h3 id="libcore--core-language-primitives"><a class="header" href="#libcore--core-language-primitives"><code>lib/core/</code> — Core Language Primitives</a></h3>
 <p>These modules provide the fundamental types and traits that the language itself depends on:</p>
 <div class="table-wrapper">
@@ -1448,8 +1448,24 @@ fn main() -&gt; i32 {
 </tbody>
 </table>
 </div>
+<h3 id="libsys--low-level-system-primitives"><a class="header" href="#libsys--low-level-system-primitives"><code>lib/sys/</code> — Low-level System Primitives</a></h3>
+<p>These modules provide direct bindings and primitives interacting with the operating system and low-level runtime:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Module</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>libc</code></td><td>Platform-dependent C standard library API declarations and bindings</td></tr>
+<tr><td><code>termios</code></td><td>Low-level Tty terminal mode and control attributes configuration</td></tr>
+<tr><td><code>thread</code></td><td>Lower-level OS native thread interfaces</td></tr>
+<tr><td><code>sync</code></td><td>OS-level synchronization primitives and lock implementations</td></tr>
+<tr><td><code>linux</code> / <code>macos</code> / <code>windows</code></td><td>Platform-specific system calls and bindings</td></tr>
+</tbody>
+</table>
+</div>
 <h3 id="libstd--standard-library"><a class="header" href="#libstd--standard-library"><code>lib/std/</code> — Standard Library</a></h3>
-<p>Ready-to-use standard modules for application development (Complete List):</p>
+<p>Ready-to-use standard modules for application development:</p>
 <div class="table-wrapper">
 <table>
 <thead>
@@ -1472,7 +1488,7 @@ fn main() -&gt; i32 {
 <tr><td><code>path</code></td><td>Cross-platform file path parsing and manipulation (<code>Path</code> / <code>PathBuf</code>)</td></tr>
 <tr><td><code>env</code></td><td>Environment variables, process arguments, and system context interaction</td></tr>
 <tr><td><code>process</code></td><td>Subprocess spawning, state control, and pipe communication</td></tr>
-<tr><td><code>thread</code></td><td>Native system-level thread management and lifecycle control (<code>Thread</code>)</td></tr>
+<tr><td><code>thread</code></td><td>OS native thread management and lifecycle control (<code>Thread</code>)</td></tr>
 <tr><td><code>sync</code></td><td>Thread synchronization primitives (<code>Mutex</code> / <code>Condvar</code> / <code>WaitGroup</code>)</td></tr>
 <tr><td><code>atomic</code></td><td>Hardware-level atomic operations and lock-free sync primitives</td></tr>
 <tr><td><code>mpsc</code></td><td>Multi-producer single-consumer (MPSC) thread concurrency channel</td></tr>
@@ -1481,12 +1497,10 @@ fn main() -&gt; i32 {
 <tr><td><code>math</code></td><td>Common mathematical functions and limit constants</td></tr>
 <tr><td><code>rand</code></td><td>Pseudo-random number generator and random utilities</td></tr>
 <tr><td><code>time</code></td><td>System time and monotonic durations (<code>Duration</code> / <code>Instant</code>)</td></tr>
-<tr><td><code>log</code></td><td>Basic logging utilities and severity filtering</td></tr>
 <tr><td><code>fmt</code></td><td>Text formatting and debug printing utilities (<code>Format</code>)</td></tr>
 <tr><td><code>memory</code></td><td>Low-level memory allocation, region copying, and raw pointer helpers</td></tr>
 <tr><td><code>error</code></td><td>Common error traits (<code>Error</code>) and failure base definitions</td></tr>
 <tr><td><code>panic</code></td><td>Runtime fatal error triggering, intercepting, and stack hooks</td></tr>
-<tr><td><code>termios</code></td><td>Low-level Tty terminal mode and control attributes configuration</td></tr>
 </tbody>
 </table>
 </div>
@@ -1498,6 +1512,7 @@ fn main() -&gt; i32 {
 <tr><th>Module</th><th>Description</th></tr>
 </thead>
 <tbody>
+<tr><td><code>log</code></td><td>Basic logging utilities and severity filtering</td></tr>
 <tr><td><code>net/http</code></td><td>HTTP client and server</td></tr>
 <tr><td><code>net/url</code></td><td>URL parsing</td></tr>
 <tr><td><code>serde/json</code></td><td>JSON serialization</td></tr>
@@ -2419,13 +2434,13 @@ fn example() {
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="appendix"><a class="header" href="#appendix">Appendix</a></h1>
 <p>To help you fully master the Toka language, this <strong>Appendix</strong> provides a wealth of reference materials and practical development tools.</p>
-<p>For developers coming to Toka from other mainstream languages (such as C++, Rust, or Go), this appendix is dedicated to alleviating your <strong>mental model baggage</strong> and providing a seamless transition and smooth migration guide.</p>
+<p>For developers coming to Toka from other mainstream languages (such as C++, Rust, or Go), this appendix is designed to help you smoothly transition and migrate to Toka.</p>
 <hr>
 <h2 id="appendix-reference-directory"><a class="header" href="#appendix-reference-directory">Appendix Reference Directory</a></h2>
 <p>This appendix consists of the following three core reference modules:</p>
 <h3 id="1-toka-vs-other-languages"><a class="header" href="#1-toka-vs-other-languages">1. <a href="#toka-vs-other-languages">Toka vs. Other Languages</a></a></h3>
 <ul>
-<li><strong>Contents</strong>: While Toka draws inspiration from various modern languages, it introduces highly unique concepts (such as dereferencing “wearing/removing a hat,” which is the exact opposite of C++). This chapter provides clear comparison tables and side-by-side code snippets comparing Toka with <strong>C/C++, Rust, and Go</strong> to help you quickly build an accurate comparative mental model.</li>
+<li><strong>Contents</strong>: While Toka draws inspiration from various modern languages, it introduces unique concepts (such as dereferencing “wearing/removing a hat,” which is the exact opposite of C++). This chapter provides clear comparison tables and side-by-side code snippets comparing Toka with <strong>C/C++, Rust, and Go</strong> to help you quickly build an accurate comparative mental model.</li>
 </ul>
 <h3 id="2-migration-guide"><a class="header" href="#2-migration-guide">2. <a href="#migration-guide">Migration Guide</a></a></h3>
 <ul>
@@ -2433,13 +2448,13 @@ fn example() {
 </ul>
 <h3 id="3-faq"><a class="header" href="#3-faq">3. <a href="#frequently-asked-questions">FAQ</a></a></h3>
 <ul>
-<li><strong>Contents</strong>: A compilation of the most common pitfalls and questions from the developer community. From beginner confusion like “why can’t I use curly braces to define Shapes” to deeper questions like “how does pointer rebinding work inside method calls,” this chapter offers direct answers and diagnostic compiler error explanations to clear any compiler mist.</li>
+<li><strong>Contents</strong>: A compilation of the most common pitfalls and questions from the developer community. From beginner confusion like “why can’t I use curly braces to define Shapes” to deeper questions like “how does pointer rebinding work inside method calls,” this chapter offers direct answers and diagnostic compiler error explanations to help resolve build-time issues.</li>
 </ul>
 <hr>
 <blockquote class="blockquote-tag blockquote-tag-note">
 <p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
 <p><strong>Continuous Learning &amp; Community Support</strong>
-Programming is an art of practice, and Toka is rapidly evolving. If you encounter any issues or discover bugs while coding or reading this manual, you are highly encouraged to submit an Issue or Pull Request to the official repository. We hope this manual becomes your most trusted companion in exploring the low-level systems world!</p>
+Programming is an art of practice, and Toka is rapidly evolving. If you encounter any issues or discover bugs while coding or reading this manual, you are highly encouraged to submit an Issue or Pull Request to the official repository. We hope this manual becomes a helpful companion in exploring the low-level systems world!</p>
 </blockquote>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="toka-vs-other-languages"><a class="header" href="#toka-vs-other-languages">Toka vs Other Languages</a></h1>
