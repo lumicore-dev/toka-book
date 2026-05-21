@@ -1,6 +1,6 @@
 # Error Handling
 
-Toka provides robust error handling through the Result and Option types, inspired by Rust but with a cleaner syntax.
+Toka provides robust, type-safe error handling through the `Result` and `Option` types. This model, rooted in Algebraic Data Types (ADTs), traces its origins back to the ML language family (such as Standard ML and OCaml) and was later formalized in Haskell as the Monadic `Maybe` and `Either` types. More recently, Rust popularized this elegant approach within modern systems programming. Toka inherits this rich academic and engineering heritage, further refining it with highly expressive language-level syntax—such as the `!` operator for error propagation—to deliver a cleaner, more concise developer experience.
 
 ## The Option Type
 

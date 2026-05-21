@@ -1,6 +1,6 @@
 # 错误处理
 
-Toka 通过 Result 和 Option 类型提供强大的错误处理能力，灵感来自 Rust，但语法更简洁。
+Toka 通过 `Result` 和 `Option` 类型提供强大的类型安全错误处理能力。这种基于代数数据类型（ADT）的错误处理模型源远流长，最早可追溯到 ML 语言家族（如 Standard ML、OCaml）中的 `option` 类型，并由 Haskell 作为 Monad（`Maybe` / `Either`）进行了形式化推广。近来，Rust 将这一优雅的模型成功引入到了现代系统级编程中。Toka 继承了这一优秀的学术与工程传统，并通过更具表现力的语言级语法（如用于错误传播的 `!` 操作符）使其更加简洁易用。
 
 ## Option 类型
 
