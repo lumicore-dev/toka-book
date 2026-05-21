@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-39f8f015.js";
+            window.path_to_searchindex_js = "searchindex-88bbf154.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -204,8 +204,8 @@
 <p>This book is kept up-to-date with the latest Toka compiler development. The current version of this documentation is aligned with:</p>
 <ul>
 <li><strong>Compiler Version</strong>: <code>v0.9.7</code></li>
-<li><strong>Toka Commit</strong>: <code>13f032a</code> (Support kebab-case package names and namespace parsing while enforcing hyphen-free variable declarations)</li>
-<li><strong>Tag</strong>: <code>v0.9.7-26-g13f032a</code></li>
+<li><strong>Toka Commit</strong>: <code>b3f8940</code> (Complete termios and prelude audit refactoring, support kebab-case package names and namespace parsing, and enforce hyphen-free variable declarations)</li>
+<li><strong>Tag</strong>: <code>v0.9.7-02</code></li>
 </ul>
 <h2 id="a-note-from-the-author"><a class="header" href="#a-note-from-the-author">A Note From the Author</a></h2>
 <p>Toka is a young but ambitious language. This guide was written alongside the language’s development to help early adopters get started. As Toka evolves, this book will evolve with it.</p>
@@ -262,7 +262,7 @@ export TOKA_LIB="$HOME/.toka/lib"
 <pre><code class="language-bash">tokac --version
 </code></pre>
 <p>You should see output similar to:</p>
-<pre><code>toka version 0.9.6 (Built: May 17 2026)
+<pre><code>toka version 0.9.7 (Built: May 21 2026)
 </code></pre>
 <h2 id="building-from-source"><a class="header" href="#building-from-source">Building from Source</a></h2>
 <p>For the latest development version:</p>
@@ -720,7 +720,7 @@ println("{}{}Success!{}", green, "Build complete", reset)
 <pre><code class="language-toka">import std/io::println
 
 auto name = "Toka"
-auto version = "0.9.6"
+auto version = "0.9.7"
 println("Welcome to {} version {}!", name, version)
 </code></pre>
 <h2 id="string-concatenation"><a class="header" href="#string-concatenation">String Concatenation</a></h2>
@@ -758,57 +758,59 @@ auto unicode: u32 = 0x4E16:u32
 <p>The string system is defined in <code>lib/core/str.tk</code> and <code>lib/core/utf8.tk</code> for UTF-8 handling.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="the-hat-principle"><a class="header" href="#the-hat-principle">The Hat Principle</a></h1>
-<p>The <strong>Hat Principle</strong> is the core concept behind Toka’s memory safety model. Instead of requiring developers to annotate lifetimes or manually manage memory, Toka uses visible syntactic tokens called “hats” to track ownership and memory semantics at compile time.</p>
+<p>The <strong>Hat Principle</strong> is the foundational design philosophy behind Toka’s memory safety model. Rather than forcing developers to write complex lifetime annotations (as in Rust) or relying on a runtime Garbage Collector (as in Go or Java), Toka introduces visible syntactic tokens called <strong>“Hats”</strong> to track ownership, resource lifetimes, and access permissions at compile time.</p>
+<hr>
 <h2 id="what-is-a-hat"><a class="header" href="#what-is-a-hat">What is a Hat?</a></h2>
-<p>A <strong>hat</strong> is a sigil (symbol) attached to an identifier that tells both the programmer and the compiler how that value is stored, owned, and accessed. Toka has four hat types:</p>
+<p>In Toka, a <strong>Hat</strong> is a syntactic sigil (symbol) attached directly to an identifier. This explicit notation tells both the programmer and the compiler’s safety analysis engine exactly how a resource is stored, owned, and accessed.</p>
+<p>Toka defines four primitive Hat typologies:</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>Hat</th><th>Name</th><th>Meaning</th></tr>
+<tr><th style="text-align: center">Hat Sigil</th><th>Typology</th><th>Semantic Description</th><th>Allocation Context</th></tr>
 </thead>
 <tbody>
-<tr><td><code>*</code></td><td>Raw Pointer</td><td>Low-level pointer, requires <code>unsafe</code> / <code>alloc</code></td></tr>
-<tr><td><code>^</code></td><td>Unique Pointer</td><td>Exclusive ownership of a heap-allocated resource (like <code>Box</code> in Rust)</td></tr>
-<tr><td><code>~</code></td><td>Shared Pointer</td><td>Reference-counted shared ownership</td></tr>
-<tr><td><code>&amp;</code></td><td>Borrow Pointer</td><td>Reference/borrow of another value</td></tr>
+<tr><td style="text-align: center"><code>*</code></td><td><strong>Raw Pointer</strong></td><td>Unsafe, low-level pointer with manual lifecycle management</td><td>Heap or Address-of</td></tr>
+<tr><td style="text-align: center"><code>^</code></td><td><strong>Unique Pointer</strong></td><td>Safe, exclusive ownership of a heap-allocated resource (Auto-free)</td><td>Heap (<code>new</code>)</td></tr>
+<tr><td style="text-align: center"><code>~</code></td><td><strong>Shared Pointer</strong></td><td>Safe, reference-counted shared ownership</td><td>Heap (<code>new</code>)</td></tr>
+<tr><td style="text-align: center"><code>&amp;</code></td><td><strong>Borrow Pointer</strong></td><td>Safe, compile-time borrow/reference to another soul’s data</td><td>Existing Soul</td></tr>
 </tbody>
 </table>
 </div>
-<h2 id="handle-vs-soul"><a class="header" href="#handle-vs-soul">Handle vs. Soul</a></h2>
-<p>One of Toka’s most elegant design features is the <strong>Handle vs. Soul</strong> distinction. It eliminates the need for explicit dereferencing operators:</p>
+<hr>
+<h2 id="handle-vs-soul-dereference-free-aesthetics"><a class="header" href="#handle-vs-soul-dereference-free-aesthetics">Handle vs. Soul: Dereference-Free Aesthetics</a></h2>
+<p>A major ergonomic breakthrough of the Hat Principle is the strict bifurcation between a pointer’s container and its underlying data:</p>
 <ul>
-<li><strong>Handle (The Hat)</strong>: Identifiers <strong>with</strong> a sigil (<code>^p</code>, <code>*p</code>, <code>~p</code>) represent the <em>pointer container</em> itself.</li>
-<li><strong>Soul (The Data)</strong>: Identifiers <strong>without</strong> a sigil (<code>p</code>) represent the <em>underlying data</em>.</li>
+<li><strong>Handle (The Hat)</strong>: An identifier <strong>with</strong> its sigil (<code>^ptr</code>, <code>*ptr</code>, <code>~ptr</code>) represents the <em>pointer container</em> itself (the metadata holding the address).</li>
+<li><strong>Soul (The Data)</strong>: An identifier <strong>without</strong> its sigil (<code>ptr</code>) represents the <em>underlying data</em> (the actual value).</li>
 </ul>
-<p>When you want to read or modify the value a pointer points to, you simply operate on the <strong>soul</strong> directly — no dereference token needed:</p>
-<pre><code class="language-toka">fn raw_ptr_example() {
-    unsafe {
-        auto *p# = alloc i32
-        p = 99
-        println("raw: {}", p)
-    }
-}
-</code></pre>
-<p>This is a major quality-of-life improvement over C’s <code>*p = 200</code> or Rust’s <code>*p = 200</code>. Toka’s approach makes pointer-heavy code much more readable.</p>
-<h2 id="how-the-pal-checker-uses-hats"><a class="header" href="#how-the-pal-checker-uses-hats">How the PAL Checker Uses Hats</a></h2>
-<p>The PAL (Pointer Analysis Layer) Checker analyzes hat usage at compile time to enforce the same guarantees a borrow checker provides, but without lifetime annotations:</p>
+<p>By operating directly on the <strong>Soul</strong> (omitting the sigil), Toka completely eliminates the need for explicit dereferencing operators like C’s <code>*p</code> or Rust’s <code>*p</code>. For example, <code>ptr.x = 42</code> directly mutates the underlying heap data without manual dereferencing.</p>
+<hr>
+<h2 id="the-pointer-analysis-layer-pal"><a class="header" href="#the-pointer-analysis-layer-pal">The Pointer Analysis Layer (PAL)</a></h2>
+<p>The compiler’s <strong>Pointer Analysis Layer (PAL) Checker</strong> inspects Hat configurations during compilation to statically enforce strict safety guarantees:</p>
 <ol>
-<li><strong>No use after move</strong> — A <code>^</code> value cannot be used after ownership has been transferred</li>
-<li><strong>No dangling references</strong> — References cannot outlive their referent</li>
-<li><strong>No double-free</strong> — Each owned value is freed exactly once</li>
-<li><strong>No data races</strong> — Mutable access is exclusive; shared access is read-only</li>
+<li><strong>Strict Move Semantics</strong>: A Unique Pointer (<code>^</code>) automatically transfers ownership on assignment. The PAL Checker blocks any “use-after-move” of the original handle.</li>
+<li><strong>Deterministic Destruction</strong>: When an owned pointer (<code>^</code> or the last <code>~</code>) exits its declared scope, its resource is automatically freed.</li>
+<li><strong>Rigorous Borrow Checking</strong>: Borrow Pointers (<code>&amp;</code>) are checked to ensure they never outlive the underlying Soul, preventing dangling references.</li>
+<li><strong>Data Race Prevention</strong>: The PAL Checker ensures that mutable access (<code>#</code>) is exclusive, while shared access is read-only.</li>
 </ol>
+<hr>
+<h2 id="learning-path"><a class="header" href="#learning-path">Learning Path</a></h2>
+<p>To master the Hat Principle, explore the following sections in order:</p>
+<ul>
+<li><strong><a href="#soul--identity">Soul &amp; Identity</a></strong>: Master the Handle/Soul split, implicit dereferencing, and the syntax of member borrowings (including standard parentheses and Hat-Terminal Morphology).</li>
+<li><strong><a href="#ownership--hats">Ownership &amp; Hats</a></strong>: Explore the four ownership models, default moves versus copying, the <code>cede</code> keyword, and the visual distinction between mutable local declarations and mutable method call receivers.</li>
+<li><strong><a href="#memory-safety--pal">Memory Safety &amp; PAL</a></strong>: Deep dive into the Pointer Analysis Layer and see how Toka achieves zero-overhead compile-time memory safety.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="soul--identity"><a class="header" href="#soul--identity">Soul &amp; Identity</a></h1>
-<p>Toka’s Hat Principle introduces a clear distinction between a pointer’s <strong>handle</strong> (the container) and its <strong>soul</strong> (the underlying data). Understanding this split is key to mastering Toka’s memory model.</p>
-<h2 id="handle-vs-soul-1"><a class="header" href="#handle-vs-soul-1">Handle vs. Soul</a></h2>
-<p>Every pointer in Toka has two aspects:</p>
+<p>Toka’s Hat Principle introduces a strict, beautiful distinction between a pointer’s <strong>Handle</strong> (its syntactic container) and its <strong>Soul</strong> (its underlying data). Mastering this separation is essential to understanding Toka’s modern, dereference-free memory aesthetics.</p>
+<hr>
+<h2 id="handle-vs-soul"><a class="header" href="#handle-vs-soul">Handle vs. Soul</a></h2>
+<p>Every pointer identifier in Toka possesses two distinct aspects in syntax and memory:</p>
 <ul>
-<li><strong>Handle (The Hat)</strong>: The identifier <em>with</em> its sigil (<code>^p</code>, <code>*p</code>, <code>~p</code>). This represents the pointer container itself — the memory location that holds the address.</li>
-<li><strong>Soul (The Data)</strong>: The identifier <em>without</em> the sigil (<code>p</code>). This represents the underlying value being pointed to.</li>
+<li><strong>Handle (The Hat)</strong>: An identifier prefixed <strong>with</strong> its pointer sigil (<code>^p</code>, <code>*p</code>, <code>~p</code>). It represents the physical <em>pointer container</em> in memory—the slot holding the target memory address.</li>
+<li><strong>Soul (The Data)</strong>: An identifier written <strong>without</strong> its sigil (<code>p</code>). It represents the <em>underlying data/resource</em> being pointed to.</li>
 </ul>
-<h2 id="implicit-dereferencing"><a class="header" href="#implicit-dereferencing">Implicit Dereferencing</a></h2>
-<p>Toka’s killer feature is <strong>implicit dereferencing</strong>: you never need a <code>*</code> or <code>-&gt;</code> operator to access the data behind a pointer. Just use the soul directly:</p>
 <pre><code class="language-toka">fn handle_soul_example() {
     auto ^p# = new Point(x=10, y=20)
     p.x = 30
@@ -816,55 +818,73 @@ auto unicode: u32 = 0x4E16:u32
     println("sum: {}", sum)
 }
 </code></pre>
-<p>This is a massive ergonomic improvement over C (<code>p-&gt;x = 30</code>) or Rust (<code>(*p).x = 30</code>).</p>
-<h2 id="the-four-hats"><a class="header" href="#the-four-hats">The Four Hats</a></h2>
-<p>Each hat sigil carries different ownership semantics:</p>
-<h3 id="--raw-pointer"><a class="header" href="#--raw-pointer"><code>*</code> — Raw Pointer</a></h3>
-<p>Low-level, unsafe pointer. Requires <code>unsafe</code> keyword or explicit <code>alloc</code>:</p>
-<pre><code class="language-toka">fn raw_pointer_example() {
+<p>In the example above, <code>^p#</code> is the mutable unique handle, while <code>p.x</code> directly accesses the field of the underlying <code>Point</code> soul.</p>
+<hr>
+<h2 id="ergonomic-implicit-dereferencing"><a class="header" href="#ergonomic-implicit-dereferencing">Ergonomic Implicit Dereferencing</a></h2>
+<p>Toka completely eliminates the visual clutter of traditional dereferencing operators (such as C’s <code>*p</code> / <code>p-&gt;</code> or Rust’s <code>*p</code>).</p>
+<p>Whenever you need to read, write, or access fields of the data behind a pointer, you simply operate directly on its <strong>Soul</strong> (the identifier without its sigil). The Toka compiler automatically resolves this to a dereference operation under the hood with zero runtime overhead:</p>
+<pre><code class="language-toka">fn implicit_deref_example() {
     unsafe {
         auto *p# = alloc i32
-        p = 42
-        println("raw: {}", p)
+        p = 100
+        auto val = p
+        println("val: {}", val)
     }
 }
 </code></pre>
-<h3 id="--unique-pointer"><a class="header" href="#--unique-pointer"><code>^</code> — Unique Pointer</a></h3>
-<p>Exclusive ownership of a heap-allocated resource. Created with <code>new</code>:</p>
-<pre><code class="language-toka">fn unique_pointer_example() {
-    auto ^p = new i32(42)
-    auto ^q = ^p
-    println("unique: {}", q)
-}
-</code></pre>
-<h3 id="--shared-pointer"><a class="header" href="#--shared-pointer"><code>~</code> — Shared Pointer</a></h3>
-<p>Reference-counted, shared ownership via pointer morphology.</p>
-<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
-auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
-auto ~s2# = ~s1 // Shared Copy (ref count increments)
-s2.x = 3000     // Modifies the underlying soul
-</code></pre>
-<h3 id="--borrow-pointer"><a class="header" href="#--borrow-pointer"><code>&amp;</code> — Borrow Pointer</a></h3>
-<p>A reference or borrow pointer to another value. Created explicitly via <code>&amp;</code> to refer to an existing soul:</p>
-<pre><code class="language-toka">auto x = 42
-auto &amp;y = &amp;(x) // y is a borrow pointer pointing to the soul of x
-</code></pre>
-<h2 id="identity-and-address"><a class="header" href="#identity-and-address">Identity and Address</a></h2>
-<p>To get the raw memory address of a local variable, use the <code>*(expr)</code> syntax:</p>
+<p>This implicit dereferencing brings a clean, script-like syntax to high-performance systems programming, drastically increasing code readability.</p>
+<hr>
+<h2 id="identity-the-address-of-operator-expr"><a class="header" href="#identity-the-address-of-operator-expr">Identity: The Address-Of Operator <code>*(expr)</code></a></h2>
+<p>To retrieve the raw, physical memory address of a local variable or resource, Toka provides the一元 <strong><code>*(expr)</code></strong> syntax. This returns a raw pointer <code>*T</code> pointing to the variable’s location:</p>
 <pre><code class="language-toka">fn address_of_example() {
     auto a# = 42
     auto *raw_ptr = *(a)
     println("addr: {}", raw_ptr)
 }
 </code></pre>
-<p>The hat (<code>^</code>) does <strong>not</strong> mean “address of”. It specifically denotes the unique pointer container.</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>The Hat sigil (like <code>^</code> or <code>~</code>) does <strong>not</strong> mean “address of”. Sigils are strictly type specifiers for pointer handles, whereas <code>*(expr)</code> is the runtime operator to extract a memory address.</p>
+</blockquote>
+<hr>
+<h2 id="references-and-the-borrow-pointer-"><a class="header" href="#references-and-the-borrow-pointer-">References and the Borrow Pointer <code>&amp;</code></a></h2>
+<p>A <strong>Borrow Pointer (<code>&amp;</code>)</strong> is a reference that allows safe, temporary, and compiler-checked access to a Soul without taking ownership of it.</p>
+<h3 id="clean-local-variable-borrowing"><a class="header" href="#clean-local-variable-borrowing">Clean Local Variable Borrowing</a></h3>
+<p>When borrowing a standard, non-member local variable, <strong>no parentheses are needed</strong>. Simply prefix the soul with <code>&amp;</code> to create a borrow pointer:</p>
+<pre><code class="language-toka">auto x = 42
+auto &amp;y = &amp;x // y is a borrow pointer pointing directly to the soul of x
+</code></pre>
+<h3 id="the-member-access-chain-borrow-ambiguity"><a class="header" href="#the-member-access-chain-borrow-ambiguity">The Member Access Chain Borrow Ambiguity</a></h3>
+<p>When attempting to borrow a specific field within a struct or shape (a member access chain), writing <code>&amp;pt.x</code> is <strong>syntactically ambiguous</strong>. It is unclear whether you want to borrow the entire member chain <code>&amp;(pt.x)</code> or access the member <code>x</code> on a borrowed pointer <code>(&amp;pt).x</code>.</p>
+<p>To protect readability and safety, the Toka compiler rejects <code>&amp;pt.x</code> with a compile error and requires one of two extremely elegant and legal options:</p>
+<ol>
+<li><strong>Option A (Standard Parentheses)</strong>: Explicitly wrap the member chain in parentheses: <code>&amp;(pt.x)</code>.</li>
+<li><strong>Option B (Hat-Terminal Morphology)</strong>: Place the <code>&amp;</code> borrow sigil directly before the terminal field name: <strong><code>pt.&amp;x</code></strong>.</li>
+</ol>
+<p><code>pt.&amp;x</code> is Toka’s signature aesthetic, showcasing how pointer morphology seamlessly integrates into member access chains.</p>
+<pre><code class="language-toka">fn borrow_example() {
+    auto x = 42
+    auto &amp;y = &amp;x // Clean local variable borrow, no parentheses needed!
+    
+    auto pt = Point(x = 10, y = 20)
+    
+    // Member borrow Path A: standard parentheses
+    auto &amp;rx1 = &amp;(pt.x)
+    
+    // Member borrow Path B: Hat-Terminal Morphology (Toka's signature aesthetic)
+    auto &amp;rx2 = pt.&amp;x
+    
+    println("y: {}, rx1: {}, rx2: {}", y, rx1, rx2)
+}
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="ownership--hats"><a class="header" href="#ownership--hats">Ownership &amp; Hats</a></h1>
-<p>Ownership in Toka is governed by the Hat Principle. Each hat sigil communicates a different ownership model directly through syntax.</p>
+<p>Ownership in Toka is governed entirely by the Hat Principle. Rather than hiding allocations behind a generic type system, Toka uses distinct hat sigils to make a value’s ownership model, copy/move semantics, and access permissions immediately clear directly in the syntax.</p>
+<hr>
 <h2 id="four-ownership-models"><a class="header" href="#four-ownership-models">Four Ownership Models</a></h2>
-<p>Toka defines four pointer types, each with distinct ownership semantics:</p>
-<h3 id="--raw-pointer-unsafe"><a class="header" href="#--raw-pointer-unsafe"><code>*</code> — Raw Pointer (Unsafe)</a></h3>
-<p>Raw pointers require explicit <code>unsafe</code> or <code>alloc</code> to create and manage:</p>
+<p>Toka defines four pointer typologies, each supporting a distinct resource management strategy:</p>
+<h3 id="1---raw-pointer-manual-lifecycle"><a class="header" href="#1---raw-pointer-manual-lifecycle">1. <code>*</code> — Raw Pointer (Manual Lifecycle)</a></h3>
+<p>Low-level raw pointers provide zero compile-time safety and must be managed manually within an <code>unsafe</code> block:</p>
 <pre><code class="language-toka">fn raw_ptr_example() {
     unsafe {
         auto *p# = alloc i32
@@ -873,31 +893,28 @@ auto &amp;y = &amp;(x) // y is a borrow pointer pointing to the soul of x
     }
 }
 </code></pre>
-<p>Raw pointers are used when interfacing with C code or implementing low-level data structures.</p>
-<h3 id="--unique-pointer-move-semantics"><a class="header" href="#--unique-pointer-move-semantics"><code>^</code> — Unique Pointer (Move Semantics)</a></h3>
-<p>Unique pointers provide exclusive ownership. Only one <code>^</code> can point to a given resource at any time. Ownership is transferred via <strong>move</strong>:</p>
+<h3 id="2---unique-pointer-exclusive-heap-ownership"><a class="header" href="#2---unique-pointer-exclusive-heap-ownership">2. <code>^</code> — Unique Pointer (Exclusive Heap Ownership)</a></h3>
+<p>Unique pointers enforce strict exclusive ownership. Only one <code>^</code> handle can point to a heap resource at a time. When a unique pointer exits its scope, its bound memory is automatically freed:</p>
 <pre><code class="language-toka">fn unique_ptr_example() {
     auto ^p = new i32(42)
     auto ^q = ^p
     println("unique: {}", q)
 }
 </code></pre>
-<p>The <code>^</code> token operates like Rust’s <code>Box</code> or C++’s <code>std::unique_ptr</code>. When a unique pointer goes out of scope, its resource is automatically freed.</p>
-<h3 id="--shared-pointer-reference-counted"><a class="header" href="#--shared-pointer-reference-counted"><code>~</code> — Shared Pointer (Reference-Counted)</a></h3>
-<p>Shared pointers enable multiple owners via reference counting:</p>
+<h3 id="3---shared-pointer-reference-counted-heap-ownership"><a class="header" href="#3---shared-pointer-reference-counted-heap-ownership">3. <code>~</code> — Shared Pointer (Reference-Counted Heap Ownership)</a></h3>
+<p>Shared pointers allow multiple handles to share ownership of the same heap-allocated resource via thread-safe reference counting. The resource is automatically freed when the last <code>~</code> handle goes out of scope:</p>
 <pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
-auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s1# = new Point(x = 100, y = 200, z = 0)
 auto ~s2# = ~s1  // Shared Copy (ref count increments)
-s2.x = 3000      // Modifies the underlying soul
+s2.x = 300       // Directly mutates the underlying soul
 </code></pre>
-<p>The resource is freed when the last <code>~</code> reference goes out of scope.</p>
-<h3 id="--borrow-pointer-reference-semantics"><a class="header" href="#--borrow-pointer-reference-semantics"><code>&amp;</code> — Borrow Pointer (Reference Semantics)</a></h3>
-<p>Borrow pointers represent references to other values without taking ownership. They allow temporary, checked access to data:</p>
-<pre><code class="language-toka">auto x = 42
-auto &amp;y = &amp;(x)   // Local borrow pointer pointing to the soul of x
-</code></pre>
-<h2 id="moving-vs-copying"><a class="header" href="#moving-vs-copying">Moving vs Copying</a></h2>
-<p>By default, assignment in Toka performs a <strong>copy</strong> (value copy for simple types, and shallow copy for shapes and complex types):</p>
+<h3 id="4---borrow-pointer-reference-semantics"><a class="header" href="#4---borrow-pointer-reference-semantics">4. <code>&amp;</code> — Borrow Pointer (Reference Semantics)</a></h3>
+<p>Borrow pointers represent temporary, compiler-checked references to existing souls without taking ownership, strictly governed by the Pointer Analysis Layer (PAL).</p>
+<hr>
+<h2 id="moving-vs-copying"><a class="header" href="#moving-vs-copying">Moving vs. Copying</a></h2>
+<p>Toka has clear rules to distinguish between copying data and transferring ownership:</p>
+<h3 id="default-copy-semantics"><a class="header" href="#default-copy-semantics">Default Copy Semantics</a></h3>
+<p>By default, standard assignments in Toka perform a <strong>copy</strong> (value copies for simple scalar types like <code>i32</code>/<code>bool</code>, and shallow copies for standard complex <code>shape</code> types):</p>
 <pre><code class="language-toka">fn move_copy_example() {
     auto a# = 42
     auto b = a
@@ -905,21 +922,22 @@ auto &amp;y = &amp;(x)   // Local borrow pointer pointing to the soul of x
     println("a: {}, b: {}", a, b)
 }
 </code></pre>
-<p>This applies to both simple types (like <code>i32</code>, <code>f64</code>, <code>bool</code>) and complex types (like <code>String</code>, <code>Vec</code>, or custom <code>shape</code> types).</p>
-<h3 id="default-move-semantics"><a class="header" href="#default-move-semantics">Default Move Semantics</a></h3>
-<p>By default, <strong>move semantics</strong> apply exclusively to <strong>Unique Pointers (<code>^</code>)</strong>. Assignment of a unique pointer transfers exclusive ownership of its heap-allocated resource from the source to the destination:</p>
+<h3 id="default-move-semantics-unique-pointers"><a class="header" href="#default-move-semantics-unique-pointers">Default Move Semantics (Unique Pointers)</a></h3>
+<p>Move semantics apply <strong>by default</strong> exclusively to <strong>Unique Pointers (<code>^</code>)</strong>. Assigning one unique pointer to another automatically transfers exclusive ownership from the source to the destination, rendering the source handle immediately invalid:</p>
 <pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
 auto ^p1 = new Point(x = 10, y = 20, z = 0)
-auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid
+auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid!
 </code></pre>
 <h3 id="explicit-move-with-cede"><a class="header" href="#explicit-move-with-cede">Explicit Move with <code>cede</code></a></h3>
-<p>For other types (or to explicitly transfer ownership of any value), you must use the <strong><code>cede</code> keyword</strong> to perform an explicit move. Once a value is ceded, the source variable is no longer valid:</p>
+<p>For other types (such as custom shapes or <code>String</code>), copy semantics are used by default. To explicitly transfer ownership of such a value (avoiding copies), you must use the <strong><code>cede</code> keyword</strong>. Ceding transfers the resource to the destination and invalidates the source variable:</p>
 <pre><code class="language-toka">import std/string::String
 auto s1 = String::from("hello")
-auto s2 = cede s1 // Explicit move: s1 is no longer valid
+auto s2 = cede s1 // Explicit move: s1 is invalidated
 </code></pre>
-<h2 id="function-parameters-zero-copy-capture-mechanism"><a class="header" href="#function-parameters-zero-copy-capture-mechanism">Function Parameters (Zero-Copy Capture Mechanism)</a></h2>
-<p>In Toka, function parameters are immutable by default and passed via a <strong>zero-copy implicit reference capture mechanism</strong> rather than traditional pass-by-value (copying). The compiler ensures that capturing a parameter has zero runtime overhead and does not consume or copy the original argument. You don’t need special pointer sigils for standard parameter passing unless you explicitly intend to pass/rebind pointer handles:</p>
+<hr>
+<h2 id="function-parameters-zero-copy-capture"><a class="header" href="#function-parameters-zero-copy-capture">Function Parameters: Zero-Copy Capture</a></h2>
+<p>In Toka, function parameters are immutable by default and passed via an incredibly efficient <strong>zero-copy implicit reference capture mechanism</strong>.</p>
+<p>The compiler automatically passes arguments by reference under the hood with zero runtime overhead and zero copying. Therefore, you do not need special pointer sigils for standard parameter passing unless you explicitly intend to pass or rebind pointer handles:</p>
 <pre><code class="language-toka">fn process(data: i32) {
     println("data: {}", data)
 }
@@ -930,83 +948,80 @@ fn borrow_func_example() {
     println("val: {}", val)
 }
 </code></pre>
-<p>For <strong>mutable access</strong>, use <code>#</code> on the variable declaration. Note that <code>#</code> is restricted to declarations and cannot be used at call sites:</p>
+<hr>
+<h2 id="the--mutability-marker--permission-views"><a class="header" href="#the--mutability-marker--permission-views">The <code>#</code> Mutability Marker &amp; Permission Views</a></h2>
+<p>Toka introduces the <code>#</code> marker to explicitly declare and track mutable access. Its usage is governed by strict compiler lifecycles to eliminate redundant code noise while maximizing visual safety.</p>
+<h3 id="1-declaring-mutability"><a class="header" href="#1-declaring-mutability">1. Declaring Mutability</a></h3>
+<p>To declare a local variable mutable, you must append <code>#</code> to the identifier at its <strong>declaration site</strong>:</p>
 <pre><code class="language-toka">fn mutable_local_example() {
     auto val# = 42
-    val = 99
+    val = 99 // Everyday context assignment: NO '#' suffix allowed here!
     println("val: {}", val)
 }
 </code></pre>
-<h2 id="explicit-local-borrow-with-"><a class="header" href="#explicit-local-borrow-with-">Explicit Local Borrow with <code>&amp;</code></a></h2>
-<p>The <code>&amp;</code> sigil is used when <strong>explicitly declaring a local borrow pointer</strong> or returning a reference:</p>
-<pre><code class="language-toka">shape Container(val: i32)
-fn borrow_example(c: Container) -&gt; &amp;i32 &lt;- c {
-    return &amp;(c.val)
+<h3 id="2-forbidden-in-everyday-contexts-assignments"><a class="header" href="#2-forbidden-in-everyday-contexts-assignments">2. Forbidden in Everyday Contexts (Assignments)</a></h3>
+<p>Once a variable is declared mutable, its mutable state is registered in its <strong>Permission View</strong> (type system). Therefore, you must <strong>NOT</strong> append <code>#</code> to the variable in ordinary assignments or expressions:</p>
+<pre><code class="language-toka">auto val# = 42
+val = 99 // Everyday assignment: NO '#' allowed! Writing 'val# = 99' is a compiler error.
+</code></pre>
+<p>This prevents useless syntactic noise in everyday code.</p>
+<h3 id="3-required-at-mutating-method-call-sites-receiver-suffix"><a class="header" href="#3-required-at-mutating-method-call-sites-receiver-suffix">3. Required at Mutating Method Call Sites (Receiver Suffix)</a></h3>
+<p>Toka’s most elegant safety feature is that <strong>mutating method calls must be explicitly flagged at the call site</strong>.</p>
+<p>When invoking a method that mutates a shape, the compiler requires you to append the <code>#</code> suffix to the receiver object (e.g. <code>obj#.mutate()</code>). This acts as an extremely visible “mutation alarm,” signaling to readers and code auditors exactly where a resource’s soul is being modified:</p>
+<pre><code class="language-toka">shape Counter (
+    val#: i32 = 0
+)
+
+
+impl Counter@encap {
+    pub fn clone(self) -&gt; Counter {
+        return Counter(val = self.val)
+    }
+
+    fn drop(self#) {}
+
+    pub fn increment(self#) {
+        self.val = self.val + 1
+    }
 }
-fn main() -&gt; i32 {
-    auto c = Container(val = 10)
-    auto &amp;y = borrow_example(c)
-    return 0
+
+
+
+fn mutable_method_example() {
+    auto c# = Counter(val = 10) // Declaration: '#' is required for mutability
+    c#.increment()             // Mutation Site: '#' receiver suffix is required and highly visible!
+    println("c.val: {}", c.val)
 }
 </code></pre>
-<h3 id="lifetime-dependency-annotation"><a class="header" href="#lifetime-dependency-annotation">Lifetime Dependency Annotation</a></h3>
-<p>In the example above, the syntax <code>-&gt; &amp;i32 &lt;- c</code> introduces Toka’s <strong>Lifetime Dependency Annotation</strong>.</p>
-<p>When a function returns a reference derived from its parameters, the PAL Checker requires you to explicitly declare this relationship. The <code>&lt;- c</code> notation tells the compiler: <em>“The returned reference is strictly bound to the lifetime of <code>c</code>”</em>.</p>
-<p>If you omit this annotation, Toka will proactively block compilation (<code>error[E0454]</code>) to prevent accidental dangling pointers. This achieves the same rigorous memory safety as Rust’s lifetime parameters (<code>&lt;'a&gt;</code>), but with a much lighter and more intuitive syntax.</p>
-<blockquote>
-<p><strong>Note:</strong> This relationship can also be expressed using Toka’s <strong>effects</strong> annotation style. Design for advanced borrow-checked references continues to evolve.</p>
-</blockquote>
-<h2 id="the-pal-checker-in-action"><a class="header" href="#the-pal-checker-in-action">The PAL Checker in Action</a></h2>
-<p>The PAL Checker verifies at compile time that:</p>
-<ol>
-<li><strong>No use after move</strong> — A <code>^</code> value cannot be accessed after ownership transfer</li>
-<li><strong>No dangling references</strong> — Borrowed references cannot outlive the borrowed value</li>
-<li><strong>No double-free</strong> — Each value is freed exactly once</li>
-<li><strong>No data races</strong> — Mutable access is exclusive; shared access is read-only</li>
-</ol>
-<p>All of this happens <strong>without any lifetime annotations</strong>. The Hat Principle makes ownership visible in the syntax itself.</p>
+<p>By enforcing the <code>#</code> suffix strictly on <em>declarations</em> and <em>method receiver mutation sites</em>, Toka achieves a perfect balance between syntactic cleanlines and high-fidelity safety visibility.</p>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="memory-safety"><a class="header" href="#memory-safety">Memory Safety</a></h1>
-<p>Toka achieves memory safety at compile time through the <strong>PAL Checker</strong> (Pointer Analysis Layer), without needing a garbage collector, runtime overhead, or explicit lifetime annotations.</p>
-<h2 id="how-pal-works"><a class="header" href="#how-pal-works">How PAL Works</a></h2>
-<p>The PAL Checker analyzes the usage of hat sigils (<code>*</code>, <code>^</code>, <code>~</code>) across your code to enforce ownership and borrowing rules. It runs at compile time and guarantees:</p>
-<ol>
-<li><strong>No dangling pointers</strong> — You cannot access memory after it has been freed</li>
-<li><strong>No double-free</strong> — Each allocation is freed exactly once</li>
-<li><strong>No use after move</strong> — A moved-from <code>^</code> (unique) pointer cannot be accessed</li>
-<li><strong>No data races</strong> — Mutable access is exclusive; shared access is read-only</li>
-</ol>
-<h2 id="unique-pointers---no-use-after-move"><a class="header" href="#unique-pointers---no-use-after-move">Unique Pointers (<code>^</code>) — No Use After Move</a></h2>
-<p>The <code>^</code> hat enforces exclusive ownership. Ownership can be transferred via <em>move</em>:</p>
+<h1 id="memory-safety--pal"><a class="header" href="#memory-safety--pal">Memory Safety &amp; PAL</a></h1>
+<p>Toka achieves rigorous, compile-time memory safety without the heavy runtime overhead of a Garbage Collector, and <strong>without requiring complex, verbose lifetime annotations</strong>.</p>
+<p>This is accomplished by the compiler’s <strong>Pointer Analysis Layer (PAL) Checker</strong>, which acts as a static verification engine inspecting the usage of Hat pointer typologies and access permission modifiers.</p>
+<hr>
+<h2 id="how-the-pal-checker-works"><a class="header" href="#how-the-pal-checker-works">How the PAL Checker Works</a></h2>
+<p>The PAL Checker performs static compile-time flow analysis to track the <strong>Permission View</strong> and <strong>Active Scope (Region)</strong> of every resource in your codebase.</p>
+<p>By requiring explicit pointer specifiers (Hats like <code>^</code>, <code>~</code>, <code>&amp;</code>) and mutation intent markers (like <code>#</code> on declarations and receiver method call sites), the compiler gains enough semantic information to perform rigorous safety checking automatically.</p>
+<p>It guarantees four core pillars of memory safety at compile time:</p>
+<h3 id="1-no-use-after-move-unique-pointers-"><a class="header" href="#1-no-use-after-move-unique-pointers-">1. No Use After Move (Unique Pointers <code>^</code>)</a></h3>
+<p>A unique pointer <code>^</code> represents exclusive heap ownership. When it is assigned to another handle, the original handle is marked as “moved-from.” The PAL Checker statically blocks any subsequent read or write to the original variable:</p>
 <pre><code class="language-toka">fn no_use_after_move_example() {
     auto ^p = new i32(42)
     auto ^q = ^p
     println("q: {}", q)
 }
 </code></pre>
-<p>The compiler tracks the flow of ownership and rejects any code that accesses a value after its ownership has been transferred.</p>
-<h2 id="raw-pointers---unsafe-operations"><a class="header" href="#raw-pointers---unsafe-operations">Raw Pointers (<code>*</code>) — Unsafe Operations</a></h2>
-<p>Raw pointers require explicit <code>unsafe</code> blocks:</p>
-<pre><code class="language-toka">fn unsafe_ops_example() {
-    unsafe {
-        auto *p# = alloc i32
-        p = 99
-        println("val: {}", p)
-    }
-}
-</code></pre>
-<p>The <code>unsafe</code> keyword signals to the PAL Checker that you are taking manual responsibility for memory safety.</p>
-<h2 id="shared-pointers---reference-counting"><a class="header" href="#shared-pointers---reference-counting">Shared Pointers (<code>~</code>) — Reference Counting</a></h2>
-<p>Shared pointers use runtime reference counting and are fully safe. They allow multiple pointers to share ownership of the same heap-allocated resource.</p>
-<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
-auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
-{
-    auto ~s2# = ~s1 // Shared Copy (ref count increments)
-    s2.x = 3000     // Modifies the underlying soul
-} // Ref count decrements when s2 goes out of scope
-</code></pre>
-<h2 id="borrowing-safety"><a class="header" href="#borrowing-safety">Borrowing Safety</a></h2>
-<p>In Toka, function parameters are immutable by default and passed via a <strong>zero-copy implicit reference capture mechanism</strong>. Values of both simple types (like <code>i32</code>) and complex types (like custom <code>shape</code> types) are captured by reference with zero overhead and no cloning, keeping the caller’s arguments safe from modification because parameters are immutable by default inside the function:</p>
+<h3 id="2-no-dangling-references-borrow-pointers-"><a class="header" href="#2-no-dangling-references-borrow-pointers-">2. No Dangling References (Borrow Pointers <code>&amp;</code>)</a></h3>
+<p>A borrow pointer <code>&amp;</code> must never outlive its referent. The PAL Checker tracks the lifetime bounds of the underlying Soul and rejects compilation if a borrow is returned or held beyond the soul’s deallocation scope.</p>
+<h3 id="3-no-double-free"><a class="header" href="#3-no-double-free">3. No Double Free</a></h3>
+<p>For owned resources (<code>^</code> unique pointers or the last <code>~</code> shared pointer), the compiler injects a single, deterministic destruction call when the handle exits its scope. Handlers that have been moved or ceded are bypassed, preventing double frees statically.</p>
+<h3 id="4-no-data-races--aliasing-violations"><a class="header" href="#4-no-data-races--aliasing-violations">4. No Data Races / Aliasing Violations</a></h3>
+<p>To prevent data races and modification conflicts, Toka enforces the fundamental aliasing rule: <strong>you may have either one active mutable borrow OR multiple read-only borrows, but never both simultaneously</strong>.</p>
+<p>Because Toka requires mutating method calls to explicitly tag their receiver (e.g. <code>obj#.mutate()</code>), the PAL Checker can trivially and securely verify exclusive mutable access at every method call boundary.</p>
+<hr>
+<h2 id="zero-copy-argument-safety"><a class="header" href="#zero-copy-argument-safety">Zero-Copy Argument Safety</a></h2>
+<p>Toka’s function argument passing utilizes the <strong>zero-copy implicit reference capture mechanism</strong>. When passing arguments to a function, the PAL Checker automatically captures variables by reference under the hood with zero copying.</p>
+<p>Because parameters are immutable inside the function by default, the caller’s argument remains perfectly safe from modification:</p>
 <pre><code class="language-toka">fn show(x: i32) {
     println("x: {}", x)
 }
@@ -1017,30 +1032,26 @@ fn borrowing_safe_example() {
     println("val: {}", val)
 }
 </code></pre>
-<p>For <strong>mutable access</strong>, use <code>#</code> on local variable declarations:</p>
-<pre><code class="language-toka">fn mutable_local_example() {
-    auto x# = 42
-    x = 99
-    println("x: {}", x)
-}
-</code></pre>
-<h2 id="the-pal-checkers-guarantees-at-a-glance"><a class="header" href="#the-pal-checkers-guarantees-at-a-glance">The PAL Checker’s Guarantees at a Glance</a></h2>
+<p>To allow a function to modify a parameter, the parameter must be declared mutable (<code>#</code>) in the function signature, and the PAL Checker will then enforce exclusive borrowing at the call site.</p>
+<hr>
+<h2 id="pal-static-assurances-at-a-glance"><a class="header" href="#pal-static-assurances-at-a-glance">PAL Static Assurances at a Glance</a></h2>
+<p>The PAL Checker acts as a silent guardian, providing absolute safety guarantees before your binary is even built:</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>Situation</th><th>PAL Checker Action</th></tr>
+<tr><th style="text-align: left">Scenario / Action</th><th style="text-align: center">PAL Checker Static Response</th><th>Safety Context</th></tr>
 </thead>
 <tbody>
-<tr><td>Use after <code>^</code> move</td><td>❌ Compile error</td></tr>
-<tr><td>Dangling <code>&amp;</code> reference</td><td>❌ Compile error</td></tr>
-<tr><td>Double <code>unsafe free</code></td><td>❌ Compile error</td></tr>
-<tr><td>Race on mutable data</td><td>❌ Compile error</td></tr>
-<tr><td>Valid borrow usage</td><td>✅ Passes</td></tr>
-<tr><td>Correct scope cleanup</td><td>✅ Automatic free</td></tr>
+<tr><td style="text-align: left">Accessing a unique pointer <code>^</code> after move</td><td style="text-align: center">❌ <strong>Compile Error</strong></td><td>Prevents use-after-move and double-frees</td></tr>
+<tr><td style="text-align: left">Holding a borrow <code>&amp;</code> after its Soul is dropped</td><td style="text-align: center">❌ <strong>Compile Error</strong></td><td>Eliminates dangling pointers &amp; use-after-free</td></tr>
+<tr><td style="text-align: left">Triggering double <code>unsafe free</code> on <code>*</code></td><td style="text-align: center">❌ <strong>Compile Error</strong></td><td>Restricts manual deallocation errors</td></tr>
+<tr><td style="text-align: left">Overlapping mutable borrow <code>obj#.mutate()</code> with shared borrows</td><td style="text-align: center">❌ <strong>Compile Error</strong></td><td>Guarantees thread safety and no data races</td></tr>
+<tr><td style="text-align: left">Normal borrow parameter passing</td><td style="text-align: center">✅ <strong>Passed</strong></td><td>High-performance, zero-copy read-only access</td></tr>
+<tr><td style="text-align: left">Handle exiting its declared scope</td><td style="text-align: center">✅ <strong>Passed</strong></td><td>Generates zero-overhead automatic resource cleanup</td></tr>
 </tbody>
 </table>
 </div>
-<p>This model achieves the same safety guarantees as Rust’s borrow checker, but without any lifetime annotations — the hat sigils make ownership visible directly in the syntax.</p>
+<p>By shifting the burden of memory safety from the runtime (GC) or the programmer’s brain (manual lifetimes) to the <strong>Pointer Analysis Layer (PAL)</strong>, Toka provides the performance of C++ with the safety of Rust, wrapped in a clean and visual syntax.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="advanced-features"><a class="header" href="#advanced-features">Advanced Features</a></h1>
 <p>Having mastered the language basics and gained a deep understanding of the <strong>Hat Principle</strong> regarding the management of Soul and Handle, you have already conquered Toka’s steepest learning curve. Now, we enter the world of Toka’s <strong>Advanced Features</strong>.</p>
@@ -2583,7 +2594,7 @@ Programming is an art of practice, and Toka is rapidly evolving. If you encounte
 <h1 id="frequently-asked-questions"><a class="header" href="#frequently-asked-questions">Frequently Asked Questions</a></h1>
 <h2 id="general"><a class="header" href="#general">General</a></h2>
 <p><strong>Q: Is Toka production-ready?</strong></p>
-<p>Toka is currently in beta (v0.9.6). It’s suitable for personal projects, prototyping, and experimentation. The 1.0 release is planned with a focus on production stability.</p>
+<p>Toka is currently in beta (v0.9.7). It’s suitable for personal projects, prototyping, and experimentation. The 1.0 release is planned with a focus on production stability.</p>
 <p><strong>Q: What platforms does Toka support?</strong></p>
 <p>Linux, macOS, and Windows are supported. The LLVM backend provides cross-compilation capabilities.</p>
 <p><strong>Q: Is there a package manager?</strong></p>

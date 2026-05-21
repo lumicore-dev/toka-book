@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-1fcc17d6.js";
+            window.path_to_searchindex_js = "searchindex-44671f59.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -204,8 +204,8 @@
 <p>本书会随 Toka 编译器的开发保持更新。当前文档版本对齐：</p>
 <ul>
 <li><strong>编译器版本</strong>：<code>v0.9.7</code></li>
-<li><strong>Toka Commit</strong>：<code>13f032a</code>（支持 kebab-case 包名和命名空间解析，同时强制禁止连字符变量声明）</li>
-<li><strong>Tag</strong>：<code>v0.9.7-26-g13f032a</code></li>
+<li><strong>Toka Commit</strong>：<code>b3f8940</code>（完成 termios 与 prelude 审计重构，支持 kebab-case 包名和命名空间解析，并强制禁止连字符变量声明）</li>
+<li><strong>Tag</strong>：<code>v0.9.7-02</code></li>
 </ul>
 <h2 id="作者的话"><a class="header" href="#作者的话">作者的话</a></h2>
 <p>Toka 是一门年轻但充满雄心的语言。这本指南伴随语言的开发同步编写，旨在帮助早期采用者快速上手。随着 Toka 的演进，本书也会一同成长。</p>
@@ -262,7 +262,7 @@ export TOKA_LIB="$HOME/.toka/lib"
 <pre><code class="language-bash">tokac --version
 </code></pre>
 <p>你应该会看到类似如下的输出：</p>
-<pre><code>toka version 0.9.6 (Built: May 17 2026)
+<pre><code>toka version 0.9.7 (Built: May 21 2026)
 </code></pre>
 <h2 id="从源码编译"><a class="header" href="#从源码编译">从源码编译</a></h2>
 <p>如果你想使用最新的开发版本：</p>
@@ -721,7 +721,7 @@ println("{}{}成功！{}", green, "构建完成", reset)
 <pre><code class="language-toka">import std/io::println
 
 auto name = "Toka"
-auto version = "0.9.6"
+auto version = "0.9.7"
 println("欢迎使用 {} 版本 {}！", name, version)
 </code></pre>
 <h2 id="字符串拼接"><a class="header" href="#字符串拼接">字符串拼接</a></h2>
@@ -759,57 +759,59 @@ auto unicode: u32 = 0x4E16:u32
 <p>字符串系统在 <code>lib/core/str.tk</code> 和 <code>lib/core/utf8.tk</code> 中定义，用于 UTF-8 处理。</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="hat-principle帽子原则"><a class="header" href="#hat-principle帽子原则">Hat Principle（帽子原则）</a></h1>
-<p><strong>Hat Principle（帽子原则）</strong> 是 Toka 内存安全模型背后的核心概念。它不是要求开发者标注生命周期或手动管理内存，而是使用称为“帽子（hat）“的可视语法标记，在编译时追踪所有权和内存语义。</p>
+<p><strong>Hat Principle（帽子原则）</strong> 是 Toka 内存安全模型背后的核心设计哲学。与强制开发者编写繁琐生命周期标注（如 Rust）或依赖运行时垃圾回收器（如 Go 或 Java）的传统方式不同，Toka 引入了称为**“帽子（Hats）”**的直观语法标记，在编译期静态追踪所有权、生命周期与访问权限。</p>
+<hr>
 <h2 id="什么是帽子"><a class="header" href="#什么是帽子">什么是帽子？</a></h2>
-<p><strong>帽子（hat）</strong> 是附加在标识符上的一个标记符号（sigil），告诉程序员和编译器该值是如何存储、拥有和访问的。Toka 有四种帽子类型：</p>
+<p>在 Toka 中，**帽子（Hat）**是直接附加在标识符上的语法标记符号（sigil）。这种显式标注能向开发者和编译器的安全分析引擎清晰宣告资源的存储方式、所有权归属以及访问模式。</p>
+<p>Toka 定义了四种基础的帽子类型学：</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>帽子</th><th>名称</th><th>含义</th></tr>
+<tr><th style="text-align: center">帽子标记</th><th>类型学名称</th><th>语义描述</th><th>分配/来源上下文</th></tr>
 </thead>
 <tbody>
-<tr><td><code>*</code></td><td>原始指针</td><td>底层指针，需要 <code>unsafe</code> / <code>alloc</code></td></tr>
-<tr><td><code>^</code></td><td>独占指针</td><td>对堆分配资源的独占所有权（类似 Rust 的 <code>Box</code>）</td></tr>
-<tr><td><code>~</code></td><td>共享指针</td><td>基于引用计数的共享所有权</td></tr>
-<tr><td><code>&amp;</code></td><td>借用指针</td><td>对其他值的引用/借用</td></tr>
+<tr><td style="text-align: center"><code>*</code></td><td><strong>原始指针 (Raw Pointer)</strong></td><td>不安全、底层的原始指针，需手动管理生命周期</td><td>堆分配或取地址</td></tr>
+<tr><td style="text-align: center"><code>^</code></td><td><strong>独占指针 (Unique Pointer)</strong></td><td>安全的堆资源独占所有权，超出作用域自动释放</td><td>堆分配 (<code>new</code>)</td></tr>
+<tr><td style="text-align: center"><code>~</code></td><td><strong>共享指针 (Shared Pointer)</strong></td><td>安全的、基于引用计数的共享所有权</td><td>堆分配 (<code>new</code>)</td></tr>
+<tr><td style="text-align: center"><code>&amp;</code></td><td><strong>借用指针 (Borrow Pointer)</strong></td><td>安全的、编译期受检的对其他灵魂（Soul）数据的引用</td><td>现有灵魂</td></tr>
 </tbody>
 </table>
 </div>
-<h2 id="手柄-vs-灵魂"><a class="header" href="#手柄-vs-灵魂">手柄 vs. 灵魂</a></h2>
-<p>Toka 最优雅的设计特性之一是<strong>手柄（Handle）vs. 灵魂（Soul）</strong> 的区分。它消除了显式解引用运算符的需求：</p>
+<hr>
+<h2 id="手柄-vs-灵魂无解引用美学"><a class="header" href="#手柄-vs-灵魂无解引用美学">手柄 vs. 灵魂：无解引用美学</a></h2>
+<p>帽子原则最伟大的易用性突破在于将指针容器与底层数据进行了严格的语法分立：</p>
 <ul>
-<li><strong>手柄（帽子）</strong>：<strong>带有</strong>标记符号的标识符（<code>^p</code>, <code>*p</code>, <code>~p</code>）表示<em>指针容器本身</em>。</li>
-<li><strong>灵魂（数据）</strong>：<strong>不带</strong>标记符号的标识符（<code>p</code>）表示<em>底层数据</em>。</li>
+<li><strong>手柄（Handle，即帽子）</strong>：<strong>带有</strong>标记符号的标识符（<code>^ptr</code>, <code>*ptr</code>, <code>~ptr</code>）表示<em>指针容器本身</em>（保存地址的元数据内存）。</li>
+<li><strong>灵魂（Soul，即数据）</strong>：<strong>不带</strong>标记符号的标识符（<code>ptr</code>）表示<em>底层数据</em>（实际值本身）。</li>
 </ul>
-<p>当你想要读取或修改指针指向的值时，你直接在<strong>灵魂</strong>上操作——不需要解引用标记：</p>
-<pre><code class="language-toka">fn raw_ptr_example() {
-    unsafe {
-        auto *p# = alloc i32
-        p = 99
-        println("raw: {}", p)
-    }
-}
-</code></pre>
-<p>这是对 C 语言的 <code>*p = 200</code> 或 Rust 的 <code>*p = 200</code> 的重大生活质量改进。Toka 的方法使指针密集型代码更加可读。</p>
-<h2 id="pal-checker-如何使用帽子"><a class="header" href="#pal-checker-如何使用帽子">PAL Checker 如何使用帽子</a></h2>
-<p>PAL（Pointer Analysis Layer，指针分析层）检查器在编译时分析帽子的使用情况，以强制执行借用检查器所提供的相同保证，但无需生命周期标注：</p>
+<p>通过直接对<strong>灵魂</strong>（省略帽子标记）进行操作，Toka 彻底消除了 C 语言中 <code>*p</code> 或 Rust 中 <code>*p</code> 这种繁琐的显式解引用运算符。例如，<code>ptr.x = 42</code> 会直接修改堆底层的结构体数据，无需进行显式解引用。</p>
+<hr>
+<h2 id="指针分析层pal"><a class="header" href="#指针分析层pal">指针分析层（PAL）</a></h2>
+<p>编译器的 <strong>指针分析层（Pointer Analysis Layer，简称 PAL Checker）</strong> 在编译时审查帽子的使用方式，以静态强制执行以下核心安全保证：</p>
 <ol>
-<li><strong>移动后不可使用</strong> — <code>^</code> 值在所有权转移后不能使用</li>
-<li><strong>无悬垂引用</strong> — 引用不能超过其引用对象的生命周期</li>
-<li><strong>无双重释放</strong> — 每个拥有的值恰好释放一次</li>
-<li><strong>无数据竞争</strong> — 可变访问是独占的；共享访问是只读的</li>
+<li><strong>严格的移动语义</strong>：独占指针（<code>^</code>）在赋值时会自动转移所有权。PAL Checker 会静态拦截任何对原句柄的“移动后使用（use-after-move）”。</li>
+<li><strong>确定性析构</strong>：当拥有的指针（<code>^</code> 或最后一个 <code>~</code>）离开其声明的作用域时，其绑定的堆资源会被自动、安全地释放。</li>
+<li><strong>严苛的借用检查</strong>：借用指针（<code>&amp;</code>）会接受严格的生命周期检查，确保其绝不比所指向的“灵魂”存活得更久，从源头上杜绝悬垂指针。</li>
+<li><strong>数据竞争防护</strong>：PAL Checker 确保可变访问（<code>#</code>）是排他的，而共享访问则是完全只读的。</li>
 </ol>
+<hr>
+<h2 id="学习路线"><a class="header" href="#学习路线">学习路线</a></h2>
+<p>要彻底掌握帽子原则，请依次深入探索以下子章节：</p>
+<ul>
+<li><strong><a href="#灵魂与身份soul--identity">灵魂与身份</a></strong>：精通手柄与灵魂的分立、隐式解引用，以及成员链借用（包括标准括号与标志性的帽子终端形态）的语法艺术。</li>
+<li><strong><a href="#所有权与帽子">所有权与帽子</a></strong>：深入剖析四种所有权模型、默认移动与拷贝、<code>cede</code> 关键字，以及局部变量可变声明与方法调用接收者可变标注的编译器底层设计哲学。</li>
+<li><strong><a href="#内存安全与-pal">内存安全与 PAL</a></strong>：深度剖析指针分析层静态安全分析器如何实现零开销的编译期安全验证。</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="灵魂与身份soul--identity"><a class="header" href="#灵魂与身份soul--identity">灵魂与身份（Soul &amp; Identity）</a></h1>
-<p>Toka 的 Hat Principle 引入了指针的<strong>手柄（handle）</strong>（容器）与其<strong>灵魂（soul）</strong>（底层数据）之间的清晰区分。理解这一分离是掌握 Toka 内存模型的关键。</p>
-<h2 id="手柄-vs-灵魂-1"><a class="header" href="#手柄-vs-灵魂-1">手柄 vs. 灵魂</a></h2>
-<p>Toka 中的每个指针都有两个方面：</p>
+<p>Toka 的帽子原则在指针的**手柄（Handle，语法容器）<strong>与其</strong>灵魂（Soul，底层数据）**之间引入了严格且美妙的分立。理解并掌握这一核心设计是领略 Toka 现代、无解引用美学（dereference-free aesthetics）的关键。</p>
+<hr>
+<h2 id="手柄-vs-灵魂"><a class="header" href="#手柄-vs-灵魂">手柄 vs. 灵魂</a></h2>
+<p>在 Toka 中，每个指针标识符在语法和内存层面上都具有两个截然不同的面相：</p>
 <ul>
-<li><strong>手柄（帽子）</strong>：<em>带有</em>标记符号的标识符（<code>^p</code>, <code>*p</code>, <code>~p</code>）。表示指针容器本身——保存地址的内存位置。</li>
-<li><strong>灵魂（数据）</strong>：<em>不带</em>标记符号的标识符（<code>p</code>）。表示被指向的底层值。</li>
+<li><strong>手柄（Handle，即帽子）</strong>：<strong>带有</strong>指针标记符号的标识符（如 <code>^p</code>、<code>*p</code>、<code>~p</code>）。它在内存中代表指针容器本身——即保存目标内存地址的元数据槽。</li>
+<li><strong>灵魂（Soul，即数据）</strong>：<strong>不带</strong>指针标记符号的标识符（如 <code>p</code>）。它代表被指向的底层数据或资源本身。</li>
 </ul>
-<h2 id="隐式解引用"><a class="header" href="#隐式解引用">隐式解引用</a></h2>
-<p>Toka 的杀手级特性是<strong>隐式解引用</strong>：你永远不需要 <code>*</code> 或 <code>-&gt;</code> 运算符来访问指针背后的数据。直接使用灵魂即可：</p>
 <pre><code class="language-toka">fn handle_soul_example() {
     auto ^p# = new Point(x=10, y=20)
     p.x = 30
@@ -817,55 +819,73 @@ auto unicode: u32 = 0x4E16:u32
     println("sum: {}", sum)
 }
 </code></pre>
-<p>相比于 C 语言的（<code>p-&gt;x = 30</code>）或 Rust 的（<code>(*p).x = 30</code>），这是一个巨大的人体工程学改进。</p>
-<h2 id="四种帽子"><a class="header" href="#四种帽子">四种帽子</a></h2>
-<p>每种帽子标记符号携带不同的所有权语义：</p>
-<h3 id="--原始指针"><a class="header" href="#--原始指针"><code>*</code> — 原始指针</a></h3>
-<p>底层的不安全指针。需要 <code>unsafe</code> 关键字或显式 <code>alloc</code>：</p>
-<pre><code class="language-toka">fn raw_pointer_example() {
+<p>在上面的例子中，<code>^p#</code> 是可变的独占手柄，而 <code>p.x</code> 则直接访问底层 <code>Point</code> 灵魂的字段。</p>
+<hr>
+<h2 id="优雅的隐式解引用"><a class="header" href="#优雅的隐式解引用">优雅的隐式解引用</a></h2>
+<p>Toka 彻底摒弃了传统系统级语言中繁琐的显式解引用运算符（例如 C 语言中的 <code>*p</code> / <code>p-&gt;</code>，或 Rust 中的 <code>*p</code>）。</p>
+<p>每当你需要读取、修改指针背后的数据或访问其内部字段时，你只需直接操作其<strong>灵魂</strong>（即不带帽子标记的标识符）。Toka 编译器会在后台自动将其解析为解引用操作，具有零运行时开销：</p>
+<pre><code class="language-toka">fn implicit_deref_example() {
     unsafe {
         auto *p# = alloc i32
-        p = 42
-        println("raw: {}", p)
+        p = 100
+        auto val = p
+        println("val: {}", val)
     }
 }
 </code></pre>
-<h3 id="--独占指针"><a class="header" href="#--独占指针"><code>^</code> — 独占指针</a></h3>
-<p>对堆分配资源的独占所有权。使用 <code>new</code> 创建：</p>
-<pre><code class="language-toka">fn unique_pointer_example() {
-    auto ^p = new i32(42)
-    auto ^q = ^p
-    println("unique: {}", q)
-}
-</code></pre>
-<h3 id="--共享指针"><a class="header" href="#--共享指针"><code>~</code> — 共享指针</a></h3>
-<p>引用计数、基于指针形态学的共享所有权。</p>
-<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
-auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
-auto ~s2# = ~s1 // 共享拷贝（引用计数增加）
-s2.x = 3000     // 直接修改底层数据（灵魂）
-</code></pre>
-<h3 id="--借用指针"><a class="header" href="#--借用指针"><code>&amp;</code> — 借用指针</a></h3>
-<p>指向另一个值的引用或借用指针。通过显式地 <code>&amp;</code> 指向现有的灵魂来创建：</p>
-<pre><code class="language-toka">auto x = 42
-auto &amp;y = &amp;(x) // y 是指向 x 灵魂的借用指针
-</code></pre>
-<h2 id="身份与地址"><a class="header" href="#身份与地址">身份与地址</a></h2>
-<p>要获取局部变量的原始内存地址，使用 <code>*(expr)</code> 语法：</p>
+<p>这种隐式解引用机制为高性能系统编程带来如脚本语言般纯净、清爽的语法，极大地提升了代码的易读性。</p>
+<hr>
+<h2 id="身份取地址运算符-expr"><a class="header" href="#身份取地址运算符-expr">身份：取地址运算符 <code>*(expr)</code></a></h2>
+<p>为了获取局部变量或资源的原始物理内存地址，Toka 提供了 <strong><code>*(expr)</code></strong> 语法。该运算会返回一个指向该变量内存位置的原始指针 <code>*T</code>：</p>
 <pre><code class="language-toka">fn address_of_example() {
     auto a# = 42
     auto *raw_ptr = *(a)
     println("addr: {}", raw_ptr)
 }
 </code></pre>
-<p>帽子（<code>^</code>）并<strong>不</strong>表示“地址“。它特指独占指针容器。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>帽子标记符号（如 <code>^</code> 或 <code>~</code>）并不代表“取地址”。帽子是严格的指针手柄类型修饰符，而 <code>*(expr)</code> 才是用于在运行时提取内存地址的运算符。</p>
+</blockquote>
+<hr>
+<h2 id="借用指针--与引用"><a class="header" href="#借用指针--与引用">借用指针 <code>&amp;</code> 与引用</a></h2>
+<p>**借用指针（<code>&amp;</code>）**是一种安全的引用机制，允许在不转移所有权的前提下，临时、且接受编译器静态检查地访问某个灵魂（Soul）的数据。</p>
+<h3 id="干净的局部变量借用"><a class="header" href="#干净的局部变量借用">干净的局部变量借用</a></h3>
+<p>当借用一个普通的、非数组成员的局部变量时，<strong>完全不需要加括号</strong>。直接在灵魂标识符前添加 <code>&amp;</code> 即可创建借用指针：</p>
+<pre><code class="language-toka">auto x = 42
+auto &amp;y = &amp;x // y 是指向 x 灵魂的借用指针，无需冗余括号
+</code></pre>
+<h3 id="成员访问链借用的视觉歧义限制"><a class="header" href="#成员访问链借用的视觉歧义限制">成员访问链借用的视觉歧义限制</a></h3>
+<p>当你试图借用结构体或 Shape 内部的特定字段（即成员访问链）时，如果直接写成 <code>&amp;pt.x</code>，会产生<strong>语法歧义</strong>。这在视觉上无法辨清你究竟是想借用整个成员链 <code>&amp;(pt.x)</code>，还是想在已借用的指针上访问成员 <code>(&amp;pt).x</code>。</p>
+<p>为了守护代码的极佳可读性与类型安全，Toka 编译器会拒绝无括号的 <code>&amp;pt.x</code> 编译，并提供两种完美合法且极具工业美感的写法：</p>
+<ol>
+<li><strong>方案 A（标准括号式）</strong>：显式地为成员链加括号：<code>&amp;(pt.x)</code>。</li>
+<li><strong>方案 B（帽子终端形态，Hat-Terminal Morphology）</strong>：将 <code>&amp;</code> 借用符号直接嵌入点运算符和终端字段名之间：<strong><code>pt.&amp;x</code></strong>。</li>
+</ol>
+<p><code>pt.&amp;x</code> 是 Toka 最具标志性的美学设计，完美地展示了指针形态学是如何天衣无缝地融入到成员访问链之中的。</p>
+<pre><code class="language-toka">fn borrow_example() {
+    auto x = 42
+    auto &amp;y = &amp;x // Clean local variable borrow, no parentheses needed!
+    
+    auto pt = Point(x = 10, y = 20)
+    
+    // Member borrow Path A: standard parentheses
+    auto &amp;rx1 = &amp;(pt.x)
+    
+    // Member borrow Path B: Hat-Terminal Morphology (Toka's signature aesthetic)
+    auto &amp;rx2 = pt.&amp;x
+    
+    println("y: {}, rx1: {}, rx2: {}", y, rx1, rx2)
+}
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="所有权与帽子"><a class="header" href="#所有权与帽子">所有权与帽子</a></h1>
-<p>Toka 中的所有权由 Hat Principle 支配。每种帽子标记符号通过语法直接传达不同的所有权模型。</p>
+<p>Toka 中的所有权完全由帽子原则（Hat Principle）支配。与将内存分配掩盖在泛型类型系统之下的传统做法不同，Toka 使用独特的帽子标记符号（sigil），在语法上将值的所有权模型、拷贝/移动语义以及访问权限昭示得一清二楚。</p>
+<hr>
 <h2 id="四种所有权模型"><a class="header" href="#四种所有权模型">四种所有权模型</a></h2>
-<p>Toka 定义了四种指针类型，每种具有不同的所有权语义：</p>
-<h3 id="--原始指针不安全"><a class="header" href="#--原始指针不安全"><code>*</code> — 原始指针（不安全）</a></h3>
-<p>原始指针需要显式的 <code>unsafe</code> 或 <code>alloc</code> 来创建和管理：</p>
+<p>Toka 定义了四种指针类型学，每种对应不同的资源生命周期管理策略：</p>
+<h3 id="1---原始指针人工管理生命周期"><a class="header" href="#1---原始指针人工管理生命周期">1. <code>*</code> — 原始指针（人工管理生命周期）</a></h3>
+<p>底层原始指针提供零编译期安全保障，必须在 <code>unsafe</code> 块中进行手动分配与释放：</p>
 <pre><code class="language-toka">fn raw_ptr_example() {
     unsafe {
         auto *p# = alloc i32
@@ -874,31 +894,28 @@ auto &amp;y = &amp;(x) // y 是指向 x 灵魂的借用指针
     }
 }
 </code></pre>
-<p>原始指针用于与 C 代码交互或实现底层数据结构。</p>
-<h3 id="--独占指针移动语义"><a class="header" href="#--独占指针移动语义"><code>^</code> — 独占指针（移动语义）</a></h3>
-<p>独占指针提供独占所有权。任何时刻只能有一个 <code>^</code> 指向给定的资源。所有权通过<strong>移动</strong>来转移：</p>
+<h3 id="2---独占指针独占堆所有权"><a class="header" href="#2---独占指针独占堆所有权">2. <code>^</code> — 独占指针（独占堆所有权）</a></h3>
+<p>独占指针强制执行严格的独占所有权。在任何时刻，一个堆资源只能有一个 <code>^</code> 手柄指向它。当独占指针离开其声明的作用域时，其绑定的内存会被自动、即时地释放：</p>
 <pre><code class="language-toka">fn unique_ptr_example() {
     auto ^p = new i32(42)
     auto ^q = ^p
     println("unique: {}", q)
 }
 </code></pre>
-<p><code>^</code> 标记的作用类似于 Rust 的 <code>Box</code> 或 C++ 的 <code>std::unique_ptr</code>。当独占指针离开作用域时，其资源会自动释放。</p>
-<h3 id="--共享指针引用计数"><a class="header" href="#--共享指针引用计数"><code>~</code> — 共享指针（引用计数）</a></h3>
-<p>共享指针允许多个所有者通过引用计数共享所有权：</p>
+<h3 id="3---共享指针引用计数共享所有权"><a class="header" href="#3---共享指针引用计数共享所有权">3. <code>~</code> — 共享指针（引用计数共享所有权）</a></h3>
+<p>共享指针允许多个手柄通过线程安全的引用计数共享对同一堆资源的所有权。当最后一个指向它的 <code>~</code> 手柄离开作用域时，资源才会被自动释放：</p>
 <pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
-auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s1# = new Point(x = 100, y = 200, z = 0)
 auto ~s2# = ~s1  // 共享拷贝（引用计数增加）
-s2.x = 3000      // 直接修改底层数据（灵魂）
+s2.x = 300       // 直接修改底层灵魂（Soul）的数据
 </code></pre>
-<p>当最后一个 <code>~</code> 引用离开作用域时，资源被释放。</p>
-<h3 id="--借用指针引用语义"><a class="header" href="#--借用指针引用语义"><code>&amp;</code> — 借用指针（引用语义）</a></h3>
-<p>借用指针表示对其他值的引用，不获取其所有权。它们允许临时、受检地访问数据：</p>
-<pre><code class="language-toka">auto x = 42
-auto &amp;y = &amp;(x)   // 指向 x 灵魂的局部借用指针
-</code></pre>
+<h3 id="4---借用指针引用语义"><a class="header" href="#4---借用指针引用语义">4. <code>&amp;</code> — 借用指针（引用语义）</a></h3>
+<p>借用指针是由指针分析层（PAL Checker）静态受检的、对现有灵魂的临时引用，它不持有资源所有权。</p>
+<hr>
 <h2 id="移动-vs-拷贝"><a class="header" href="#移动-vs-拷贝">移动 vs. 拷贝</a></h2>
-<p>默认情况下，Toka 中的赋值操作执行的是<strong>拷贝</strong>（对于简单类型是按值拷贝，对于结构体/复杂类型是浅拷贝）：</p>
+<p>Toka 拥有清晰的规则来区分数据的“拷贝”与所有权的“转移”：</p>
+<h3 id="默认拷贝语义"><a class="header" href="#默认拷贝语义">默认拷贝语义</a></h3>
+<p>默认情况下，Toka 中的普通赋值执行的是<strong>拷贝</strong>。对于简单标量类型（如 <code>i32</code>、<code>bool</code>）执行按值拷贝，对于复杂的 Shape 结构体执行浅拷贝：</p>
 <pre><code class="language-toka">fn move_copy_example() {
     auto a# = 42
     auto b = a
@@ -906,21 +923,22 @@ auto &amp;y = &amp;(x)   // 指向 x 灵魂的局部借用指针
     println("a: {}, b: {}", a, b)
 }
 </code></pre>
-<p>这适用于简单类型（如 <code>i32</code>、<code>f64</code>、<code>bool</code>）以及复杂类型（如 <code>String</code>、<code>Vec</code> 或自定义 <code>shape</code> 类型）。</p>
-<h3 id="默认移动语义"><a class="header" href="#默认移动语义">默认移动语义</a></h3>
-<p>默认情况下，<strong>移动语义（Move semantics）<strong>仅适用于</strong>独占指针（<code>^</code>）</strong>。赋值独占指针会将其底层堆资源的独占所有权从源转移到目标：</p>
+<h3 id="默认移动语义独占指针"><a class="header" href="#默认移动语义独占指针">默认移动语义（独占指针）</a></h3>
+<p>移动语义<strong>在默认情况下</strong>仅适用于<strong>独占指针（<code>^</code>）</strong>。将一个独占指针赋值给另一个，会自动将堆资源的独占所有权从源转移到目标，这会使源手柄立即失效：</p>
 <pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
 auto ^p1 = new Point(x = 10, y = 20, z = 0)
-auto ^p2 = ^p1  // 所有权转移（移动）给 p2，p1 之后不再有效
+auto ^p2 = ^p1  // 所有权自动转移（移动）至 p2；p1 之后不再有效！
 </code></pre>
 <h3 id="使用-cede-进行显式移动"><a class="header" href="#使用-cede-进行显式移动">使用 <code>cede</code> 进行显式移动</a></h3>
-<p>对于其他类型（或为了显式转移任何值的所有权），必须使用 <strong><code>cede</code> 关键字</strong>进行显式移动。一旦值被 <code>cede</code>，源变量将不再有效：</p>
+<p>对于其他普通类型（如自定义 Shape 或 <code>String</code>），默认执行的是拷贝语义。为了显式转移所有权（从而避免拷贝开销），必须使用 <strong><code>cede</code> 关键字</strong>。<code>cede</code> 操作会强制将资源移动到目标，并使原变量立即失效：</p>
 <pre><code class="language-toka">import std/string::String
 auto s1 = String::from("hello")
 auto s2 = cede s1 // 显式移动：s1 之后不再有效
 </code></pre>
-<h2 id="函数参数零拷贝捕获机制"><a class="header" href="#函数参数零拷贝捕获机制">函数参数（零拷贝捕获机制）</a></h2>
-<p>在 Toka 中，函数参数默认是不可变的，并且是通过<strong>零拷贝隐式引用捕获机制</strong>传递的，而不是传统的按值传递（拷贝）。编译器保证捕获参数具有零运行时开销，并且不会消耗或拷贝原始实参。标准的参数传递不需要特殊的指针标记符号，除非你明确打算传递或重绑定指针句柄：</p>
+<hr>
+<h2 id="函数参数零拷贝引用捕获"><a class="header" href="#函数参数零拷贝引用捕获">函数参数：零拷贝引用捕获</a></h2>
+<p>在 Toka 中，函数形参默认是不可变的，并且是通过极其高效的 <strong>“零拷贝隐式引用捕获机制”</strong> 进行传递的。</p>
+<p>编译器会自动在底层以引用形式传递参数，带来零运行时开销和零拷贝。因此，对于标准的函数参数传递，你完全不需要编写任何特殊的指针标记符号，除非你明确打算传递或重绑定指针手柄本身：</p>
 <pre><code class="language-toka">fn process(data: i32) {
     println("data: {}", data)
 }
@@ -931,83 +949,80 @@ fn borrow_func_example() {
     println("val: {}", val)
 }
 </code></pre>
-<p>对于<strong>可变访问</strong>，在变量声明上使用 <code>#</code>。注意 <code>#</code> 仅限于声明时使用，不能在调用点使用：</p>
+<hr>
+<h2 id="可变性标记--与权限视图permission-view"><a class="header" href="#可变性标记--与权限视图permission-view">可变性标记 <code>#</code> 与权限视图（Permission View）</a></h2>
+<p>Toka 引入了 <code>#</code> 标记来声明和追踪可变访问权限。它的使用受到编译器生存周期的严苛规范，既消除了冗余的语法噪声，又最大化地提供了视觉安全度。</p>
+<h3 id="1-声明可变性"><a class="header" href="#1-声明可变性">1. 声明可变性</a></h3>
+<p>要在局部变量声明时指定其为可变，必须在<strong>声明点</strong>的标识符尾部追加 <code>#</code>：</p>
 <pre><code class="language-toka">fn mutable_local_example() {
     auto val# = 42
-    val = 99
+    val = 99 // Everyday context assignment: NO '#' suffix allowed here!
     println("val: {}", val)
 }
 </code></pre>
-<h2 id="使用--进行显式局部借用"><a class="header" href="#使用--进行显式局部借用">使用 <code>&amp;</code> 进行显式局部借用</a></h2>
-<p><code>&amp;</code> 标记符号用于<strong>显式声明局部借用指针</strong>或返回引用时：</p>
-<pre><code class="language-toka">shape Container(val: i32)
-fn borrow_example(c: Container) -&gt; &amp;i32 &lt;- c {
-    return &amp;(c.val)
+<h3 id="2-everyday-上下文赋值表达式中严禁标注"><a class="header" href="#2-everyday-上下文赋值表达式中严禁标注">2. Everyday 上下文（赋值表达式）中严禁标注</a></h3>
+<p>一旦变量在声明时被指定为 mutable，其可变状态便已在类型系统的 <strong>权限视图（Permission View）</strong> 中注册完毕。因此，在日常的赋值表达式或普通使用中，<strong>绝对不允许</strong>在变量名后追加 <code>#</code> 后缀：</p>
+<pre><code class="language-toka">auto val# = 42
+val = 99 // Everyday 赋值：禁止写为 val# = 99！否则会引发编译器错误。
+</code></pre>
+<p>这极大地避免了在常规书写中引入无意义的语法噪声。</p>
+<h3 id="3-可变方法调用点接收者后缀强制要求"><a class="header" href="#3-可变方法调用点接收者后缀强制要求">3. 可变方法调用点（接收者后缀）强制要求</a></h3>
+<p>Toka 最具智慧的安全美学在于：<strong>任何会发生状态修改的方法调用，都必须在调用点进行显式标示</strong>。</p>
+<p>当调用一个会修改 Shape 状态的方法时，编译器强制要求你在接收者对象（Receiver）后追加 <code>#</code> 后缀（例如 <code>obj#.mutate()</code>）。这犹如一个极高醒目度的“修改警报”，向代码阅读者与审计者最高饱和度地宣告：此处的灵魂（底层数据）正在被篡改：</p>
+<pre><code class="language-toka">shape Counter (
+    val#: i32 = 0
+)
+
+
+impl Counter@encap {
+    pub fn clone(self) -&gt; Counter {
+        return Counter(val = self.val)
+    }
+
+    fn drop(self#) {}
+
+    pub fn increment(self#) {
+        self.val = self.val + 1
+    }
 }
-fn main() -&gt; i32 {
-    auto c = Container(val = 10)
-    auto &amp;y = borrow_example(c)
-    return 0
+
+
+
+fn mutable_method_example() {
+    auto c# = Counter(val = 10) // Declaration: '#' is required for mutability
+    c#.increment()             // Mutation Site: '#' receiver suffix is required and highly visible!
+    println("c.val: {}", c.val)
 }
 </code></pre>
-<h3 id="生命周期依赖标注"><a class="header" href="#生命周期依赖标注">生命周期依赖标注</a></h3>
-<p>在上面的例子中，语法 <code>-&gt; &amp;i32 &lt;- c</code> 引入了 Toka 的<strong>生命周期依赖标注（Lifetime Dependency Annotation）</strong>。</p>
-<p>当一个函数返回一个派生自其参数的引用时，PAL Checker 要求你显式声明这种关系。<code>&lt;- c</code> 标记告诉编译器：<em>“返回的引用严格绑定到 <code>c</code> 的生命周期”</em>。</p>
-<p>如果你省略此标注，Toka 会主动阻止编译（<code>error[E0454]</code>），以防止意外的悬垂指针。这实现了与 Rust 的生命周期参数（<code>&lt;'a&gt;</code>）相同的严格内存安全保证，但语法更轻量、更直观。</p>
-<blockquote>
-<p><strong>注意：</strong> 此关系也可以使用 Toka 的 <strong>effects</strong> 标注风格来表达。对高级借用检查引用的设计正在持续演进中。</p>
-</blockquote>
-<h2 id="pal-checker-的实际运作"><a class="header" href="#pal-checker-的实际运作">PAL Checker 的实际运作</a></h2>
-<p>PAL Checker 在编译时验证：</p>
-<ol>
-<li><strong>移动后不可使用</strong> — <code>^</code> 值在所有权转移后不能访问</li>
-<li><strong>无悬垂引用</strong> — 借用的引用不能超过被借用的值的生命周期</li>
-<li><strong>无双重释放</strong> — 每个值恰好释放一次</li>
-<li><strong>无数据竞争</strong> — 可变访问是独占的；共享访问是只读的</li>
-</ol>
-<p>所有这些都<strong>无需任何生命周期标注</strong>。Hat Principle 使所有权在语法本身中变得可见。</p>
+<p>通过将 <code>#</code> 严格限制在“变量声明点”与“方法接收者可变调用点”，Toka 完美地在语法清爽度与高可视安全防护之间达成了伟大的工业平衡。</p>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="内存安全"><a class="header" href="#内存安全">内存安全</a></h1>
-<p>Toka 通过 **PAL Checker（Pointer Analysis Layer，指针分析层）**在编译时实现内存安全，无需垃圾回收器、运行时开销或显式生命周期标注。</p>
-<h2 id="pal-如何工作"><a class="header" href="#pal-如何工作">PAL 如何工作</a></h2>
-<p>PAL Checker 分析代码中帽子标记符号（<code>*</code>、<code>^</code>、<code>~</code>）的使用情况，强制执行所有权和借用规则。它在编译时运行并保证：</p>
-<ol>
-<li><strong>无悬垂指针</strong> — 在内存释放后不能访问</li>
-<li><strong>无双重释放</strong> — 每次分配恰好释放一次</li>
-<li><strong>移动后不可使用</strong> — 被移动的 <code>^</code>（独占）指针不能访问</li>
-<li><strong>无数据竞争</strong> — 可变访问是独占的；共享访问是只读的</li>
-</ol>
-<h2 id="独占指针-移动后不可使用"><a class="header" href="#独占指针-移动后不可使用">独占指针（<code>^</code>）— 移动后不可使用</a></h2>
-<p><code>^</code> 帽子强制执行独占所有权。所有权可以通过<em>移动</em>转移：</p>
+<h1 id="内存安全与-pal"><a class="header" href="#内存安全与-pal">内存安全与 PAL</a></h1>
+<p>Toka 在编译时静态实现严苛的内存安全，既不需要运行时垃圾回收器（Garbage Collector）沉重的性能开销，<strong>也无需编写繁琐、复杂的显式生命周期标注</strong>。</p>
+<p>这得益于编译器核心的 <strong>指针分析层（Pointer Analysis Layer，简称 PAL Checker）</strong>，它作为一个高效的静态验证引擎，负责在编译期审查帽子指针类型学和访问权限修饰符的使用。</p>
+<hr>
+<h2 id="pal-检查器的工作原理"><a class="header" href="#pal-检查器的工作原理">PAL 检查器的工作原理</a></h2>
+<p>PAL Checker 在编译时执行静态数据流分析，以追踪 codebase 中每个资源在类型系统中的<strong>权限视图（Permission View）<strong>与</strong>活动生命周期区间（Active Scope/Region）</strong>。</p>
+<p>通过要求显式的指针修饰符（如 <code>^</code>、<code>~</code>、<code>&amp;</code> 等帽子标记）和强可视化的修改意图标示（如变量声明时的 <code>#</code> 以及方法调用接收者尾部的 <code>#</code>），编译器获得了极其完备的语义信息，得以自动化地进行严格的安全检查。</p>
+<p>它在编译期提供四大核心内存安全支柱保证：</p>
+<h3 id="1-移动后不可使用use-after-move"><a class="header" href="#1-移动后不可使用use-after-move">1. 移动后不可使用（Use After Move）</a></h3>
+<p>独占指针 <code>^</code> 代表堆资源的独占所有权。当它被赋值给另一个句柄时，原句柄会在编译器状态机中被标记为“已移动（moved-from）”。PAL Checker 会静态拦截任何后续对该失效原变量的读写操作：</p>
 <pre><code class="language-toka">fn no_use_after_move_example() {
     auto ^p = new i32(42)
     auto ^q = ^p
     println("q: {}", q)
 }
 </code></pre>
-<p>编译器追踪所有权的流向，并拒绝任何在所有权转移后访问值的代码。</p>
-<h2 id="原始指针-不安全操作"><a class="header" href="#原始指针-不安全操作">原始指针（<code>*</code>）— 不安全操作</a></h2>
-<p>原始指针需要显式的 <code>unsafe</code> 块：</p>
-<pre><code class="language-toka">fn unsafe_ops_example() {
-    unsafe {
-        auto *p# = alloc i32
-        p = 99
-        println("val: {}", p)
-    }
-}
-</code></pre>
-<p><code>unsafe</code> 关键字向 PAL Checker 发出信号，表示你在手动承担内存安全的责任。</p>
-<h2 id="共享指针-引用计数"><a class="header" href="#共享指针-引用计数">共享指针（<code>~</code>）— 引用计数</a></h2>
-<p>共享指针使用运行时引用计数，并且是完全安全的。它们允许多个指针共享对同一堆分配资源的所有权。</p>
-<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
-auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
-{
-    auto ~s2# = ~s1 // 共享拷贝（引用计数增加）
-    s2.x = 3000     // 直接修改底层数据（灵魂）
-} // 当 s2 离开作用域时，引用计数减少
-</code></pre>
-<h2 id="借用安全"><a class="header" href="#借用安全">借用安全</a></h2>
-<p>在 Toka 中，函数参数默认是不可变的，并且是通过<strong>零拷贝隐式引用捕获机制</strong>传递的。无论是简单类型（如 <code>i32</code>）还是复杂类型（如自定义 <code>shape</code> 类型），在作为参数传入时，都是通过引用直接捕获的，具有零拷贝和零运行时开销，同时编译器默认阻止对不可变参数的任何修改，从而保护调用方的参数不被篡改：</p>
+<h3 id="2-无悬垂引用dangling-references"><a class="header" href="#2-无悬垂引用dangling-references">2. 无悬垂引用（Dangling References）</a></h3>
+<p>借用指针 <code>&amp;</code> 的生命周期绝不能超过其所指向的“灵魂（Soul）”。PAL Checker 会静态跟踪 underlying soul 的生命区间，一旦发现借用指针的持有时间超过了灵魂的生存范围（例如试图返回局部借用），将立刻拒绝编译并报错。</p>
+<h3 id="3-无双重释放double-free"><a class="header" href="#3-无双重释放double-free">3. 无双重释放（Double Free）</a></h3>
+<p>对于拥有资源所有权的手柄（如 <code>^</code> 独占指针或最后一个 <code>~</code> 共享指针），编译器会在其离开声明的作用域时，自动、确定性地注入析构与内存回收调用。而已被移动或被 <code>cede</code> 的手柄会被静态绕过，从根本上消除了双重释放的可能。</p>
+<h3 id="4-无数据竞争--别名违规data-races--aliasing-violations"><a class="header" href="#4-无数据竞争--别名违规data-races--aliasing-violations">4. 无数据竞争 / 别名违规（Data Races &amp; Aliasing Violations）</a></h3>
+<p>为了彻底杜绝并发数据竞争与读写冲突，Toka 强力推行借用别名核心准则：<strong>在任何给定的时间点，对于同一个灵魂，你只能拥有唯一的可变借用，或者拥有多个只读借用，但绝不能两者并存</strong>。</p>
+<p>由于 Toka 强制要求在调用任何可变方法时显式标注接收者（如 <code>obj#.mutate()</code>），PAL Checker 能够以极高的效率和安全性，在编译期轻而易举地对每一次方法调用边界进行排他性可变借用校验。</p>
+<hr>
+<h2 id="零拷贝实参安全"><a class="header" href="#零拷贝实参安全">零拷贝实参安全</a></h2>
+<p>Toka 的函数参数传递采用的是 <strong>“零拷贝隐式引用捕获机制”</strong>。当实参被传入函数时，PAL Checker 会自动在底层以引用形式捕获参数，带来零拷贝与零运行时开销。</p>
+<p>由于函数内部的形参默认是不可变的（immutable），因此调用方传入的实参绝无被篡改的风险：</p>
 <pre><code class="language-toka">fn show(x: i32) {
     println("x: {}", x)
 }
@@ -1018,30 +1033,26 @@ fn borrowing_safe_example() {
     println("val: {}", val)
 }
 </code></pre>
-<p>对于<strong>可变访问</strong>，在局部变量声明上使用 <code>#</code>：</p>
-<pre><code class="language-toka">fn mutable_local_example() {
-    auto x# = 42
-    x = 99
-    println("x: {}", x)
-}
-</code></pre>
-<h2 id="pal-checker-的保证一览"><a class="header" href="#pal-checker-的保证一览">PAL Checker 的保证一览</a></h2>
+<p>如果函数确需修改传入的参数，则必须在函数签名中将该参数显式声明为可变（<code>#</code>），此时 PAL Checker 将在调用点强制执行排他性的可变借用规则校验。</p>
+<hr>
+<h2 id="pal-静态保障一览表"><a class="header" href="#pal-静态保障一览表">PAL 静态保障一览表</a></h2>
+<p>PAL Checker 充当了无声的代码卫士，在您的 binary 构建之前便提供了绝对的内存安全屏障：</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>情况</th><th>PAL Checker 行为</th></tr>
+<tr><th style="text-align: left">场景 / 开发行为</th><th style="text-align: center">PAL 检查器静态反馈</th><th>安全与技术上下文</th></tr>
 </thead>
 <tbody>
-<tr><td><code>^</code> 移动后使用</td><td>❌ 编译错误</td></tr>
-<tr><td>悬垂的 <code>&amp;</code> 引用</td><td>❌ 编译错误</td></tr>
-<tr><td>双重 <code>unsafe free</code></td><td>❌ 编译错误</td></tr>
-<tr><td>可变数据竞争</td><td>❌ 编译错误</td></tr>
-<tr><td>有效的借用使用</td><td>✅ 通过</td></tr>
-<tr><td>正确的作用域清理</td><td>✅ 自动释放</td></tr>
+<tr><td style="text-align: left">在所有权移动后，再次访问独占指针 <code>^</code></td><td style="text-align: center">❌ <strong>编译期静态报错</strong></td><td>杜绝移动后使用（use-after-move）与双重释放</td></tr>
+<tr><td style="text-align: left">当灵魂（Soul）被销毁后，依然持有其借用 <code>&amp;</code></td><td style="text-align: center">❌ <strong>编译期静态报错</strong></td><td>彻底消灭悬垂指针与使用已释放内存（use-after-free）</td></tr>
+<tr><td style="text-align: left">在原始指针 <code>*</code> 上触发双重手动 <code>unsafe free</code></td><td style="text-align: center">❌ <strong>编译期静态报错</strong></td><td>静态拦截人工垃圾清理的遗留错误</td></tr>
+<tr><td style="text-align: left">将可变借用 <code>obj#.mutate()</code> 与只读借用重叠</td><td style="text-align: center">❌ <strong>编译期静态报错</strong></td><td>确保多线程环境下的线程安全，消灭数据竞争</td></tr>
+<tr><td style="text-align: left">常规借用参数传递</td><td style="text-align: center">✅ <strong>完美通过</strong></td><td>高性能、零拷贝的极速只读访问</td></tr>
+<tr><td style="text-align: left">拥有所有权的指针手柄离开其作用域</td><td style="text-align: center">✅ <strong>完美通过</strong></td><td>自动产生零运行时开销的确定性垃圾回收与资源清理</td></tr>
 </tbody>
 </table>
 </div>
-<p>该模型实现了与 Rust 借用检查器相同的安全保证，但无需任何生命周期标注——帽子标记符号直接在语法中使所有权变得可见。</p>
+<p>通过将内存安全的重担从运行时（Garbage Collector）或开发者的心智心流（手动追踪复杂的生命周期标注）转移到编译器的<strong>指针分析层（PAL）</strong>，Toka 在干净、纯粹、高可视化的现代语法中，完美实现了比肩 C++ 的极致速度与等同 Rust 的终极安全。</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="高级特性"><a class="header" href="#高级特性">高级特性</a></h1>
 <p>在掌握了变量、控制流等语言基础，并深刻理解了 <strong>帽子原则（Hat Principle）</strong> 关于灵魂（Soul）与肉身（Handle）的管理之后，你已经跨过了 Toka 最陡峭的学习曲线。现在，我们将进入 Toka 的<strong>高级特性</strong>世界。</p>

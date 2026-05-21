@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-1fcc17d6.js";
+            window.path_to_searchindex_js = "searchindex-44671f59.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -178,46 +178,49 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="hat-principle帽子原则"><a class="header" href="#hat-principle帽子原则">Hat Principle（帽子原则）</a></h1>
-<p><strong>Hat Principle（帽子原则）</strong> 是 Toka 内存安全模型背后的核心概念。它不是要求开发者标注生命周期或手动管理内存，而是使用称为“帽子（hat）“的可视语法标记，在编译时追踪所有权和内存语义。</p>
+<p><strong>Hat Principle（帽子原则）</strong> 是 Toka 内存安全模型背后的核心设计哲学。与强制开发者编写繁琐生命周期标注（如 Rust）或依赖运行时垃圾回收器（如 Go 或 Java）的传统方式不同，Toka 引入了称为**“帽子（Hats）”**的直观语法标记，在编译期静态追踪所有权、生命周期与访问权限。</p>
+<hr>
 <h2 id="什么是帽子"><a class="header" href="#什么是帽子">什么是帽子？</a></h2>
-<p><strong>帽子（hat）</strong> 是附加在标识符上的一个标记符号（sigil），告诉程序员和编译器该值是如何存储、拥有和访问的。Toka 有四种帽子类型：</p>
+<p>在 Toka 中，**帽子（Hat）**是直接附加在标识符上的语法标记符号（sigil）。这种显式标注能向开发者和编译器的安全分析引擎清晰宣告资源的存储方式、所有权归属以及访问模式。</p>
+<p>Toka 定义了四种基础的帽子类型学：</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>帽子</th><th>名称</th><th>含义</th></tr>
+<tr><th style="text-align: center">帽子标记</th><th>类型学名称</th><th>语义描述</th><th>分配/来源上下文</th></tr>
 </thead>
 <tbody>
-<tr><td><code>*</code></td><td>原始指针</td><td>底层指针，需要 <code>unsafe</code> / <code>alloc</code></td></tr>
-<tr><td><code>^</code></td><td>独占指针</td><td>对堆分配资源的独占所有权（类似 Rust 的 <code>Box</code>）</td></tr>
-<tr><td><code>~</code></td><td>共享指针</td><td>基于引用计数的共享所有权</td></tr>
-<tr><td><code>&amp;</code></td><td>借用指针</td><td>对其他值的引用/借用</td></tr>
+<tr><td style="text-align: center"><code>*</code></td><td><strong>原始指针 (Raw Pointer)</strong></td><td>不安全、底层的原始指针，需手动管理生命周期</td><td>堆分配或取地址</td></tr>
+<tr><td style="text-align: center"><code>^</code></td><td><strong>独占指针 (Unique Pointer)</strong></td><td>安全的堆资源独占所有权，超出作用域自动释放</td><td>堆分配 (<code>new</code>)</td></tr>
+<tr><td style="text-align: center"><code>~</code></td><td><strong>共享指针 (Shared Pointer)</strong></td><td>安全的、基于引用计数的共享所有权</td><td>堆分配 (<code>new</code>)</td></tr>
+<tr><td style="text-align: center"><code>&amp;</code></td><td><strong>借用指针 (Borrow Pointer)</strong></td><td>安全的、编译期受检的对其他灵魂（Soul）数据的引用</td><td>现有灵魂</td></tr>
 </tbody>
 </table>
 </div>
-<h2 id="手柄-vs-灵魂"><a class="header" href="#手柄-vs-灵魂">手柄 vs. 灵魂</a></h2>
-<p>Toka 最优雅的设计特性之一是<strong>手柄（Handle）vs. 灵魂（Soul）</strong> 的区分。它消除了显式解引用运算符的需求：</p>
+<hr>
+<h2 id="手柄-vs-灵魂无解引用美学"><a class="header" href="#手柄-vs-灵魂无解引用美学">手柄 vs. 灵魂：无解引用美学</a></h2>
+<p>帽子原则最伟大的易用性突破在于将指针容器与底层数据进行了严格的语法分立：</p>
 <ul>
-<li><strong>手柄（帽子）</strong>：<strong>带有</strong>标记符号的标识符（<code>^p</code>, <code>*p</code>, <code>~p</code>）表示<em>指针容器本身</em>。</li>
-<li><strong>灵魂（数据）</strong>：<strong>不带</strong>标记符号的标识符（<code>p</code>）表示<em>底层数据</em>。</li>
+<li><strong>手柄（Handle，即帽子）</strong>：<strong>带有</strong>标记符号的标识符（<code>^ptr</code>, <code>*ptr</code>, <code>~ptr</code>）表示<em>指针容器本身</em>（保存地址的元数据内存）。</li>
+<li><strong>灵魂（Soul，即数据）</strong>：<strong>不带</strong>标记符号的标识符（<code>ptr</code>）表示<em>底层数据</em>（实际值本身）。</li>
 </ul>
-<p>当你想要读取或修改指针指向的值时，你直接在<strong>灵魂</strong>上操作——不需要解引用标记：</p>
-<pre><code class="language-toka">fn raw_ptr_example() {
-    unsafe {
-        auto *p# = alloc i32
-        p = 99
-        println("raw: {}", p)
-    }
-}
-</code></pre>
-<p>这是对 C 语言的 <code>*p = 200</code> 或 Rust 的 <code>*p = 200</code> 的重大生活质量改进。Toka 的方法使指针密集型代码更加可读。</p>
-<h2 id="pal-checker-如何使用帽子"><a class="header" href="#pal-checker-如何使用帽子">PAL Checker 如何使用帽子</a></h2>
-<p>PAL（Pointer Analysis Layer，指针分析层）检查器在编译时分析帽子的使用情况，以强制执行借用检查器所提供的相同保证，但无需生命周期标注：</p>
+<p>通过直接对<strong>灵魂</strong>（省略帽子标记）进行操作，Toka 彻底消除了 C 语言中 <code>*p</code> 或 Rust 中 <code>*p</code> 这种繁琐的显式解引用运算符。例如，<code>ptr.x = 42</code> 会直接修改堆底层的结构体数据，无需进行显式解引用。</p>
+<hr>
+<h2 id="指针分析层pal"><a class="header" href="#指针分析层pal">指针分析层（PAL）</a></h2>
+<p>编译器的 <strong>指针分析层（Pointer Analysis Layer，简称 PAL Checker）</strong> 在编译时审查帽子的使用方式，以静态强制执行以下核心安全保证：</p>
 <ol>
-<li><strong>移动后不可使用</strong> — <code>^</code> 值在所有权转移后不能使用</li>
-<li><strong>无悬垂引用</strong> — 引用不能超过其引用对象的生命周期</li>
-<li><strong>无双重释放</strong> — 每个拥有的值恰好释放一次</li>
-<li><strong>无数据竞争</strong> — 可变访问是独占的；共享访问是只读的</li>
+<li><strong>严格的移动语义</strong>：独占指针（<code>^</code>）在赋值时会自动转移所有权。PAL Checker 会静态拦截任何对原句柄的“移动后使用（use-after-move）”。</li>
+<li><strong>确定性析构</strong>：当拥有的指针（<code>^</code> 或最后一个 <code>~</code>）离开其声明的作用域时，其绑定的堆资源会被自动、安全地释放。</li>
+<li><strong>严苛的借用检查</strong>：借用指针（<code>&amp;</code>）会接受严格的生命周期检查，确保其绝不比所指向的“灵魂”存活得更久，从源头上杜绝悬垂指针。</li>
+<li><strong>数据竞争防护</strong>：PAL Checker 确保可变访问（<code>#</code>）是排他的，而共享访问则是完全只读的。</li>
 </ol>
+<hr>
+<h2 id="学习路线"><a class="header" href="#学习路线">学习路线</a></h2>
+<p>要彻底掌握帽子原则，请依次深入探索以下子章节：</p>
+<ul>
+<li><strong><a href="hat_principle/soul_identity.html">灵魂与身份</a></strong>：精通手柄与灵魂的分立、隐式解引用，以及成员链借用（包括标准括号与标志性的帽子终端形态）的语法艺术。</li>
+<li><strong><a href="hat_principle/ownership.html">所有权与帽子</a></strong>：深入剖析四种所有权模型、默认移动与拷贝、<code>cede</code> 关键字，以及局部变量可变声明与方法调用接收者可变标注的编译器底层设计哲学。</li>
+<li><strong><a href="hat_principle/memory_safety.html">内存安全与 PAL</a></strong>：深度剖析指针分析层静态安全分析器如何实现零开销的编译期安全验证。</li>
+</ul>
 
                     </main>
 

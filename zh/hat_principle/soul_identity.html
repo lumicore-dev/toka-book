@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1fcc17d6.js";
+            window.path_to_searchindex_js = "../searchindex-44671f59.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -178,15 +178,14 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="灵魂与身份soul--identity"><a class="header" href="#灵魂与身份soul--identity">灵魂与身份（Soul &amp; Identity）</a></h1>
-<p>Toka 的 Hat Principle 引入了指针的<strong>手柄（handle）</strong>（容器）与其<strong>灵魂（soul）</strong>（底层数据）之间的清晰区分。理解这一分离是掌握 Toka 内存模型的关键。</p>
+<p>Toka 的帽子原则在指针的**手柄（Handle，语法容器）<strong>与其</strong>灵魂（Soul，底层数据）**之间引入了严格且美妙的分立。理解并掌握这一核心设计是领略 Toka 现代、无解引用美学（dereference-free aesthetics）的关键。</p>
+<hr>
 <h2 id="手柄-vs-灵魂"><a class="header" href="#手柄-vs-灵魂">手柄 vs. 灵魂</a></h2>
-<p>Toka 中的每个指针都有两个方面：</p>
+<p>在 Toka 中，每个指针标识符在语法和内存层面上都具有两个截然不同的面相：</p>
 <ul>
-<li><strong>手柄（帽子）</strong>：<em>带有</em>标记符号的标识符（<code>^p</code>, <code>*p</code>, <code>~p</code>）。表示指针容器本身——保存地址的内存位置。</li>
-<li><strong>灵魂（数据）</strong>：<em>不带</em>标记符号的标识符（<code>p</code>）。表示被指向的底层值。</li>
+<li><strong>手柄（Handle，即帽子）</strong>：<strong>带有</strong>指针标记符号的标识符（如 <code>^p</code>、<code>*p</code>、<code>~p</code>）。它在内存中代表指针容器本身——即保存目标内存地址的元数据槽。</li>
+<li><strong>灵魂（Soul，即数据）</strong>：<strong>不带</strong>指针标记符号的标识符（如 <code>p</code>）。它代表被指向的底层数据或资源本身。</li>
 </ul>
-<h2 id="隐式解引用"><a class="header" href="#隐式解引用">隐式解引用</a></h2>
-<p>Toka 的杀手级特性是<strong>隐式解引用</strong>：你永远不需要 <code>*</code> 或 <code>-&gt;</code> 运算符来访问指针背后的数据。直接使用灵魂即可：</p>
 <pre><code class="language-toka">fn handle_soul_example() {
     auto ^p# = new Point(x=10, y=20)
     p.x = 30
@@ -194,48 +193,65 @@
     println("sum: {}", sum)
 }
 </code></pre>
-<p>相比于 C 语言的（<code>p-&gt;x = 30</code>）或 Rust 的（<code>(*p).x = 30</code>），这是一个巨大的人体工程学改进。</p>
-<h2 id="四种帽子"><a class="header" href="#四种帽子">四种帽子</a></h2>
-<p>每种帽子标记符号携带不同的所有权语义：</p>
-<h3 id="--原始指针"><a class="header" href="#--原始指针"><code>*</code> — 原始指针</a></h3>
-<p>底层的不安全指针。需要 <code>unsafe</code> 关键字或显式 <code>alloc</code>：</p>
-<pre><code class="language-toka">fn raw_pointer_example() {
+<p>在上面的例子中，<code>^p#</code> 是可变的独占手柄，而 <code>p.x</code> 则直接访问底层 <code>Point</code> 灵魂的字段。</p>
+<hr>
+<h2 id="优雅的隐式解引用"><a class="header" href="#优雅的隐式解引用">优雅的隐式解引用</a></h2>
+<p>Toka 彻底摒弃了传统系统级语言中繁琐的显式解引用运算符（例如 C 语言中的 <code>*p</code> / <code>p-&gt;</code>，或 Rust 中的 <code>*p</code>）。</p>
+<p>每当你需要读取、修改指针背后的数据或访问其内部字段时，你只需直接操作其<strong>灵魂</strong>（即不带帽子标记的标识符）。Toka 编译器会在后台自动将其解析为解引用操作，具有零运行时开销：</p>
+<pre><code class="language-toka">fn implicit_deref_example() {
     unsafe {
         auto *p# = alloc i32
-        p = 42
-        println("raw: {}", p)
+        p = 100
+        auto val = p
+        println("val: {}", val)
     }
 }
 </code></pre>
-<h3 id="--独占指针"><a class="header" href="#--独占指针"><code>^</code> — 独占指针</a></h3>
-<p>对堆分配资源的独占所有权。使用 <code>new</code> 创建：</p>
-<pre><code class="language-toka">fn unique_pointer_example() {
-    auto ^p = new i32(42)
-    auto ^q = ^p
-    println("unique: {}", q)
-}
-</code></pre>
-<h3 id="--共享指针"><a class="header" href="#--共享指针"><code>~</code> — 共享指针</a></h3>
-<p>引用计数、基于指针形态学的共享所有权。</p>
-<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
-auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
-auto ~s2# = ~s1 // 共享拷贝（引用计数增加）
-s2.x = 3000     // 直接修改底层数据（灵魂）
-</code></pre>
-<h3 id="--借用指针"><a class="header" href="#--借用指针"><code>&amp;</code> — 借用指针</a></h3>
-<p>指向另一个值的引用或借用指针。通过显式地 <code>&amp;</code> 指向现有的灵魂来创建：</p>
-<pre><code class="language-toka">auto x = 42
-auto &amp;y = &amp;(x) // y 是指向 x 灵魂的借用指针
-</code></pre>
-<h2 id="身份与地址"><a class="header" href="#身份与地址">身份与地址</a></h2>
-<p>要获取局部变量的原始内存地址，使用 <code>*(expr)</code> 语法：</p>
+<p>这种隐式解引用机制为高性能系统编程带来如脚本语言般纯净、清爽的语法，极大地提升了代码的易读性。</p>
+<hr>
+<h2 id="身份取地址运算符-expr"><a class="header" href="#身份取地址运算符-expr">身份：取地址运算符 <code>*(expr)</code></a></h2>
+<p>为了获取局部变量或资源的原始物理内存地址，Toka 提供了 <strong><code>*(expr)</code></strong> 语法。该运算会返回一个指向该变量内存位置的原始指针 <code>*T</code>：</p>
 <pre><code class="language-toka">fn address_of_example() {
     auto a# = 42
     auto *raw_ptr = *(a)
     println("addr: {}", raw_ptr)
 }
 </code></pre>
-<p>帽子（<code>^</code>）并<strong>不</strong>表示“地址“。它特指独占指针容器。</p>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>帽子标记符号（如 <code>^</code> 或 <code>~</code>）并不代表“取地址”。帽子是严格的指针手柄类型修饰符，而 <code>*(expr)</code> 才是用于在运行时提取内存地址的运算符。</p>
+</blockquote>
+<hr>
+<h2 id="借用指针--与引用"><a class="header" href="#借用指针--与引用">借用指针 <code>&amp;</code> 与引用</a></h2>
+<p>**借用指针（<code>&amp;</code>）**是一种安全的引用机制，允许在不转移所有权的前提下，临时、且接受编译器静态检查地访问某个灵魂（Soul）的数据。</p>
+<h3 id="干净的局部变量借用"><a class="header" href="#干净的局部变量借用">干净的局部变量借用</a></h3>
+<p>当借用一个普通的、非数组成员的局部变量时，<strong>完全不需要加括号</strong>。直接在灵魂标识符前添加 <code>&amp;</code> 即可创建借用指针：</p>
+<pre><code class="language-toka">auto x = 42
+auto &amp;y = &amp;x // y 是指向 x 灵魂的借用指针，无需冗余括号
+</code></pre>
+<h3 id="成员访问链借用的视觉歧义限制"><a class="header" href="#成员访问链借用的视觉歧义限制">成员访问链借用的视觉歧义限制</a></h3>
+<p>当你试图借用结构体或 Shape 内部的特定字段（即成员访问链）时，如果直接写成 <code>&amp;pt.x</code>，会产生<strong>语法歧义</strong>。这在视觉上无法辨清你究竟是想借用整个成员链 <code>&amp;(pt.x)</code>，还是想在已借用的指针上访问成员 <code>(&amp;pt).x</code>。</p>
+<p>为了守护代码的极佳可读性与类型安全，Toka 编译器会拒绝无括号的 <code>&amp;pt.x</code> 编译，并提供两种完美合法且极具工业美感的写法：</p>
+<ol>
+<li><strong>方案 A（标准括号式）</strong>：显式地为成员链加括号：<code>&amp;(pt.x)</code>。</li>
+<li><strong>方案 B（帽子终端形态，Hat-Terminal Morphology）</strong>：将 <code>&amp;</code> 借用符号直接嵌入点运算符和终端字段名之间：<strong><code>pt.&amp;x</code></strong>。</li>
+</ol>
+<p><code>pt.&amp;x</code> 是 Toka 最具标志性的美学设计，完美地展示了指针形态学是如何天衣无缝地融入到成员访问链之中的。</p>
+<pre><code class="language-toka">fn borrow_example() {
+    auto x = 42
+    auto &amp;y = &amp;x // Clean local variable borrow, no parentheses needed!
+    
+    auto pt = Point(x = 10, y = 20)
+    
+    // Member borrow Path A: standard parentheses
+    auto &amp;rx1 = &amp;(pt.x)
+    
+    // Member borrow Path B: Hat-Terminal Morphology (Toka's signature aesthetic)
+    auto &amp;rx2 = pt.&amp;x
+    
+    println("y: {}, rx1: {}, rx2: {}", y, rx1, rx2)
+}
+</code></pre>
 
                     </main>
 

@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1fcc17d6.js";
+            window.path_to_searchindex_js = "../searchindex-44671f59.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -178,11 +178,12 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="所有权与帽子"><a class="header" href="#所有权与帽子">所有权与帽子</a></h1>
-<p>Toka 中的所有权由 Hat Principle 支配。每种帽子标记符号通过语法直接传达不同的所有权模型。</p>
+<p>Toka 中的所有权完全由帽子原则（Hat Principle）支配。与将内存分配掩盖在泛型类型系统之下的传统做法不同，Toka 使用独特的帽子标记符号（sigil），在语法上将值的所有权模型、拷贝/移动语义以及访问权限昭示得一清二楚。</p>
+<hr>
 <h2 id="四种所有权模型"><a class="header" href="#四种所有权模型">四种所有权模型</a></h2>
-<p>Toka 定义了四种指针类型，每种具有不同的所有权语义：</p>
-<h3 id="--原始指针不安全"><a class="header" href="#--原始指针不安全"><code>*</code> — 原始指针（不安全）</a></h3>
-<p>原始指针需要显式的 <code>unsafe</code> 或 <code>alloc</code> 来创建和管理：</p>
+<p>Toka 定义了四种指针类型学，每种对应不同的资源生命周期管理策略：</p>
+<h3 id="1---原始指针人工管理生命周期"><a class="header" href="#1---原始指针人工管理生命周期">1. <code>*</code> — 原始指针（人工管理生命周期）</a></h3>
+<p>底层原始指针提供零编译期安全保障，必须在 <code>unsafe</code> 块中进行手动分配与释放：</p>
 <pre><code class="language-toka">fn raw_ptr_example() {
     unsafe {
         auto *p# = alloc i32
@@ -191,31 +192,28 @@
     }
 }
 </code></pre>
-<p>原始指针用于与 C 代码交互或实现底层数据结构。</p>
-<h3 id="--独占指针移动语义"><a class="header" href="#--独占指针移动语义"><code>^</code> — 独占指针（移动语义）</a></h3>
-<p>独占指针提供独占所有权。任何时刻只能有一个 <code>^</code> 指向给定的资源。所有权通过<strong>移动</strong>来转移：</p>
+<h3 id="2---独占指针独占堆所有权"><a class="header" href="#2---独占指针独占堆所有权">2. <code>^</code> — 独占指针（独占堆所有权）</a></h3>
+<p>独占指针强制执行严格的独占所有权。在任何时刻，一个堆资源只能有一个 <code>^</code> 手柄指向它。当独占指针离开其声明的作用域时，其绑定的内存会被自动、即时地释放：</p>
 <pre><code class="language-toka">fn unique_ptr_example() {
     auto ^p = new i32(42)
     auto ^q = ^p
     println("unique: {}", q)
 }
 </code></pre>
-<p><code>^</code> 标记的作用类似于 Rust 的 <code>Box</code> 或 C++ 的 <code>std::unique_ptr</code>。当独占指针离开作用域时，其资源会自动释放。</p>
-<h3 id="--共享指针引用计数"><a class="header" href="#--共享指针引用计数"><code>~</code> — 共享指针（引用计数）</a></h3>
-<p>共享指针允许多个所有者通过引用计数共享所有权：</p>
+<h3 id="3---共享指针引用计数共享所有权"><a class="header" href="#3---共享指针引用计数共享所有权">3. <code>~</code> — 共享指针（引用计数共享所有权）</a></h3>
+<p>共享指针允许多个手柄通过线程安全的引用计数共享对同一堆资源的所有权。当最后一个指向它的 <code>~</code> 手柄离开作用域时，资源才会被自动释放：</p>
 <pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
-auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
+auto ~s1# = new Point(x = 100, y = 200, z = 0)
 auto ~s2# = ~s1  // 共享拷贝（引用计数增加）
-s2.x = 3000      // 直接修改底层数据（灵魂）
+s2.x = 300       // 直接修改底层灵魂（Soul）的数据
 </code></pre>
-<p>当最后一个 <code>~</code> 引用离开作用域时，资源被释放。</p>
-<h3 id="--借用指针引用语义"><a class="header" href="#--借用指针引用语义"><code>&amp;</code> — 借用指针（引用语义）</a></h3>
-<p>借用指针表示对其他值的引用，不获取其所有权。它们允许临时、受检地访问数据：</p>
-<pre><code class="language-toka">auto x = 42
-auto &amp;y = &amp;(x)   // 指向 x 灵魂的局部借用指针
-</code></pre>
+<h3 id="4---借用指针引用语义"><a class="header" href="#4---借用指针引用语义">4. <code>&amp;</code> — 借用指针（引用语义）</a></h3>
+<p>借用指针是由指针分析层（PAL Checker）静态受检的、对现有灵魂的临时引用，它不持有资源所有权。</p>
+<hr>
 <h2 id="移动-vs-拷贝"><a class="header" href="#移动-vs-拷贝">移动 vs. 拷贝</a></h2>
-<p>默认情况下，Toka 中的赋值操作执行的是<strong>拷贝</strong>（对于简单类型是按值拷贝，对于结构体/复杂类型是浅拷贝）：</p>
+<p>Toka 拥有清晰的规则来区分数据的“拷贝”与所有权的“转移”：</p>
+<h3 id="默认拷贝语义"><a class="header" href="#默认拷贝语义">默认拷贝语义</a></h3>
+<p>默认情况下，Toka 中的普通赋值执行的是<strong>拷贝</strong>。对于简单标量类型（如 <code>i32</code>、<code>bool</code>）执行按值拷贝，对于复杂的 Shape 结构体执行浅拷贝：</p>
 <pre><code class="language-toka">fn move_copy_example() {
     auto a# = 42
     auto b = a
@@ -223,21 +221,22 @@ auto &amp;y = &amp;(x)   // 指向 x 灵魂的局部借用指针
     println("a: {}, b: {}", a, b)
 }
 </code></pre>
-<p>这适用于简单类型（如 <code>i32</code>、<code>f64</code>、<code>bool</code>）以及复杂类型（如 <code>String</code>、<code>Vec</code> 或自定义 <code>shape</code> 类型）。</p>
-<h3 id="默认移动语义"><a class="header" href="#默认移动语义">默认移动语义</a></h3>
-<p>默认情况下，<strong>移动语义（Move semantics）<strong>仅适用于</strong>独占指针（<code>^</code>）</strong>。赋值独占指针会将其底层堆资源的独占所有权从源转移到目标：</p>
+<h3 id="默认移动语义独占指针"><a class="header" href="#默认移动语义独占指针">默认移动语义（独占指针）</a></h3>
+<p>移动语义<strong>在默认情况下</strong>仅适用于<strong>独占指针（<code>^</code>）</strong>。将一个独占指针赋值给另一个，会自动将堆资源的独占所有权从源转移到目标，这会使源手柄立即失效：</p>
 <pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
 auto ^p1 = new Point(x = 10, y = 20, z = 0)
-auto ^p2 = ^p1  // 所有权转移（移动）给 p2，p1 之后不再有效
+auto ^p2 = ^p1  // 所有权自动转移（移动）至 p2；p1 之后不再有效！
 </code></pre>
 <h3 id="使用-cede-进行显式移动"><a class="header" href="#使用-cede-进行显式移动">使用 <code>cede</code> 进行显式移动</a></h3>
-<p>对于其他类型（或为了显式转移任何值的所有权），必须使用 <strong><code>cede</code> 关键字</strong>进行显式移动。一旦值被 <code>cede</code>，源变量将不再有效：</p>
+<p>对于其他普通类型（如自定义 Shape 或 <code>String</code>），默认执行的是拷贝语义。为了显式转移所有权（从而避免拷贝开销），必须使用 <strong><code>cede</code> 关键字</strong>。<code>cede</code> 操作会强制将资源移动到目标，并使原变量立即失效：</p>
 <pre><code class="language-toka">import std/string::String
 auto s1 = String::from("hello")
 auto s2 = cede s1 // 显式移动：s1 之后不再有效
 </code></pre>
-<h2 id="函数参数零拷贝捕获机制"><a class="header" href="#函数参数零拷贝捕获机制">函数参数（零拷贝捕获机制）</a></h2>
-<p>在 Toka 中，函数参数默认是不可变的，并且是通过<strong>零拷贝隐式引用捕获机制</strong>传递的，而不是传统的按值传递（拷贝）。编译器保证捕获参数具有零运行时开销，并且不会消耗或拷贝原始实参。标准的参数传递不需要特殊的指针标记符号，除非你明确打算传递或重绑定指针句柄：</p>
+<hr>
+<h2 id="函数参数零拷贝引用捕获"><a class="header" href="#函数参数零拷贝引用捕获">函数参数：零拷贝引用捕获</a></h2>
+<p>在 Toka 中，函数形参默认是不可变的，并且是通过极其高效的 <strong>“零拷贝隐式引用捕获机制”</strong> 进行传递的。</p>
+<p>编译器会自动在底层以引用形式传递参数，带来零运行时开销和零拷贝。因此，对于标准的函数参数传递，你完全不需要编写任何特殊的指针标记符号，除非你明确打算传递或重绑定指针手柄本身：</p>
 <pre><code class="language-toka">fn process(data: i32) {
     println("data: {}", data)
 }
@@ -248,41 +247,52 @@ fn borrow_func_example() {
     println("val: {}", val)
 }
 </code></pre>
-<p>对于<strong>可变访问</strong>，在变量声明上使用 <code>#</code>。注意 <code>#</code> 仅限于声明时使用，不能在调用点使用：</p>
+<hr>
+<h2 id="可变性标记--与权限视图permission-view"><a class="header" href="#可变性标记--与权限视图permission-view">可变性标记 <code>#</code> 与权限视图（Permission View）</a></h2>
+<p>Toka 引入了 <code>#</code> 标记来声明和追踪可变访问权限。它的使用受到编译器生存周期的严苛规范，既消除了冗余的语法噪声，又最大化地提供了视觉安全度。</p>
+<h3 id="1-声明可变性"><a class="header" href="#1-声明可变性">1. 声明可变性</a></h3>
+<p>要在局部变量声明时指定其为可变，必须在<strong>声明点</strong>的标识符尾部追加 <code>#</code>：</p>
 <pre><code class="language-toka">fn mutable_local_example() {
     auto val# = 42
-    val = 99
+    val = 99 // Everyday context assignment: NO '#' suffix allowed here!
     println("val: {}", val)
 }
 </code></pre>
-<h2 id="使用--进行显式局部借用"><a class="header" href="#使用--进行显式局部借用">使用 <code>&amp;</code> 进行显式局部借用</a></h2>
-<p><code>&amp;</code> 标记符号用于<strong>显式声明局部借用指针</strong>或返回引用时：</p>
-<pre><code class="language-toka">shape Container(val: i32)
-fn borrow_example(c: Container) -&gt; &amp;i32 &lt;- c {
-    return &amp;(c.val)
+<h3 id="2-everyday-上下文赋值表达式中严禁标注"><a class="header" href="#2-everyday-上下文赋值表达式中严禁标注">2. Everyday 上下文（赋值表达式）中严禁标注</a></h3>
+<p>一旦变量在声明时被指定为 mutable，其可变状态便已在类型系统的 <strong>权限视图（Permission View）</strong> 中注册完毕。因此，在日常的赋值表达式或普通使用中，<strong>绝对不允许</strong>在变量名后追加 <code>#</code> 后缀：</p>
+<pre><code class="language-toka">auto val# = 42
+val = 99 // Everyday 赋值：禁止写为 val# = 99！否则会引发编译器错误。
+</code></pre>
+<p>这极大地避免了在常规书写中引入无意义的语法噪声。</p>
+<h3 id="3-可变方法调用点接收者后缀强制要求"><a class="header" href="#3-可变方法调用点接收者后缀强制要求">3. 可变方法调用点（接收者后缀）强制要求</a></h3>
+<p>Toka 最具智慧的安全美学在于：<strong>任何会发生状态修改的方法调用，都必须在调用点进行显式标示</strong>。</p>
+<p>当调用一个会修改 Shape 状态的方法时，编译器强制要求你在接收者对象（Receiver）后追加 <code>#</code> 后缀（例如 <code>obj#.mutate()</code>）。这犹如一个极高醒目度的“修改警报”，向代码阅读者与审计者最高饱和度地宣告：此处的灵魂（底层数据）正在被篡改：</p>
+<pre><code class="language-toka">shape Counter (
+    val#: i32 = 0
+)
+
+
+impl Counter@encap {
+    pub fn clone(self) -&gt; Counter {
+        return Counter(val = self.val)
+    }
+
+    fn drop(self#) {}
+
+    pub fn increment(self#) {
+        self.val = self.val + 1
+    }
 }
-fn main() -&gt; i32 {
-    auto c = Container(val = 10)
-    auto &amp;y = borrow_example(c)
-    return 0
+
+
+
+fn mutable_method_example() {
+    auto c# = Counter(val = 10) // Declaration: '#' is required for mutability
+    c#.increment()             // Mutation Site: '#' receiver suffix is required and highly visible!
+    println("c.val: {}", c.val)
 }
 </code></pre>
-<h3 id="生命周期依赖标注"><a class="header" href="#生命周期依赖标注">生命周期依赖标注</a></h3>
-<p>在上面的例子中，语法 <code>-&gt; &amp;i32 &lt;- c</code> 引入了 Toka 的<strong>生命周期依赖标注（Lifetime Dependency Annotation）</strong>。</p>
-<p>当一个函数返回一个派生自其参数的引用时，PAL Checker 要求你显式声明这种关系。<code>&lt;- c</code> 标记告诉编译器：<em>“返回的引用严格绑定到 <code>c</code> 的生命周期”</em>。</p>
-<p>如果你省略此标注，Toka 会主动阻止编译（<code>error[E0454]</code>），以防止意外的悬垂指针。这实现了与 Rust 的生命周期参数（<code>&lt;'a&gt;</code>）相同的严格内存安全保证，但语法更轻量、更直观。</p>
-<blockquote>
-<p><strong>注意：</strong> 此关系也可以使用 Toka 的 <strong>effects</strong> 标注风格来表达。对高级借用检查引用的设计正在持续演进中。</p>
-</blockquote>
-<h2 id="pal-checker-的实际运作"><a class="header" href="#pal-checker-的实际运作">PAL Checker 的实际运作</a></h2>
-<p>PAL Checker 在编译时验证：</p>
-<ol>
-<li><strong>移动后不可使用</strong> — <code>^</code> 值在所有权转移后不能访问</li>
-<li><strong>无悬垂引用</strong> — 借用的引用不能超过被借用的值的生命周期</li>
-<li><strong>无双重释放</strong> — 每个值恰好释放一次</li>
-<li><strong>无数据竞争</strong> — 可变访问是独占的；共享访问是只读的</li>
-</ol>
-<p>所有这些都<strong>无需任何生命周期标注</strong>。Hat Principle 使所有权在语法本身中变得可见。</p>
+<p>通过将 <code>#</code> 严格限制在“变量声明点”与“方法接收者可变调用点”，Toka 完美地在语法清爽度与高可视安全防护之间达成了伟大的工业平衡。</p>
 
                     </main>
 

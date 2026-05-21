@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-39f8f015.js";
+            window.path_to_searchindex_js = "../searchindex-88bbf154.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -177,47 +177,33 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="memory-safety"><a class="header" href="#memory-safety">Memory Safety</a></h1>
-<p>Toka achieves memory safety at compile time through the <strong>PAL Checker</strong> (Pointer Analysis Layer), without needing a garbage collector, runtime overhead, or explicit lifetime annotations.</p>
-<h2 id="how-pal-works"><a class="header" href="#how-pal-works">How PAL Works</a></h2>
-<p>The PAL Checker analyzes the usage of hat sigils (<code>*</code>, <code>^</code>, <code>~</code>) across your code to enforce ownership and borrowing rules. It runs at compile time and guarantees:</p>
-<ol>
-<li><strong>No dangling pointers</strong> — You cannot access memory after it has been freed</li>
-<li><strong>No double-free</strong> — Each allocation is freed exactly once</li>
-<li><strong>No use after move</strong> — A moved-from <code>^</code> (unique) pointer cannot be accessed</li>
-<li><strong>No data races</strong> — Mutable access is exclusive; shared access is read-only</li>
-</ol>
-<h2 id="unique-pointers---no-use-after-move"><a class="header" href="#unique-pointers---no-use-after-move">Unique Pointers (<code>^</code>) — No Use After Move</a></h2>
-<p>The <code>^</code> hat enforces exclusive ownership. Ownership can be transferred via <em>move</em>:</p>
+                        <h1 id="memory-safety--pal"><a class="header" href="#memory-safety--pal">Memory Safety &amp; PAL</a></h1>
+<p>Toka achieves rigorous, compile-time memory safety without the heavy runtime overhead of a Garbage Collector, and <strong>without requiring complex, verbose lifetime annotations</strong>.</p>
+<p>This is accomplished by the compiler’s <strong>Pointer Analysis Layer (PAL) Checker</strong>, which acts as a static verification engine inspecting the usage of Hat pointer typologies and access permission modifiers.</p>
+<hr>
+<h2 id="how-the-pal-checker-works"><a class="header" href="#how-the-pal-checker-works">How the PAL Checker Works</a></h2>
+<p>The PAL Checker performs static compile-time flow analysis to track the <strong>Permission View</strong> and <strong>Active Scope (Region)</strong> of every resource in your codebase.</p>
+<p>By requiring explicit pointer specifiers (Hats like <code>^</code>, <code>~</code>, <code>&amp;</code>) and mutation intent markers (like <code>#</code> on declarations and receiver method call sites), the compiler gains enough semantic information to perform rigorous safety checking automatically.</p>
+<p>It guarantees four core pillars of memory safety at compile time:</p>
+<h3 id="1-no-use-after-move-unique-pointers-"><a class="header" href="#1-no-use-after-move-unique-pointers-">1. No Use After Move (Unique Pointers <code>^</code>)</a></h3>
+<p>A unique pointer <code>^</code> represents exclusive heap ownership. When it is assigned to another handle, the original handle is marked as “moved-from.” The PAL Checker statically blocks any subsequent read or write to the original variable:</p>
 <pre><code class="language-toka">fn no_use_after_move_example() {
     auto ^p = new i32(42)
     auto ^q = ^p
     println("q: {}", q)
 }
 </code></pre>
-<p>The compiler tracks the flow of ownership and rejects any code that accesses a value after its ownership has been transferred.</p>
-<h2 id="raw-pointers---unsafe-operations"><a class="header" href="#raw-pointers---unsafe-operations">Raw Pointers (<code>*</code>) — Unsafe Operations</a></h2>
-<p>Raw pointers require explicit <code>unsafe</code> blocks:</p>
-<pre><code class="language-toka">fn unsafe_ops_example() {
-    unsafe {
-        auto *p# = alloc i32
-        p = 99
-        println("val: {}", p)
-    }
-}
-</code></pre>
-<p>The <code>unsafe</code> keyword signals to the PAL Checker that you are taking manual responsibility for memory safety.</p>
-<h2 id="shared-pointers---reference-counting"><a class="header" href="#shared-pointers---reference-counting">Shared Pointers (<code>~</code>) — Reference Counting</a></h2>
-<p>Shared pointers use runtime reference counting and are fully safe. They allow multiple pointers to share ownership of the same heap-allocated resource.</p>
-<pre><code class="language-toka">shape Point(x: i32, y: i32, z: i32)
-auto ~s1# = new Point(x = 1000, y = 2000, z = 0)
-{
-    auto ~s2# = ~s1 // Shared Copy (ref count increments)
-    s2.x = 3000     // Modifies the underlying soul
-} // Ref count decrements when s2 goes out of scope
-</code></pre>
-<h2 id="borrowing-safety"><a class="header" href="#borrowing-safety">Borrowing Safety</a></h2>
-<p>In Toka, function parameters are immutable by default and passed via a <strong>zero-copy implicit reference capture mechanism</strong>. Values of both simple types (like <code>i32</code>) and complex types (like custom <code>shape</code> types) are captured by reference with zero overhead and no cloning, keeping the caller’s arguments safe from modification because parameters are immutable by default inside the function:</p>
+<h3 id="2-no-dangling-references-borrow-pointers-"><a class="header" href="#2-no-dangling-references-borrow-pointers-">2. No Dangling References (Borrow Pointers <code>&amp;</code>)</a></h3>
+<p>A borrow pointer <code>&amp;</code> must never outlive its referent. The PAL Checker tracks the lifetime bounds of the underlying Soul and rejects compilation if a borrow is returned or held beyond the soul’s deallocation scope.</p>
+<h3 id="3-no-double-free"><a class="header" href="#3-no-double-free">3. No Double Free</a></h3>
+<p>For owned resources (<code>^</code> unique pointers or the last <code>~</code> shared pointer), the compiler injects a single, deterministic destruction call when the handle exits its scope. Handlers that have been moved or ceded are bypassed, preventing double frees statically.</p>
+<h3 id="4-no-data-races--aliasing-violations"><a class="header" href="#4-no-data-races--aliasing-violations">4. No Data Races / Aliasing Violations</a></h3>
+<p>To prevent data races and modification conflicts, Toka enforces the fundamental aliasing rule: <strong>you may have either one active mutable borrow OR multiple read-only borrows, but never both simultaneously</strong>.</p>
+<p>Because Toka requires mutating method calls to explicitly tag their receiver (e.g. <code>obj#.mutate()</code>), the PAL Checker can trivially and securely verify exclusive mutable access at every method call boundary.</p>
+<hr>
+<h2 id="zero-copy-argument-safety"><a class="header" href="#zero-copy-argument-safety">Zero-Copy Argument Safety</a></h2>
+<p>Toka’s function argument passing utilizes the <strong>zero-copy implicit reference capture mechanism</strong>. When passing arguments to a function, the PAL Checker automatically captures variables by reference under the hood with zero copying.</p>
+<p>Because parameters are immutable inside the function by default, the caller’s argument remains perfectly safe from modification:</p>
 <pre><code class="language-toka">fn show(x: i32) {
     println("x: {}", x)
 }
@@ -228,30 +214,26 @@ fn borrowing_safe_example() {
     println("val: {}", val)
 }
 </code></pre>
-<p>For <strong>mutable access</strong>, use <code>#</code> on local variable declarations:</p>
-<pre><code class="language-toka">fn mutable_local_example() {
-    auto x# = 42
-    x = 99
-    println("x: {}", x)
-}
-</code></pre>
-<h2 id="the-pal-checkers-guarantees-at-a-glance"><a class="header" href="#the-pal-checkers-guarantees-at-a-glance">The PAL Checker’s Guarantees at a Glance</a></h2>
+<p>To allow a function to modify a parameter, the parameter must be declared mutable (<code>#</code>) in the function signature, and the PAL Checker will then enforce exclusive borrowing at the call site.</p>
+<hr>
+<h2 id="pal-static-assurances-at-a-glance"><a class="header" href="#pal-static-assurances-at-a-glance">PAL Static Assurances at a Glance</a></h2>
+<p>The PAL Checker acts as a silent guardian, providing absolute safety guarantees before your binary is even built:</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>Situation</th><th>PAL Checker Action</th></tr>
+<tr><th style="text-align: left">Scenario / Action</th><th style="text-align: center">PAL Checker Static Response</th><th>Safety Context</th></tr>
 </thead>
 <tbody>
-<tr><td>Use after <code>^</code> move</td><td>❌ Compile error</td></tr>
-<tr><td>Dangling <code>&amp;</code> reference</td><td>❌ Compile error</td></tr>
-<tr><td>Double <code>unsafe free</code></td><td>❌ Compile error</td></tr>
-<tr><td>Race on mutable data</td><td>❌ Compile error</td></tr>
-<tr><td>Valid borrow usage</td><td>✅ Passes</td></tr>
-<tr><td>Correct scope cleanup</td><td>✅ Automatic free</td></tr>
+<tr><td style="text-align: left">Accessing a unique pointer <code>^</code> after move</td><td style="text-align: center">❌ <strong>Compile Error</strong></td><td>Prevents use-after-move and double-frees</td></tr>
+<tr><td style="text-align: left">Holding a borrow <code>&amp;</code> after its Soul is dropped</td><td style="text-align: center">❌ <strong>Compile Error</strong></td><td>Eliminates dangling pointers &amp; use-after-free</td></tr>
+<tr><td style="text-align: left">Triggering double <code>unsafe free</code> on <code>*</code></td><td style="text-align: center">❌ <strong>Compile Error</strong></td><td>Restricts manual deallocation errors</td></tr>
+<tr><td style="text-align: left">Overlapping mutable borrow <code>obj#.mutate()</code> with shared borrows</td><td style="text-align: center">❌ <strong>Compile Error</strong></td><td>Guarantees thread safety and no data races</td></tr>
+<tr><td style="text-align: left">Normal borrow parameter passing</td><td style="text-align: center">✅ <strong>Passed</strong></td><td>High-performance, zero-copy read-only access</td></tr>
+<tr><td style="text-align: left">Handle exiting its declared scope</td><td style="text-align: center">✅ <strong>Passed</strong></td><td>Generates zero-overhead automatic resource cleanup</td></tr>
 </tbody>
 </table>
 </div>
-<p>This model achieves the same safety guarantees as Rust’s borrow checker, but without any lifetime annotations — the hat sigils make ownership visible directly in the syntax.</p>
+<p>By shifting the burden of memory safety from the runtime (GC) or the programmer’s brain (manual lifetimes) to the <strong>Pointer Analysis Layer (PAL)</strong>, Toka provides the performance of C++ with the safety of Rust, wrapped in a clean and visual syntax.</p>
 
                     </main>
 

@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-39f8f015.js";
+            window.path_to_searchindex_js = "searchindex-88bbf154.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -178,46 +178,49 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="the-hat-principle"><a class="header" href="#the-hat-principle">The Hat Principle</a></h1>
-<p>The <strong>Hat Principle</strong> is the core concept behind Toka’s memory safety model. Instead of requiring developers to annotate lifetimes or manually manage memory, Toka uses visible syntactic tokens called “hats” to track ownership and memory semantics at compile time.</p>
+<p>The <strong>Hat Principle</strong> is the foundational design philosophy behind Toka’s memory safety model. Rather than forcing developers to write complex lifetime annotations (as in Rust) or relying on a runtime Garbage Collector (as in Go or Java), Toka introduces visible syntactic tokens called <strong>“Hats”</strong> to track ownership, resource lifetimes, and access permissions at compile time.</p>
+<hr>
 <h2 id="what-is-a-hat"><a class="header" href="#what-is-a-hat">What is a Hat?</a></h2>
-<p>A <strong>hat</strong> is a sigil (symbol) attached to an identifier that tells both the programmer and the compiler how that value is stored, owned, and accessed. Toka has four hat types:</p>
+<p>In Toka, a <strong>Hat</strong> is a syntactic sigil (symbol) attached directly to an identifier. This explicit notation tells both the programmer and the compiler’s safety analysis engine exactly how a resource is stored, owned, and accessed.</p>
+<p>Toka defines four primitive Hat typologies:</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>Hat</th><th>Name</th><th>Meaning</th></tr>
+<tr><th style="text-align: center">Hat Sigil</th><th>Typology</th><th>Semantic Description</th><th>Allocation Context</th></tr>
 </thead>
 <tbody>
-<tr><td><code>*</code></td><td>Raw Pointer</td><td>Low-level pointer, requires <code>unsafe</code> / <code>alloc</code></td></tr>
-<tr><td><code>^</code></td><td>Unique Pointer</td><td>Exclusive ownership of a heap-allocated resource (like <code>Box</code> in Rust)</td></tr>
-<tr><td><code>~</code></td><td>Shared Pointer</td><td>Reference-counted shared ownership</td></tr>
-<tr><td><code>&amp;</code></td><td>Borrow Pointer</td><td>Reference/borrow of another value</td></tr>
+<tr><td style="text-align: center"><code>*</code></td><td><strong>Raw Pointer</strong></td><td>Unsafe, low-level pointer with manual lifecycle management</td><td>Heap or Address-of</td></tr>
+<tr><td style="text-align: center"><code>^</code></td><td><strong>Unique Pointer</strong></td><td>Safe, exclusive ownership of a heap-allocated resource (Auto-free)</td><td>Heap (<code>new</code>)</td></tr>
+<tr><td style="text-align: center"><code>~</code></td><td><strong>Shared Pointer</strong></td><td>Safe, reference-counted shared ownership</td><td>Heap (<code>new</code>)</td></tr>
+<tr><td style="text-align: center"><code>&amp;</code></td><td><strong>Borrow Pointer</strong></td><td>Safe, compile-time borrow/reference to another soul’s data</td><td>Existing Soul</td></tr>
 </tbody>
 </table>
 </div>
-<h2 id="handle-vs-soul"><a class="header" href="#handle-vs-soul">Handle vs. Soul</a></h2>
-<p>One of Toka’s most elegant design features is the <strong>Handle vs. Soul</strong> distinction. It eliminates the need for explicit dereferencing operators:</p>
+<hr>
+<h2 id="handle-vs-soul-dereference-free-aesthetics"><a class="header" href="#handle-vs-soul-dereference-free-aesthetics">Handle vs. Soul: Dereference-Free Aesthetics</a></h2>
+<p>A major ergonomic breakthrough of the Hat Principle is the strict bifurcation between a pointer’s container and its underlying data:</p>
 <ul>
-<li><strong>Handle (The Hat)</strong>: Identifiers <strong>with</strong> a sigil (<code>^p</code>, <code>*p</code>, <code>~p</code>) represent the <em>pointer container</em> itself.</li>
-<li><strong>Soul (The Data)</strong>: Identifiers <strong>without</strong> a sigil (<code>p</code>) represent the <em>underlying data</em>.</li>
+<li><strong>Handle (The Hat)</strong>: An identifier <strong>with</strong> its sigil (<code>^ptr</code>, <code>*ptr</code>, <code>~ptr</code>) represents the <em>pointer container</em> itself (the metadata holding the address).</li>
+<li><strong>Soul (The Data)</strong>: An identifier <strong>without</strong> its sigil (<code>ptr</code>) represents the <em>underlying data</em> (the actual value).</li>
 </ul>
-<p>When you want to read or modify the value a pointer points to, you simply operate on the <strong>soul</strong> directly — no dereference token needed:</p>
-<pre><code class="language-toka">fn raw_ptr_example() {
-    unsafe {
-        auto *p# = alloc i32
-        p = 99
-        println("raw: {}", p)
-    }
-}
-</code></pre>
-<p>This is a major quality-of-life improvement over C’s <code>*p = 200</code> or Rust’s <code>*p = 200</code>. Toka’s approach makes pointer-heavy code much more readable.</p>
-<h2 id="how-the-pal-checker-uses-hats"><a class="header" href="#how-the-pal-checker-uses-hats">How the PAL Checker Uses Hats</a></h2>
-<p>The PAL (Pointer Analysis Layer) Checker analyzes hat usage at compile time to enforce the same guarantees a borrow checker provides, but without lifetime annotations:</p>
+<p>By operating directly on the <strong>Soul</strong> (omitting the sigil), Toka completely eliminates the need for explicit dereferencing operators like C’s <code>*p</code> or Rust’s <code>*p</code>. For example, <code>ptr.x = 42</code> directly mutates the underlying heap data without manual dereferencing.</p>
+<hr>
+<h2 id="the-pointer-analysis-layer-pal"><a class="header" href="#the-pointer-analysis-layer-pal">The Pointer Analysis Layer (PAL)</a></h2>
+<p>The compiler’s <strong>Pointer Analysis Layer (PAL) Checker</strong> inspects Hat configurations during compilation to statically enforce strict safety guarantees:</p>
 <ol>
-<li><strong>No use after move</strong> — A <code>^</code> value cannot be used after ownership has been transferred</li>
-<li><strong>No dangling references</strong> — References cannot outlive their referent</li>
-<li><strong>No double-free</strong> — Each owned value is freed exactly once</li>
-<li><strong>No data races</strong> — Mutable access is exclusive; shared access is read-only</li>
+<li><strong>Strict Move Semantics</strong>: A Unique Pointer (<code>^</code>) automatically transfers ownership on assignment. The PAL Checker blocks any “use-after-move” of the original handle.</li>
+<li><strong>Deterministic Destruction</strong>: When an owned pointer (<code>^</code> or the last <code>~</code>) exits its declared scope, its resource is automatically freed.</li>
+<li><strong>Rigorous Borrow Checking</strong>: Borrow Pointers (<code>&amp;</code>) are checked to ensure they never outlive the underlying Soul, preventing dangling references.</li>
+<li><strong>Data Race Prevention</strong>: The PAL Checker ensures that mutable access (<code>#</code>) is exclusive, while shared access is read-only.</li>
 </ol>
+<hr>
+<h2 id="learning-path"><a class="header" href="#learning-path">Learning Path</a></h2>
+<p>To master the Hat Principle, explore the following sections in order:</p>
+<ul>
+<li><strong><a href="hat_principle/soul_identity.html">Soul &amp; Identity</a></strong>: Master the Handle/Soul split, implicit dereferencing, and the syntax of member borrowings (including standard parentheses and Hat-Terminal Morphology).</li>
+<li><strong><a href="hat_principle/ownership.html">Ownership &amp; Hats</a></strong>: Explore the four ownership models, default moves versus copying, the <code>cede</code> keyword, and the visual distinction between mutable local declarations and mutable method call receivers.</li>
+<li><strong><a href="hat_principle/memory_safety.html">Memory Safety &amp; PAL</a></strong>: Deep dive into the Pointer Analysis Layer and see how Toka achieves zero-overhead compile-time memory safety.</li>
+</ul>
 
                     </main>
 
