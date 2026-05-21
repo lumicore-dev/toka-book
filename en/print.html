@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-e87e8b39.js";
+            window.path_to_searchindex_js = "searchindex-1c4fdd59.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -217,27 +217,27 @@
 <p><em>— lumicore-dev</em></p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
-<p>Welcome to Toka! This chapter will guide you through installing Toka, writing your first program, and understanding the project structure.</p>
-<h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
-<p>Toka provides pre-compiled binaries for Linux, macOS, and Windows. The easiest way to install is via the quick install script:</p>
-<pre><code class="language-bash">curl -fsSL https://tokalang.dev/install.sh | bash
-</code></pre>
-<p>This script will automatically detect your operating system and CPU architecture, download the latest stable release to <code>~/.toka/</code>, and configure your environment.</p>
-<h3 id="setting-up-environment-variables"><a class="header" href="#setting-up-environment-variables">Setting Up Environment Variables</a></h3>
-<p>After installation, you need to set up two environment variables to use Toka from any directory:</p>
-<pre><code class="language-bash">export PATH="$HOME/.toka/bin:$PATH"
-export TOKA_LIB="$HOME/.toka/lib"
-</code></pre>
-<p>Add these lines to your <code>~/.bashrc</code> or <code>~/.zshrc</code> to make them permanent.</p>
-<h3 id="verify-installation"><a class="header" href="#verify-installation">Verify Installation</a></h3>
-<p>Run the following command to confirm everything is working:</p>
-<pre><code class="language-bash">tokac --version
-</code></pre>
-<p>You should see output similar to:</p>
-<pre><code>toka version 0.9.6 (Built: May 17 2026 13:53:33)
-</code></pre>
+<p>Welcome to Toka! Toka is a modern, expressive systems programming language designed for absolute safety, high performance, and minimal mental overhead. It implements the innovative <strong>Hat Principle</strong> to achieve compile-time memory safety without the need for a garbage collector or manual lifetime annotations.</p>
+<p>To help you get up and running as quickly as possible, this chapter is divided into three logical steps. We recommend following them in order:</p>
+<h2 id="-your-path-to-toka"><a class="header" href="#-your-path-to-toka">🧭 Your Path to Toka</a></h2>
+<ol>
+<li>
+<p><strong><a href="#installation">Installation</a></strong>
+Set up the Toka compiler and toolchain on your system. We provide a single-command quick installer for Linux, macOS, and Windows, as well as instructions for building from source.</p>
+</li>
+<li>
+<p><strong><a href="#hello-toka">Hello, Toka!</a></strong>
+Write, compile, and run your very first Toka program. You’ll learn how to invoke the compiler directly and understand the anatomy of a basic Toka executable.</p>
+</li>
+<li>
+<p><strong><a href="#project-structure">Project Structure</a></strong>
+Scale up from a single-file script to a structured multi-file package. Learn about Toka’s built-in package manager, defining package metadata in <code>package.tk</code>, adding dependencies, and structuring library projects.</p>
+</li>
+</ol>
+<hr>
+<p>Let’s begin by installing Toka on your machine!</p>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="installation-1"><a class="header" href="#installation-1">Installation</a></h1>
+<h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
 <p>Getting Toka on your system takes just a few seconds.</p>
 <h2 id="quick-install"><a class="header" href="#quick-install">Quick Install</a></h2>
 <p>The easiest way to install Toka is via the official install script:</p>
@@ -258,25 +258,11 @@ export TOKA_LIB="$HOME/.toka/lib"
 <p>Reload your shell:</p>
 <pre><code class="language-bash">source ~/.bashrc
 </code></pre>
-<h2 id="verify-installation-1"><a class="header" href="#verify-installation-1">Verify Installation</a></h2>
+<h2 id="verify-installation"><a class="header" href="#verify-installation">Verify Installation</a></h2>
 <pre><code class="language-bash">tokac --version
 </code></pre>
 <p>You should see output similar to:</p>
 <pre><code>toka version 0.9.6 (Built: May 17 2026)
-</code></pre>
-<h2 id="hello-toka"><a class="header" href="#hello-toka">Hello, Toka!</a></h2>
-<p>Create your first program:</p>
-<pre><code class="language-bash">echo 'import std/io::println
-
-fn main() -&gt; i32 {
-    println("Hello, Toka!")
-    return 0
-}' &gt; hello.tk
-
-toka run hello.tk
-</code></pre>
-<p>Expected output:</p>
-<pre><code>Hello, Toka!
 </code></pre>
 <h2 id="building-from-source"><a class="header" href="#building-from-source">Building from Source</a></h2>
 <p>For the latest development version:</p>
@@ -300,7 +286,7 @@ make -C build -j8
 </table>
 </div>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="hello-toka-1"><a class="header" href="#hello-toka-1">Hello, Toka!</a></h1>
+<h1 id="hello-toka"><a class="header" href="#hello-toka">Hello, Toka!</a></h1>
 <p>Let’s write your first Toka program. Create a file called <code>hello.tk</code>:</p>
 <pre><code class="language-toka">import std/io::println
 
@@ -342,16 +328,9 @@ toka run hello.tk
 <h1 id="project-structure"><a class="header" href="#project-structure">Project Structure</a></h1>
 <p>Understanding Toka’s project structure helps you organize your code effectively.</p>
 <h2 id="single-file-programs"><a class="header" href="#single-file-programs">Single-File Programs</a></h2>
-<p>For simple programs, a single <code>.tk</code> file is all you need:</p>
-<pre><code class="language-toka">// hello.tk
-import std/io::println
-
-fn main() -&gt; i32 {
-    println("Hello, Toka!")
-    return 0
-}
+<p>For quick prototyping or simple scripts, a single <code>.tk</code> file is perfectly sufficient. As we saw in the <a href="#hello-toka">Hello, Toka!</a> section, you can write all your code in one file (like <code>hello.tk</code>) and execute it instantly with:</p>
+<pre><code class="language-bash">toka run hello.tk
 </code></pre>
-<p>Run with: <code>toka run hello.tk</code></p>
 <h2 id="multi-file-projects"><a class="header" href="#multi-file-projects">Multi-File Projects</a></h2>
 <p>For larger projects, initialize a project using <code>toka init</code>. This creates a <code>package.tk</code> file:</p>
 <pre><code class="language-tokalang">// package.tk

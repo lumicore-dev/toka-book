@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-e87e8b39.js";
+            window.path_to_searchindex_js = "../searchindex-1c4fdd59.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -180,16 +180,9 @@
                         <h1 id="project-structure"><a class="header" href="#project-structure">Project Structure</a></h1>
 <p>Understanding Toka’s project structure helps you organize your code effectively.</p>
 <h2 id="single-file-programs"><a class="header" href="#single-file-programs">Single-File Programs</a></h2>
-<p>For simple programs, a single <code>.tk</code> file is all you need:</p>
-<pre><code class="language-toka">// hello.tk
-import std/io::println
-
-fn main() -&gt; i32 {
-    println("Hello, Toka!")
-    return 0
-}
+<p>For quick prototyping or simple scripts, a single <code>.tk</code> file is perfectly sufficient. As we saw in the <a href="./hello_toka.html">Hello, Toka!</a> section, you can write all your code in one file (like <code>hello.tk</code>) and execute it instantly with:</p>
+<pre><code class="language-bash">toka run hello.tk
 </code></pre>
-<p>Run with: <code>toka run hello.tk</code></p>
 <h2 id="multi-file-projects"><a class="header" href="#multi-file-projects">Multi-File Projects</a></h2>
 <p>For larger projects, initialize a project using <code>toka init</code>. This creates a <code>package.tk</code> file:</p>
 <pre><code class="language-tokalang">// package.tk

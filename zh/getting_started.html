@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-f70aef36.js";
+            window.path_to_searchindex_js = "searchindex-de7ac38e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -178,25 +178,25 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="快速入门"><a class="header" href="#快速入门">快速入门</a></h1>
-<p>欢迎使用 Toka！本章将引导你安装 Toka、编写你的第一个程序，并理解项目结构。</p>
-<h2 id="安装"><a class="header" href="#安装">安装</a></h2>
-<p>Toka 为 Linux、macOS 和 Windows 提供预编译的二进制文件。最简单的安装方式是通过快速安装脚本：</p>
-<pre><code class="language-bash">curl -fsSL https://tokalang.dev/install.sh | bash
-</code></pre>
-<p>该脚本会自动检测你的操作系统和 CPU 架构，将最新的稳定版本下载到 <code>~/.toka/</code>，并配置你的环境。</p>
-<h3 id="设置环境变量"><a class="header" href="#设置环境变量">设置环境变量</a></h3>
-<p>安装完成后，你需要设置两个环境变量，以便在任何目录下使用 Toka：</p>
-<pre><code class="language-bash">export PATH="$HOME/.toka/bin:$PATH"
-export TOKA_LIB="$HOME/.toka/lib"
-</code></pre>
-<p>将这些行添加到你的 <code>~/.bashrc</code> 或 <code>~/.zshrc</code> 中，使其永久生效。</p>
-<h3 id="验证安装"><a class="header" href="#验证安装">验证安装</a></h3>
-<p>运行以下命令确认一切正常：</p>
-<pre><code class="language-bash">tokac --version
-</code></pre>
-<p>你应该会看到类似如下的输出：</p>
-<pre><code>toka version 0.9.6 (Built: May 17 2026 13:53:33)
-</code></pre>
+<p>欢迎使用 Toka！Toka 是一门现代、富有表现力的系统级编程语言，旨在提供极致的安全、高性能以及极低的心智负担。它通过创新的 <strong>Hat Principle（帽子原则）</strong> 来实现编译时内存安全，无需垃圾回收器，也无需繁琐的手动生命周期标注。</p>
+<p>为了让您以最快的速度上手，本章被划分为三个由浅入深的步骤。我们建议您按顺序阅读和实践：</p>
+<h2 id="-您的-toka-学习路线"><a class="header" href="#-您的-toka-学习路线">🧭 您的 Toka 学习路线</a></h2>
+<ol>
+<li>
+<p><strong><a href="./getting_started/installation.html">安装 Toka</a></strong>
+在您的系统上安装并配置 Toka 编译器与工具链。我们为 Linux、macOS 和 Windows 提供了单命令快速安装脚本，同时提供了从源码编译的详细说明。</p>
+</li>
+<li>
+<p><strong><a href="./getting_started/hello_toka.html">Hello, Toka！</a></strong>
+编写、编译并运行您的第一个 Toka 程序。您将学习如何直接调用编译器，并理解一个最基本的 Toka 可执行程序的内部构造。</p>
+</li>
+<li>
+<p><strong><a href="./getting_started/project_structure.html">项目结构</a></strong>
+从简单的单文件脚本过渡到结构化、专业的多文件包管理。了解 Toka 内置的包管理器、如何通过 <code>package.tk</code> 定义项目元数据、如何添加依赖以及如何组织库项目。</p>
+</li>
+</ol>
+<hr>
+<p>现在，让我们从在您的机器上安装 Toka 开始吧！</p>
 
                     </main>
 
