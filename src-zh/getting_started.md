@@ -1,38 +1,20 @@
 # 快速入门
 
-欢迎使用 Toka！本章将引导你安装 Toka、编写你的第一个程序，并理解项目结构。
+欢迎使用 Toka！Toka 是一门现代、富有表现力的系统级编程语言，旨在提供极致的安全、高性能以及极低的心智负担。它通过创新的 **Hat Principle（帽子原则）** 来实现编译时内存安全，无需垃圾回收器，也无需繁琐的手动生命周期标注。
 
-## 安装
+为了让您以最快的速度上手，本章被划分为三个由浅入深的步骤。我们建议您按顺序阅读和实践：
 
-Toka 为 Linux、macOS 和 Windows 提供预编译的二进制文件。最简单的安装方式是通过快速安装脚本：
+## 🧭 您的 Toka 学习路线
 
-```bash
-curl -fsSL https://tokalang.dev/install.sh | bash
-```
+1. **[安装 Toka](./getting_started/installation.md)**
+   在您的系统上安装并配置 Toka 编译器与工具链。我们为 Linux、macOS 和 Windows 提供了单命令快速安装脚本，同时提供了从源码编译的详细说明。
 
-该脚本会自动检测你的操作系统和 CPU 架构，将最新的稳定版本下载到 `~/.toka/`，并配置你的环境。
+2. **[Hello, Toka！](./getting_started/hello_toka.md)**
+   编写、编译并运行您的第一个 Toka 程序。您将学习如何直接调用编译器，并理解一个最基本的 Toka 可执行程序的内部构造。
 
-### 设置环境变量
+3. **[项目结构](./getting_started/project_structure.md)**
+   从简单的单文件脚本过渡到结构化、专业的多文件包管理。了解 Toka 内置的包管理器、如何通过 `package.tk` 定义项目元数据、如何添加依赖以及如何组织库项目。
 
-安装完成后，你需要设置两个环境变量，以便在任何目录下使用 Toka：
+---
 
-```bash
-export PATH="$HOME/.toka/bin:$PATH"
-export TOKA_LIB="$HOME/.toka/lib"
-```
-
-将这些行添加到你的 `~/.bashrc` 或 `~/.zshrc` 中，使其永久生效。
-
-### 验证安装
-
-运行以下命令确认一切正常：
-
-```bash
-tokac --version
-```
-
-你应该会看到类似如下的输出：
-
-```
-toka version 0.9.6 (Built: May 17 2026 13:53:33)
-```
+现在，让我们从在您的机器上安装 Toka 开始吧！

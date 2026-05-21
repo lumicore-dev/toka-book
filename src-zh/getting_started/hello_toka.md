@@ -52,7 +52,7 @@ Hello, Toka!
 如果想快速测试而不创建文件，也可以直接使用：
 
 ```bash
-echo 'import std/io::{println} fn main() -> i32 { println("Hello, Toka World!") return 0 }' > hello.tk
+echo 'import std/io::println fn main() -> i32 { println("Hello, Toka World!") return 0 }' > hello.tk
 toka run hello.tk
 ```
 

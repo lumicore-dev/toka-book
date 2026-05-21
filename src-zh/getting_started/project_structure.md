@@ -4,19 +4,11 @@
 
 ## 单文件程序
 
-对于简单的程序，一个 `.tk` 文件就足够了：
+对于快速原型开发或简单的脚本，一个单独的 `.tk` 文件就足够了。正如我们在 [Hello, Toka！](./hello_toka.md) 一节中所见，您可以将所有代码编写在一个文件（如 `hello.tk`）中，并通过以下命令立即执行它：
 
-```toka
-// hello.tk
-import std/io::println
-
-fn main() -> i32 {
-    println("Hello, Toka!")
-    return 0
-}
+```bash
+toka run hello.tk
 ```
-
-运行方式：`toka run hello.tk`
 
 ## 多文件项目
 

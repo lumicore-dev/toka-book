@@ -1,38 +1,20 @@
 # Getting Started
 
-Welcome to Toka! This chapter will guide you through installing Toka, writing your first program, and understanding the project structure.
+Welcome to Toka! Toka is a modern, expressive systems programming language designed for absolute safety, high performance, and minimal mental overhead. It implements the innovative **Hat Principle** to achieve compile-time memory safety without the need for a garbage collector or manual lifetime annotations.
 
-## Installation
+To help you get up and running as quickly as possible, this chapter is divided into three logical steps. We recommend following them in order:
 
-Toka provides pre-compiled binaries for Linux, macOS, and Windows. The easiest way to install is via the quick install script:
+## 🧭 Your Path to Toka
 
-```bash
-curl -fsSL https://tokalang.dev/install.sh | bash
-```
+1. **[Installation](./getting_started/installation.md)**
+   Set up the Toka compiler and toolchain on your system. We provide a single-command quick installer for Linux, macOS, and Windows, as well as instructions for building from source.
 
-This script will automatically detect your operating system and CPU architecture, download the latest stable release to `~/.toka/`, and configure your environment.
+2. **[Hello, Toka!](./getting_started/hello_toka.md)**
+   Write, compile, and run your very first Toka program. You'll learn how to invoke the compiler directly and understand the anatomy of a basic Toka executable.
 
-### Setting Up Environment Variables
+3. **[Project Structure](./getting_started/project_structure.md)**
+   Scale up from a single-file script to a structured multi-file package. Learn about Toka's built-in package manager, defining package metadata in `package.tk`, adding dependencies, and structuring library projects.
 
-After installation, you need to set up two environment variables to use Toka from any directory:
+---
 
-```bash
-export PATH="$HOME/.toka/bin:$PATH"
-export TOKA_LIB="$HOME/.toka/lib"
-```
-
-Add these lines to your `~/.bashrc` or `~/.zshrc` to make them permanent.
-
-### Verify Installation
-
-Run the following command to confirm everything is working:
-
-```bash
-tokac --version
-```
-
-You should see output similar to:
-
-```
-toka version 0.9.6 (Built: May 17 2026 13:53:33)
-```
+Let's begin by installing Toka on your machine!

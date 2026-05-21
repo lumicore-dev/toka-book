@@ -43,27 +43,6 @@ You should see output similar to:
 toka version 0.9.6 (Built: May 17 2026)
 ```
 
-## Hello, Toka!
-
-Create your first program:
-
-```bash
-echo 'import std/io::println
-
-fn main() -> i32 {
-    println("Hello, Toka!")
-    return 0
-}' > hello.tk
-
-toka run hello.tk
-```
-
-Expected output:
-
-```
-Hello, Toka!
-```
-
 ## Building from Source
 
 For the latest development version:

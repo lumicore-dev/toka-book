@@ -43,27 +43,6 @@ tokac --version
 toka version 0.9.6 (Built: May 17 2026)
 ```
 
-## Hello, Toka！
-
-创建你的第一个程序：
-
-```bash
-echo 'import std/io::println
-
-fn main() -> i32 {
-    println("Hello, Toka!")
-    return 0
-}' > hello.tk
-
-toka run hello.tk
-```
-
-预期输出：
-
-```
-Hello, Toka!
-```
-
 ## 从源码编译
 
 如果你想使用最新的开发版本：

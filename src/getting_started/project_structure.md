@@ -4,19 +4,11 @@ Understanding Toka's project structure helps you organize your code effectively.
 
 ## Single-File Programs
 
-For simple programs, a single `.tk` file is all you need:
+For quick prototyping or simple scripts, a single `.tk` file is perfectly sufficient. As we saw in the [Hello, Toka!](./hello_toka.md) section, you can write all your code in one file (like `hello.tk`) and execute it instantly with:
 
-```toka
-// hello.tk
-import std/io::println
-
-fn main() -> i32 {
-    println("Hello, Toka!")
-    return 0
-}
+```bash
+toka run hello.tk
 ```
-
-Run with: `toka run hello.tk`
 
 ## Multi-File Projects
 
