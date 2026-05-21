@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-44671f59.js";
+            window.path_to_searchindex_js = "../searchindex-3d2aecac.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -209,17 +209,17 @@
 </code></pre>
 <p>这种隐式解引用机制为高性能系统编程带来如脚本语言般纯净、清爽的语法，极大地提升了代码的易读性。</p>
 <hr>
-<h2 id="身份取地址运算符-expr"><a class="header" href="#身份取地址运算符-expr">身份：取地址运算符 <code>*(expr)</code></a></h2>
-<p>为了获取局部变量或资源的原始物理内存地址，Toka 提供了 <strong><code>*(expr)</code></strong> 语法。该运算会返回一个指向该变量内存位置的原始指针 <code>*T</code>：</p>
+<h2 id="身份取地址运算符-expr"><a class="header" href="#身份取地址运算符-expr">身份：取地址运算符 <code>*expr</code></a></h2>
+<p>为了获取局部变量或资源的原始物理内存地址，Toka 提供了 <strong><code>*expr</code></strong> 语法。该运算会返回一个指向该变量内存位置的原始指针 <code>*T</code>：</p>
 <pre><code class="language-toka">fn address_of_example() {
     auto a# = 42
-    auto *raw_ptr = *(a)
+    auto *raw_ptr = *a
     println("addr: {}", raw_ptr)
 }
 </code></pre>
 <blockquote class="blockquote-tag blockquote-tag-note">
 <p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
-<p>帽子标记符号（如 <code>^</code> 或 <code>~</code>）并不代表“取地址”。帽子是严格的指针手柄类型修饰符，而 <code>*(expr)</code> 才是用于在运行时提取内存地址的运算符。</p>
+<p>帽子标记符号（如 <code>^</code> 或 <code>~</code>）并不代表“取地址”。帽子是严格的指针手柄类型修饰符，而 <code>*expr</code> 才是用于在运行时提取内存地址的运算符。</p>
 </blockquote>
 <hr>
 <h2 id="借用指针--与引用"><a class="header" href="#借用指针--与引用">借用指针 <code>&amp;</code> 与引用</a></h2>

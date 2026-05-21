@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-88bbf154.js";
+            window.path_to_searchindex_js = "../searchindex-fcd3b1ba.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -209,17 +209,17 @@
 </code></pre>
 <p>This implicit dereferencing brings a clean, script-like syntax to high-performance systems programming, drastically increasing code readability.</p>
 <hr>
-<h2 id="identity-the-address-of-operator-expr"><a class="header" href="#identity-the-address-of-operator-expr">Identity: The Address-Of Operator <code>*(expr)</code></a></h2>
-<p>To retrieve the raw, physical memory address of a local variable or resource, Toka provides the一元 <strong><code>*(expr)</code></strong> syntax. This returns a raw pointer <code>*T</code> pointing to the variable’s location:</p>
+<h2 id="identity-the-address-of-operator-expr"><a class="header" href="#identity-the-address-of-operator-expr">Identity: The Address-Of Operator <code>*expr</code></a></h2>
+<p>To retrieve the raw, physical memory address of a local variable or resource, Toka provides the unary <strong><code>*expr</code></strong> syntax. This returns a raw pointer <code>*T</code> pointing to the variable’s location:</p>
 <pre><code class="language-toka">fn address_of_example() {
     auto a# = 42
-    auto *raw_ptr = *(a)
+    auto *raw_ptr = *a
     println("addr: {}", raw_ptr)
 }
 </code></pre>
 <blockquote class="blockquote-tag blockquote-tag-note">
 <p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
-<p>The Hat sigil (like <code>^</code> or <code>~</code>) does <strong>not</strong> mean “address of”. Sigils are strictly type specifiers for pointer handles, whereas <code>*(expr)</code> is the runtime operator to extract a memory address.</p>
+<p>The Hat sigil (like <code>^</code> or <code>~</code>) does <strong>not</strong> mean “address of”. Sigils are strictly type specifiers for pointer handles, whereas <code>*expr</code> is the runtime operator to extract a memory address.</p>
 </blockquote>
 <hr>
 <h2 id="references-and-the-borrow-pointer-"><a class="header" href="#references-and-the-borrow-pointer-">References and the Borrow Pointer <code>&amp;</code></a></h2>
