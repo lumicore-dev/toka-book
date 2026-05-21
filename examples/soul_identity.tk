@@ -46,7 +46,7 @@ fn unique_pointer_example() {
 // ANCHOR: address_of
 fn address_of_example() {
     auto a# = 42
-    auto *raw_ptr = *(a)
+    auto *raw_ptr = *a
     println("addr: {}", raw_ptr)
 }
 // ANCHOR_END: address_of

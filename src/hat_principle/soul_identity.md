@@ -33,16 +33,16 @@ This implicit dereferencing brings a clean, script-like syntax to high-performan
 
 ---
 
-## Identity: The Address-Of Operator `*(expr)`
+## Identity: The Address-Of Operator `*expr`
 
-To retrieve the raw, physical memory address of a local variable or resource, Toka provides the一元 **`*(expr)`** syntax. This returns a raw pointer `*T` pointing to the variable's location:
+To retrieve the raw, physical memory address of a local variable or resource, Toka provides the unary **`*expr`** syntax. This returns a raw pointer `*T` pointing to the variable's location:
 
 ```toka
 {{#include ../../examples/soul_identity.tk:address_of}}
 ```
 
 > [!NOTE]
-> The Hat sigil (like `^` or `~`) does **not** mean "address of". Sigils are strictly type specifiers for pointer handles, whereas `*(expr)` is the runtime operator to extract a memory address.
+> The Hat sigil (like `^` or `~`) does **not** mean "address of". Sigils are strictly type specifiers for pointer handles, whereas `*expr` is the runtime operator to extract a memory address.
 
 ---
 
