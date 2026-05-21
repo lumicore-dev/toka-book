@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-46feb1f5.js";
+            window.path_to_searchindex_js = "searchindex-4bafd0e2.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -183,19 +183,15 @@
 <hr>
 <h2 id="practical-roadmap"><a class="header" href="#practical-roadmap">Practical Roadmap</a></h2>
 <p>The three projects in this chapter progress in a step-by-step fashion to help you gradually build robust system-level development mental models:</p>
-<pre><code class="language-text">            Systems Software Engineering Roadmap
-                            │
-                            ▼
-     [ Step 1: CLI Tool ] ──── Familiarize with stdx/cli/flag standard APIs
-                            │
-                            ▼
-    [ Step 2: HTTP Server ] ── Master raw TCP &amp; Hat concurrency safety
-                            │
-                            ▼
-    [ Step 3: Regex Engine ] ─ Exercise Token stream parsing &amp; pattern matching
-                            │
-                            ▼
-          🏆 【 Full-fledged Systems Developer 】
+<pre><code class="language-mermaid">flowchart TD
+    Step1("**Step 1: CLI Tool**&lt;br&gt;Familiarize with stdx/cli/flag standard APIs")
+    Step2("**Step 2: HTTP Server**&lt;br&gt;Master raw TCP &amp; Hat concurrency safety")
+    Step3("**Step 3: Regex Engine**&lt;br&gt;Exercise Token stream parsing &amp; pattern matching")
+    Champ("🏆 **Full-fledged Systems Developer**")
+
+    Step1 --&gt; Step2 --&gt; Step3 --&gt; Champ
+
+    style Champ stroke:#a855f7,stroke-width:2px;
 </code></pre>
 <h3 id="1-cli-tool-with-stdxcliflag"><a class="header" href="#1-cli-tool-with-stdxcliflag">1. <a href="projects/cli_tool.html">CLI Tool with stdx/cli/flag</a></a></h3>
 <ul>
@@ -270,7 +266,7 @@ Before starting each project, make sure you have correctly configured your <code
         <script src="book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="theme/toka-91bce5e1.js"></script>
+        <script src="theme/toka-cb5e1a39.js"></script>
 
 
 

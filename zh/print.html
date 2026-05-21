@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-864ead7c.js";
+            window.path_to_searchindex_js = "searchindex-25606248.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -2060,19 +2060,15 @@ fn generate_key() -&gt; u64 {
 <hr>
 <h2 id="项目实战阶梯"><a class="header" href="#项目实战阶梯">项目实战阶梯</a></h2>
 <p>本章包含的三个项目呈阶梯状递进，帮助你逐步建立起健壮 of 系统级开发心智：</p>
-<pre><code class="language-text">           系统级软件工程的实战阶梯（Roadmap）
-                            │
-                            ▼
-   [ 阶梯一：命令行工具 ]  ─── 熟悉官方 stdx/cli/flag 标准扩展 API
-                            │
-                            ▼
-   [ 阶梯二：HTTP 服务器 ] ─── 打通原始 TCP 与 Hat Concurrency 并发安全
-                            │
-                            ▼
-   [ 阶梯三：手写正则引擎 ] ─── 锻炼字符 Token 流控制与树状模式匹配算法
-                            │
-                            ▼
-           🏆 【 进阶为系统级全能开发者 】
+<pre><code class="language-mermaid">flowchart TD
+    Step1("**阶梯一：命令行工具**&lt;br&gt;熟悉官方 stdx/cli/flag 标准扩展 API")
+    Step2("**阶梯二：HTTP 服务器**&lt;br&gt;打通原始 TCP 与 Hat Concurrency 并发安全")
+    Step3("**阶梯三：手写正则引擎**&lt;br&gt;锻炼字符 Token 流控制与树状模式匹配算法")
+    Champ("🏆 **进阶为系统级全能开发者**")
+
+    Step1 --&gt; Step2 --&gt; Step3 --&gt; Champ
+
+    style Champ stroke:#a855f7,stroke-width:2px;
 </code></pre>
 <h3 id="1-用-stdxcliflag-构建-cli-工具"><a class="header" href="#1-用-stdxcliflag-构建-cli-工具">1. <a href="#用-stdxcliflag-构建-cli-工具">用 stdx/cli/flag 构建 CLI 工具</a></a></h3>
 <ul>
@@ -2671,7 +2667,7 @@ fn example() {
         <script src="book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="theme/toka-91bce5e1.js"></script>
+        <script src="theme/toka-cb5e1a39.js"></script>
 
         <script>
         window.addEventListener('load', function() {

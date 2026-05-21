@@ -315,3 +315,54 @@ hljs.registerLanguage('toka', function(hljs) {
     renderAlerts();
   }
 })();
+
+// Lightweight front-end Mermaid.js loader and renderer
+(function() {
+  function renderMermaid() {
+    var mermaidCodes = document.querySelectorAll('pre code.language-mermaid');
+    if (mermaidCodes.length === 0) return;
+
+    // Load mermaid.js dynamically from CDN
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
+    script.onload = function() {
+      // Check mdBook theme to adapt Mermaid's style
+      var isDark = document.documentElement.classList.contains('coal') ||
+                   document.documentElement.classList.contains('navy') ||
+                   document.documentElement.classList.contains('ayu') ||
+                   document.documentElement.classList.contains('tomorrow-night');
+      
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: isDark ? 'dark' : 'default',
+        securityLevel: 'loose',
+        themeVariables: {
+          fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
+        }
+      });
+
+      mermaidCodes.forEach(function(code) {
+        var pre = code.parentElement;
+        var div = document.createElement('div');
+        div.className = 'mermaid';
+        div.textContent = code.textContent;
+        
+        // Apply some basic layout polishing for premium look
+        div.style.margin = '2em 0';
+        div.style.display = 'flex';
+        div.style.justifyContent = 'center';
+        
+        pre.parentElement.replaceChild(div, pre);
+      });
+
+      mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+    };
+    document.head.appendChild(script);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderMermaid);
+  } else {
+    renderMermaid();
+  }
+})();
