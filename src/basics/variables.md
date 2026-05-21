@@ -24,10 +24,10 @@ Package names and imported namespaces **can** use hyphens freely. This is common
 import std/io::println
 
 // Package and namespace names can contain hyphens
-import ./nested/toka-ink as toka-ink
+import ./nested/toka-ink as toka_ink
 
 fn main() -> i32 {
-    toka-ink::render()
+    toka_ink::render()
     return 0
 }
 ```

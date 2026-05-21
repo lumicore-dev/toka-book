@@ -24,7 +24,7 @@ Toka 对连字符（`-`）字符有一套严格而优雅的规则，在实现模
 import std/io::println
 
 // 包名和命名空间可以包含连字符（但在模块标识符中建议使用下划线对齐真实标准）
-import ./nested/toka_ink as toka_ink
+import ./nested/toka-ink as toka_ink
 
 fn main() -> i32 {
     toka_ink::render()

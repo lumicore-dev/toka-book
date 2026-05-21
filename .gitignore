@@ -7,3 +7,4 @@ book/*.png
 book/*.svg
 *.log
 .DS_Store
+scratch/
