@@ -31,7 +31,7 @@ flowchart TD
     Pattern --> PatternDesc
     Async --> AsyncDesc
 
-    style Root fill:#1e1b4b,stroke:#a855f7,stroke-width:2px;
+    style Root fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#fff;
     style Generics stroke:#3b82f6,stroke-width:1.5px;
     style Error stroke:#10b981,stroke-width:1.5px;
     style Pattern stroke:#f59e0b,stroke-width:1.5px;
