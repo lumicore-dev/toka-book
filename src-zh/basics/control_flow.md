@@ -91,7 +91,7 @@ while iter < 100 {
 
 ## Match（模式匹配）
 
-Toka 使用 `match` 表达式提供强大的模式匹配能力：
+Toka 使用 `match` 表达式提供直观的模式匹配支持：
 
 ```toka
 fn describe(value: i32) -> cstring {

@@ -47,7 +47,7 @@ To allow a function to modify a parameter, the parameter must be declared mutabl
 
 ## PAL Static Assurances at a Glance
 
-The PAL Checker acts as a silent guardian, providing absolute safety guarantees before your binary is even built:
+The PAL Checker statically analyzes and verifies memory safety during compilation:
 
 | Scenario / Action | PAL Checker Static Response | Safety Context |
 |:---|:---:|---|
@@ -58,4 +58,4 @@ The PAL Checker acts as a silent guardian, providing absolute safety guarantees 
 | Normal borrow parameter passing | ✅ **Passed** | High-performance, zero-copy read-only access |
 | Handle exiting its declared scope | ✅ **Passed** | Generates zero-overhead automatic resource cleanup |
 
-By shifting the burden of memory safety from the runtime (GC) or the programmer's brain (manual lifetimes) to the **Pointer Analysis Layer (PAL)**, Toka provides the performance of C++ with the safety of Rust, wrapped in a clean and visual syntax.
+By shifting the verification of memory safety to the **Pointer Analysis Layer (PAL)**, Toka allows developers to write safe, high-performance code without the need for manual lifetime annotations.

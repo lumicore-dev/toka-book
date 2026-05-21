@@ -1,6 +1,6 @@
 # Soul & Identity
 
-Toka's Hat Principle introduces a strict, beautiful distinction between a pointer's **Handle** (its syntactic container) and its **Soul** (its underlying data). Mastering this separation is essential to understanding Toka's modern, dereference-free memory aesthetics.
+Toka's Hat Principle introduces a strict, clear distinction between a pointer's **Handle** (its syntactic container) and its **Soul** (its underlying data). Mastering this separation is essential to understanding Toka's memory management model.
 
 ---
 
@@ -61,12 +61,12 @@ auto &y = &x // y is a borrow pointer pointing directly to the soul of x
 ### The Member Access Chain Borrow Ambiguity
 When attempting to borrow a specific field within a struct or shape (a member access chain), writing `&pt.x` is **syntactically ambiguous**. It is unclear whether you want to borrow the entire member chain `&(pt.x)` or access the member `x` on a borrowed pointer `(&pt).x`.
 
-To protect readability and safety, the Toka compiler rejects `&pt.x` with a compile error and requires one of two extremely elegant and legal options:
+To ensure clarity and type safety, the Toka compiler rejects `&pt.x` with a compile error and requires one of two clear and legal options:
 
 1. **Option A (Standard Parentheses)**: Explicitly wrap the member chain in parentheses: `&(pt.x)`.
 2. **Option B (Hat-Terminal Morphology)**: Place the `&` borrow sigil directly before the terminal field name: **`pt.&x`**.
 
-`pt.&x` is Toka's signature aesthetic, showcasing how pointer morphology seamlessly integrates into member access chains.
+`pt.&x` is an intuitive form, allowing the borrow operation to integrate directly into the member access chain.
 
 ```toka
 {{#include ../../examples/soul_identity.tk:borrow_ptr}}

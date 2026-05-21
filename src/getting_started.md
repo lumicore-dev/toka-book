@@ -1,6 +1,6 @@
 # Getting Started
 
-Welcome to Toka! Toka is a modern, expressive systems programming language designed for absolute safety, high performance, and minimal mental overhead. It implements the innovative **Hat Principle** to achieve compile-time memory safety without the need for a garbage collector or manual lifetime annotations.
+Welcome to Toka! Toka is a modern systems programming language designed for memory safety, high performance, and intuitive development. It implements the **Hat Principle** to achieve compile-time memory safety without a garbage collector or manual lifetime annotations.
 
 To help you get up and running as quickly as possible, this chapter is divided into three logical steps. We recommend following them in order:
 

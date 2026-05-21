@@ -19,9 +19,9 @@ Toka defines four primitive Hat typologies:
 
 ---
 
-## Handle vs. Soul: Dereference-Free Aesthetics
+## Handle vs. Soul: Implicit Dereferencing
 
-A major ergonomic breakthrough of the Hat Principle is the strict bifurcation between a pointer's container and its underlying data:
+One of the key usability features of the Hat Principle is the strict bifurcation between a pointer's container and its underlying data:
 
 * **Handle (The Hat)**: An identifier **with** its sigil (`^ptr`, `*ptr`, `~ptr`) represents the *pointer container* itself (the metadata holding the address).
 * **Soul (The Data)**: An identifier **without** its sigil (`ptr`) represents the *underlying data* (the actual value).

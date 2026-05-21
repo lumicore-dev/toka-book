@@ -91,7 +91,7 @@ while iter < 100 {
 
 ## Match (Pattern Matching)
 
-Toka provides powerful pattern matching with the `match` expression:
+Toka provides intuitive pattern matching with the `match` expression:
 
 ```toka
 fn describe(value: i32) -> cstring {

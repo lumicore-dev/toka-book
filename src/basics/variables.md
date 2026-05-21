@@ -46,7 +46,7 @@ fn main() {
 
 ### Unambiguous Subtraction
 
-Because hyphens are strictly forbidden in variable and function names, the subtraction operator (`-`) is completely unambiguous. Ordinary subtraction expressions without spaces are **always** 100% parsed correctly:
+Because hyphens are strictly forbidden in variable and function names, the subtraction operator (`-`) is completely unambiguous. Ordinary subtraction expressions without spaces are **always** parsed correctly without ambiguity:
 
 ```toka
 import std/io::println

@@ -92,10 +92,10 @@ val = 99 // Everyday assignment: NO '#' allowed! Writing 'val# = 99' is a compil
 This prevents useless syntactic noise in everyday code.
 
 ### 3. Required at Mutating Method Call Sites (Receiver Suffix)
-Toka's most elegant safety feature is that **mutating method calls must be explicitly flagged at the call site**. 
+A key safety feature in Toka is that **mutating method calls must be explicitly flagged at the call site**. 
 
-When invoking a method that mutates a shape, the compiler requires you to append the `#` suffix to the receiver object (e.g. `obj#.mutate()`). This acts as an extremely visible "mutation alarm," signaling to readers and code auditors exactly where a resource's soul is being modified:
+When invoking a method that mutates a shape, the compiler requires you to append the `#` suffix to the receiver object (e.g. `obj#.mutate()`). This makes the state mutation explicit, aiding code readability and auditing:
 ```toka
 {{#include ../../examples/ownership.tk:mutable_method}}
 ```
-By enforcing the `#` suffix strictly on *declarations* and *method receiver mutation sites*, Toka achieves a perfect balance between syntactic cleanlines and high-fidelity safety visibility.
+By restricting the `#` suffix to declarations and mutating method call sites, Toka keeps the syntax intuitive while providing clear safety visibility.

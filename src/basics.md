@@ -28,7 +28,7 @@ Toka is designed around a few core principles:
 1. **Safety by default** — Variables are immutable unless explicitly marked.
 2. **No hidden runtime** — What you write is what gets executed. No garbage collector, no VM.
 3. **C-like performance** — Built on LLVM 20, Toka generates optimized native code.
-4. **Modern syntax** — Clean, readable, with powerful pattern matching and error handling.
+4. **Modern syntax** — Clean, readable, with intuitive pattern matching and error handling.
 
 ## Comment Syntax
 
