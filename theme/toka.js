@@ -287,7 +287,7 @@ hljs.registerLanguage('toka', function(hljs) {
 
       var rawHtml = p.innerHTML;
       // Match pattern "[!NOTE]" or "[!TIP]" etc. at the start of the blockquote
-      var match = rawHtml.match(/^\\s*\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\\](?:\\s|<br>|\\n)?/i);
+      var match = rawHtml.match(/^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](?:\s|<br>|\n)?/i);
       if (!match) return;
 
       var type = match[1].toUpperCase();
@@ -295,7 +295,7 @@ hljs.registerLanguage('toka', function(hljs) {
       if (!config) return;
 
       // Clean the "[!NOTE]" prefix from the HTML
-      p.innerHTML = rawHtml.replace(/^\\s*\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\\](?:\\s|<br>|\\n)?/i, '');
+      p.innerHTML = rawHtml.replace(/^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](?:\s|<br>|\n)?/i, '');
 
       // Add appropriate CSS classes to the blockquote
       bq.classList.add('markdown-alert');
