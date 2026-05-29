@@ -15,10 +15,14 @@ These modules provide the fundamental types and traits that the language itself 
 | `prelude` | Auto-imported basics for every Toka program |
 | `types` | Type definitions and limits |
 | `traits` | Core traits (`@Hash`, `@PartialEq`, `@PartialOrd`) |
+| `char` | Unicode character handling and classification |
 | `str` | String slice operations |
+| `string` | UTF-8 dynamic string type and views |
+| `bytes` | Read-only binary byte-stream view |
 | `memory` | Memory management primitives |
 | `option` | `Option<T>` type for nullable values |
 | `result` | `Result<T, E>` type for error handling |
+| `task` | Fundamental coroutine execution runtime and task base |
 
 ### `lib/sys/` — Low-level System Primitives
 
@@ -38,9 +42,6 @@ Ready-to-use standard modules for application development:
 
 | Module | Description |
 |--------|-------------|
-| `prelude` | Auto-imported standard prelude containing the most common types |
-| `char` | Unicode character handling and classification |
-| `string` | UTF-8 dynamic string type and views (`string` / `str`) |
 | `vec` | Dynamically growing sequential array container (`Vec`) |
 | `deque` | Double-ended queue based on ring buffers (`VecDeque`) |
 | `slab` | Zero-copy generational slab allocator (`Slab` / `SlabID`) |
@@ -49,6 +50,8 @@ Ready-to-use standard modules for application development:
 | `btreemap` | B-Tree based ordered key-value map (`BTreeMap`) |
 | `btreeset` | B-Tree based ordered unique set (`BTreeSet`) |
 | `heap` | Priority queue implemented with max/min binary heap (`BinaryHeap`) |
+| `arena` | Region-based arena allocator for high performance allocation (`Arena`) |
+| `ring` | High throughput lock-free ring buffers (`RingBuffer`) |
 | `io` | Buffered standard console I/O (`stdin` / `stdout` / `println`) |
 | `fs` | File system read/write and directory metadata operations |
 | `path` | Cross-platform file path parsing and manipulation (`Path` / `PathBuf`) |
@@ -57,14 +60,12 @@ Ready-to-use standard modules for application development:
 | `thread` | OS native thread management and lifecycle control (`Thread`) |
 | `sync` | Thread synchronization primitives (`Mutex` / `Condvar` / `WaitGroup`) |
 | `atomic` | Hardware-level atomic operations and lock-free sync primitives |
-| `mpsc` | Multi-producer single-consumer (MPSC) thread concurrency channel |
+| `channel` | Thread message passing communication channel (`channel` / `sync_channel`) |
 | `task` | Coroutine task scheduling, context management, and async runtime |
 | `net` | TCP & UDP socket network communication interfaces |
 | `math` | Common mathematical functions and limit constants |
-| `rand` | Pseudo-random number generator and random utilities |
 | `time` | System time and monotonic durations (`Duration` / `Instant`) |
 | `fmt` | Text formatting and debug printing utilities (`Format`) |
-| `memory` | Low-level memory allocation, region copying, and raw pointer helpers |
 | `error` | Common error traits (`Error`) and failure base definitions |
 | `panic` | Runtime fatal error triggering, intercepting, and stack hooks |
 
@@ -77,11 +78,16 @@ New modules that are still evolving or optional extensions:
 | `log` | Basic logging utilities and severity filtering |
 | `net/http` | HTTP client and server |
 | `net/url` | URL parsing |
+| `net/websocket` | WebSocket client and server |
 | `serde/json` | JSON serialization |
 | `crypto/md5` | MD5 hashing |
 | `crypto/sha1` | SHA-1 hashing |
 | `crypto/sha256` | SHA-256 hashing |
-| `websocket` | WebSocket client and server |
+| `encoding/base64` | Base64 encoding and decoding |
+| `encoding/hex` | Hexadecimal encoding and decoding |
+| `io/bufio` | Buffered advanced I/O streams (`BufReader` / `BufWriter`) |
+| `rand/rand` | Pseudo-random number generator and random utilities (`Random`) |
+| `trace/span` | Method execution timing and trace spans |
 | `cli/flag` | CLI flag parsing |
 
 ## Design Philosophy
