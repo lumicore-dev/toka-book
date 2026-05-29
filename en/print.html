@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-e3a43758.js";
+            window.path_to_searchindex_js = "searchindex-2f3e496d.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -1515,10 +1515,14 @@ fn main() -&gt; i32 {
 <tr><td><code>prelude</code></td><td>Auto-imported basics for every Toka program</td></tr>
 <tr><td><code>types</code></td><td>Type definitions and limits</td></tr>
 <tr><td><code>traits</code></td><td>Core traits (<code>@Hash</code>, <code>@PartialEq</code>, <code>@PartialOrd</code>)</td></tr>
+<tr><td><code>char</code></td><td>Unicode character handling and classification</td></tr>
 <tr><td><code>str</code></td><td>String slice operations</td></tr>
+<tr><td><code>string</code></td><td>UTF-8 dynamic string type and views</td></tr>
+<tr><td><code>bytes</code></td><td>Read-only binary byte-stream view</td></tr>
 <tr><td><code>memory</code></td><td>Memory management primitives</td></tr>
 <tr><td><code>option</code></td><td><code>Option&lt;T&gt;</code> type for nullable values</td></tr>
 <tr><td><code>result</code></td><td><code>Result&lt;T, E&gt;</code> type for error handling</td></tr>
+<tr><td><code>task</code></td><td>Fundamental coroutine execution runtime and task base</td></tr>
 </tbody>
 </table>
 </div>
@@ -1546,9 +1550,6 @@ fn main() -&gt; i32 {
 <tr><th>Module</th><th>Description</th></tr>
 </thead>
 <tbody>
-<tr><td><code>prelude</code></td><td>Auto-imported standard prelude containing the most common types</td></tr>
-<tr><td><code>char</code></td><td>Unicode character handling and classification</td></tr>
-<tr><td><code>string</code></td><td>UTF-8 dynamic string type and views (<code>string</code> / <code>str</code>)</td></tr>
 <tr><td><code>vec</code></td><td>Dynamically growing sequential array container (<code>Vec</code>)</td></tr>
 <tr><td><code>deque</code></td><td>Double-ended queue based on ring buffers (<code>VecDeque</code>)</td></tr>
 <tr><td><code>slab</code></td><td>Zero-copy generational slab allocator (<code>Slab</code> / <code>SlabID</code>)</td></tr>
@@ -1557,6 +1558,8 @@ fn main() -&gt; i32 {
 <tr><td><code>btreemap</code></td><td>B-Tree based ordered key-value map (<code>BTreeMap</code>)</td></tr>
 <tr><td><code>btreeset</code></td><td>B-Tree based ordered unique set (<code>BTreeSet</code>)</td></tr>
 <tr><td><code>heap</code></td><td>Priority queue implemented with max/min binary heap (<code>BinaryHeap</code>)</td></tr>
+<tr><td><code>arena</code></td><td>Region-based arena allocator for high performance allocation (<code>Arena</code>)</td></tr>
+<tr><td><code>ring</code></td><td>High throughput lock-free ring buffers (<code>RingBuffer</code>)</td></tr>
 <tr><td><code>io</code></td><td>Buffered standard console I/O (<code>stdin</code> / <code>stdout</code> / <code>println</code>)</td></tr>
 <tr><td><code>fs</code></td><td>File system read/write and directory metadata operations</td></tr>
 <tr><td><code>path</code></td><td>Cross-platform file path parsing and manipulation (<code>Path</code> / <code>PathBuf</code>)</td></tr>
@@ -1565,14 +1568,12 @@ fn main() -&gt; i32 {
 <tr><td><code>thread</code></td><td>OS native thread management and lifecycle control (<code>Thread</code>)</td></tr>
 <tr><td><code>sync</code></td><td>Thread synchronization primitives (<code>Mutex</code> / <code>Condvar</code> / <code>WaitGroup</code>)</td></tr>
 <tr><td><code>atomic</code></td><td>Hardware-level atomic operations and lock-free sync primitives</td></tr>
-<tr><td><code>mpsc</code></td><td>Multi-producer single-consumer (MPSC) thread concurrency channel</td></tr>
+<tr><td><code>channel</code></td><td>Thread message passing communication channel (<code>channel</code> / <code>sync_channel</code>)</td></tr>
 <tr><td><code>task</code></td><td>Coroutine task scheduling, context management, and async runtime</td></tr>
 <tr><td><code>net</code></td><td>TCP &amp; UDP socket network communication interfaces</td></tr>
 <tr><td><code>math</code></td><td>Common mathematical functions and limit constants</td></tr>
-<tr><td><code>rand</code></td><td>Pseudo-random number generator and random utilities</td></tr>
 <tr><td><code>time</code></td><td>System time and monotonic durations (<code>Duration</code> / <code>Instant</code>)</td></tr>
 <tr><td><code>fmt</code></td><td>Text formatting and debug printing utilities (<code>Format</code>)</td></tr>
-<tr><td><code>memory</code></td><td>Low-level memory allocation, region copying, and raw pointer helpers</td></tr>
 <tr><td><code>error</code></td><td>Common error traits (<code>Error</code>) and failure base definitions</td></tr>
 <tr><td><code>panic</code></td><td>Runtime fatal error triggering, intercepting, and stack hooks</td></tr>
 </tbody>
@@ -1589,11 +1590,16 @@ fn main() -&gt; i32 {
 <tr><td><code>log</code></td><td>Basic logging utilities and severity filtering</td></tr>
 <tr><td><code>net/http</code></td><td>HTTP client and server</td></tr>
 <tr><td><code>net/url</code></td><td>URL parsing</td></tr>
+<tr><td><code>net/websocket</code></td><td>WebSocket client and server</td></tr>
 <tr><td><code>serde/json</code></td><td>JSON serialization</td></tr>
 <tr><td><code>crypto/md5</code></td><td>MD5 hashing</td></tr>
 <tr><td><code>crypto/sha1</code></td><td>SHA-1 hashing</td></tr>
 <tr><td><code>crypto/sha256</code></td><td>SHA-256 hashing</td></tr>
-<tr><td><code>websocket</code></td><td>WebSocket client and server</td></tr>
+<tr><td><code>encoding/base64</code></td><td>Base64 encoding and decoding</td></tr>
+<tr><td><code>encoding/hex</code></td><td>Hexadecimal encoding and decoding</td></tr>
+<tr><td><code>io/bufio</code></td><td>Buffered advanced I/O streams (<code>BufReader</code> / <code>BufWriter</code>)</td></tr>
+<tr><td><code>rand/rand</code></td><td>Pseudo-random number generator and random utilities (<code>Random</code>)</td></tr>
+<tr><td><code>trace/span</code></td><td>Method execution timing and trace spans</td></tr>
 <tr><td><code>cli/flag</code></td><td>CLI flag parsing</td></tr>
 </tbody>
 </table>

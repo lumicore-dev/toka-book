@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-9f61b2c2.js";
+            window.path_to_searchindex_js = "searchindex-e1a56556.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -192,10 +192,14 @@
 <tr><td><code>prelude</code></td><td>每个 Toka 程序自动导入的基础内容</td></tr>
 <tr><td><code>types</code></td><td>类型定义和极限值</td></tr>
 <tr><td><code>traits</code></td><td>核心 traits（<code>@Hash</code>、<code>@PartialEq</code>、<code>@PartialOrd</code>）</td></tr>
+<tr><td><code>char</code></td><td>Unicode 字符处理与分类</td></tr>
 <tr><td><code>str</code></td><td>字符串切片操作</td></tr>
+<tr><td><code>string</code></td><td>UTF-8 编码的动态字符串类型与视图</td></tr>
+<tr><td><code>bytes</code></td><td>只读二进制字节流视图</td></tr>
 <tr><td><code>memory</code></td><td>内存管理原语</td></tr>
 <tr><td><code>option</code></td><td>用于可空值的 <code>Option&lt;T&gt;</code> 类型</td></tr>
 <tr><td><code>result</code></td><td>用于错误处理的 <code>Result&lt;T, E&gt;</code> 类型</td></tr>
+<tr><td><code>task</code></td><td>基础协程生命周期与底座</td></tr>
 </tbody>
 </table>
 </div>
@@ -223,9 +227,6 @@
 <tr><th>模块</th><th>描述</th></tr>
 </thead>
 <tbody>
-<tr><td><code>prelude</code></td><td>自动导入的标准库预导入模块，包含最常用类型</td></tr>
-<tr><td><code>char</code></td><td>Unicode 字符处理与分类</td></tr>
-<tr><td><code>string</code></td><td>UTF-8 编码的动态字符串类型与视图（<code>string</code> / <code>str</code>）</td></tr>
 <tr><td><code>vec</code></td><td>动态增长的顺序数组容器（<code>Vec</code>）</td></tr>
 <tr><td><code>deque</code></td><td>基于循环缓冲区的双端队列（<code>VecDeque</code>）</td></tr>
 <tr><td><code>slab</code></td><td>零拷贝分代插槽分配器（<code>Slab</code> / <code>SlabID</code>）</td></tr>
@@ -234,22 +235,22 @@
 <tr><td><code>btreemap</code></td><td>基于 B-Tree 的有序键值映射（<code>BTreeMap</code>）</td></tr>
 <tr><td><code>btreeset</code></td><td>基于 B-Tree 的有序唯一集合（<code>BTreeSet</code>）</td></tr>
 <tr><td><code>heap</code></td><td>最大堆/最小堆实现的优先队列（<code>BinaryHeap</code>）</td></tr>
+<tr><td><code>arena</code></td><td>轻量级 Arena 区域内存分配器（<code>Arena</code>）</td></tr>
+<tr><td><code>ring</code></td><td>循环无锁缓冲区（<code>RingBuffer</code>）</td></tr>
 <tr><td><code>io</code></td><td>带缓冲的标准控制台 I/O（<code>stdin</code> / <code>stdout</code> / <code>println</code>）</td></tr>
 <tr><td><code>fs</code></td><td>文件系统读写及目录元数据操作</td></tr>
 <tr><td><code>path</code></td><td>跨平台文件路径解析与操作（<code>Path</code> / <code>PathBuf</code>）</td></tr>
 <tr><td><code>env</code></td><td>环境变量获取、进程参数与系统上下文交互</td></tr>
 <tr><td><code>process</code></td><td>子进程的创建、状态控制与管道交互</td></tr>
 <tr><td><code>thread</code></td><td>操作系统原生线程管理与生命周期控制（<code>Thread</code>）</td></tr>
-<tr><td><code>sync</code></td><td>线程级同步锁原语（<code>Mutex</code> / <code>Condvar</code> / <code>WaitGroup</code>）</td></tr>
+<tr><td><code>sync</code></td><td>线程级同步锁原语（<code>Mutex</code> / <code>Condvar</code> / <code>WaitGroup</code>)</td></tr>
 <tr><td><code>atomic</code></td><td>硬件级原子操作与无锁同步原语</td></tr>
-<tr><td><code>mpsc</code></td><td>多生产者单消费者（MPSC）线程并发通道</td></tr>
+<tr><td><code>channel</code></td><td>线程间消息传递通信通道（<code>channel</code> / <code>sync_channel</code>）</td></tr>
 <tr><td><code>task</code></td><td>协程异步任务的调度、上下文管理与运行时</td></tr>
 <tr><td><code>net</code></td><td>TCP 与 UDP 套接字网络通信接口</td></tr>
 <tr><td><code>math</code></td><td>常用数学计算函数与极限常量</td></tr>
-<tr><td><code>rand</code></td><td>伪随机数生成器与随机实用工具</td></tr>
 <tr><td><code>time</code></td><td>系统时间与单调递增持续时间（<code>Duration</code> / <code>Instant</code>）</td></tr>
 <tr><td><code>fmt</code></td><td>文本格式化与调试输出工具（<code>Format</code>）</td></tr>
-<tr><td><code>memory</code></td><td>底层内存分配、区域拷贝与裸指针辅助方法</td></tr>
 <tr><td><code>error</code></td><td>通用错误特征（<code>Error</code>）与故障基类定义</td></tr>
 <tr><td><code>panic</code></td><td>运行时致命错误触发、拦截与堆栈挂钩处理</td></tr>
 </tbody>
@@ -266,11 +267,16 @@
 <tr><td><code>log</code></td><td>基础日志打印与级别过滤机制</td></tr>
 <tr><td><code>net/http</code></td><td>HTTP 客户端和服务器</td></tr>
 <tr><td><code>net/url</code></td><td>URL 解析</td></tr>
+<tr><td><code>net/websocket</code></td><td>WebSocket 客户端和服务器</td></tr>
 <tr><td><code>serde/json</code></td><td>JSON 序列化</td></tr>
 <tr><td><code>crypto/md5</code></td><td>MD5 哈希</td></tr>
 <tr><td><code>crypto/sha1</code></td><td>SHA-1 哈希</td></tr>
 <tr><td><code>crypto/sha256</code></td><td>SHA-256 哈希</td></tr>
-<tr><td><code>websocket</code></td><td>WebSocket 客户端和服务器</td></tr>
+<tr><td><code>encoding/base64</code></td><td>Base64 编码与解码</td></tr>
+<tr><td><code>encoding/hex</code></td><td>十六进制编码与解码</td></tr>
+<tr><td><code>io/bufio</code></td><td>带缓冲的高级输入输出流（<code>BufReader</code> / <code>BufWriter</code>）</td></tr>
+<tr><td><code>rand/rand</code></td><td>伪随机数生成器与随机实用工具（<code>Random</code>）</td></tr>
+<tr><td><code>trace/span</code></td><td>调用栈与方法耗时追踪 span</td></tr>
 <tr><td><code>cli/flag</code></td><td>CLI 参数解析</td></tr>
 </tbody>
 </table>
