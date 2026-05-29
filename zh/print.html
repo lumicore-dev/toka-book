@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-e1a56556.js";
+            window.path_to_searchindex_js = "searchindex-ac871418.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -1166,9 +1166,10 @@ fn borrowing_safe_example() {
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="泛型generics"><a class="header" href="#泛型generics">泛型（Generics）</a></h1>
 <p>泛型允许你编写灵活、可复用的代码，适用于任何类型，同时保持编译时安全性。</p>
+<p>在 Toka 中，定义自定义泛型时通常使用直观的 <code>T</code>（不带单引号）形式。带单引号的 <code>'T</code>（Morphic 泛型）仅在编写通用容器场景下需要，用以动态兼容灵魂元素与指针元素。</p>
 <h2 id="泛型函数"><a class="header" href="#泛型函数">泛型函数</a></h2>
-<p>使用简写 <code>'T</code> 语法定义泛型函数：</p>
-<pre><code class="language-toka">fn identity&lt;'T&gt;(value: 'T) -&gt; 'T {
+<p>使用标准的 <code>T</code> 语法定义泛型函数：</p>
+<pre><code class="language-toka">fn identity&lt;T&gt;(value: T) -&gt; T {
     return value
 }
 
@@ -1177,7 +1178,7 @@ auto y = identity("hello") // 适用于字符串
 </code></pre>
 <h2 id="泛型约束"><a class="header" href="#泛型约束">泛型约束</a></h2>
 <p>使用 trait 约束泛型：</p>
-<pre><code class="language-toka">fn max&lt;'T: @PartialOrd&gt;(a: 'T, b: 'T) -&gt; 'T {
+<pre><code class="language-toka">fn max&lt;T: @PartialOrd&gt;(a: T, b: T) -&gt; T {
     if a &gt; b {
         return a
     }
@@ -1206,6 +1207,16 @@ impl&lt;'A, 'B&gt; Pair&lt;'A, 'B&gt; {
 }
 </code></pre>
 <p>当定义具有 Morphic 泛型类型（那些带有单引号前缀的类型，如 <code>'A</code>）的 Shape 时，Toka 强制执行一条严格规则：对应的字段名称也必须带有单引号前缀（例如 <code>'first: 'A</code>）。这表明这些字段能够动态接受不同的指针形态状态，从而规避“灵魂塌陷”。但是，在调用方法或获取字段值时，应像往常一样使用常规字段名称进行引用（例如使用 <code>self.first</code>，而不是 <code>self.'first</code>）。</p>
+<h3 id="morphic-泛型与普通泛型的选择"><a class="header" href="#morphic-泛型与普通泛型的选择">Morphic 泛型与普通泛型的选择</a></h3>
+<p>在定义自定义泛型或泛型参数时，Toka 支持带单引号（如 <code>'T</code>）和不带单引号（如 <code>T</code>）两种写法。它们的核心区别和应用场景如下：</p>
+<ul>
+<li><strong><code>T</code>（普通泛型，不带单引号）</strong>：<strong>一般自定义泛型时仅需要 <code>T</code> 这种形式</strong>。无论你是编写高层业务逻辑、自定义普通数据结构，还是编写普通的辅助函数，均直接推荐使用标准泛型 <code>T</code>。它完全消除了单引号的语法噪点，最符合日常开发直觉。</li>
+<li><strong><code>'T</code>（Morphic 泛型，带单引号）</strong>：<strong>仅在开发底层通用容器或极少数基础库组件</strong>（如 <code>Vec</code>、<code>HashMap</code>、<code>Slab</code> 或并发通道 <code>Channel</code>）时，才需要使用 <code>'T</code> 参数写法。因为通用容器必须同时兼容<strong>灵魂元素</strong>（裸结构体值类型）与<strong>指针元素</strong>（如 <code>^</code> 独占指针或 <code>~</code> 共享指针等），Morphic 泛型能够通过多态形态自适应避免“灵魂塌陷”，确保极高效率。</li>
+</ul>
+<blockquote class="blockquote-tag blockquote-tag-note">
+<p class="blockquote-tag-title"><svg viewbox="0 0 16 16" width="18" height="18"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>在大多数日常编程中，你只需要像传统编程语言那样使用 <code>T</code> 即可，这极大地简化了代码的可读性。</p>
+</blockquote>
 <h2 id="类型推断"><a class="header" href="#类型推断">类型推断</a></h2>
 <p>在大多数情况下，Toka 可以推断泛型类型，因此你很少需要显式指定：</p>
 <pre><code class="language-tokalang">fn pair&lt;'A, 'B&gt;(a: 'A, b: 'B) -&gt; Pair&lt;'A, 'B&gt; {
