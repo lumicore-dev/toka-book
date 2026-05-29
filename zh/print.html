@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-6759e637.js";
+            window.path_to_searchindex_js = "searchindex-9f61b2c2.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-34655f65.js"></script>
@@ -203,9 +203,9 @@
 <h2 id="语言版本对齐"><a class="header" href="#语言版本对齐">语言版本对齐</a></h2>
 <p>本书会随 Toka 编译器的开发保持更新。当前文档版本对齐：</p>
 <ul>
-<li><strong>编译器版本</strong>：<code>v0.9.7</code></li>
-<li><strong>Toka Commit</strong>：<code>b3f8940</code>（完成 termios 与 prelude 审计重构，支持 kebab-case 包名和命名空间解析，并强制禁止连字符变量声明）</li>
-<li><strong>Tag</strong>：<code>v0.9.7-02</code></li>
+<li><strong>编译器版本</strong>：<code>v0.9.8</code></li>
+<li><strong>Toka Commit</strong>：<code>aadfd52</code>（完成太极三轨文本体系、废除 while 统一为 loop、标准分代 Slab 分配器重构以及 forge 并行增量构建引擎）</li>
+<li><strong>Tag</strong>：<code>v0.9.8-03</code></li>
 </ul>
 <h2 id="作者的话"><a class="header" href="#作者的话">作者的话</a></h2>
 <p>Toka 是一门年轻但充满雄心的语言。这本指南伴随语言的开发同步编写，旨在帮助早期采用者快速上手。随着 Toka 的演进，本书也会一同成长。</p>
@@ -390,6 +390,30 @@ import std/time as time_lib
     └── release/
         └── my-project    # 发布版二进制（添加 --release 参数）
 </code></pre>
+<h2 id="-增量构建与-forge-引擎"><a class="header" href="#-增量构建与-forge-引擎">🛠️ 增量构建与 Forge 引擎</a></h2>
+<p>自 Toka v0.9.8-03 起，官方引入了高吞吐量、并行的增量构建引擎 <strong><code>forge</code></strong>。它通过解析项目根目录下的 <code>build.tk</code> 拓扑依赖声明，实现多模块的并行增量编译，并将构建状态持久化存储于本地。</p>
+<h3 id="1-声明构建配置-buildtk"><a class="header" href="#1-声明构建配置-buildtk">1. 声明构建配置 <code>build.tk</code></a></h3>
+<p>在项目的根目录下创建一个 <code>build.tk</code> 文件，使用内置的 <code>build</code> 工具链来定义你的可执行文件或库：</p>
+<pre><code class="language-toka">import build::{Executable, run_build}
+
+fn main() -&gt; i32 {
+    // 实例化一个构建工程，Executable::make(二进制名称, 入口源文件)
+    // 由于 Executable::make 底层是对 C-FFI 的高层封装，我们需要显式传递 FFI 裸指针。
+    auto proj# = Executable::make("my-project".as_cstr().raw_ptr(), "src/main.tk".as_cstr().raw_ptr())
+    return run_build(proj)
+}
+</code></pre>
+<h3 id="2-使用-forge-开启增量并发构建"><a class="header" href="#2-使用-forge-开启增量并发构建">2. 使用 Forge 开启增量并发构建</a></h3>
+<p>在终端中执行：</p>
+<pre><code class="language-bash"># 开启并行构建，-j 指定并发线程数（默认为 4）
+forge -j 8
+</code></pre>
+<p><code>forge</code> 引擎将自动：</p>
+<ul>
+<li>扫描并解析 <code>src/main.tk</code> 及其所有 <code>import</code> 子模块的静态依赖拓扑 DAG。</li>
+<li>比对源文件的最新修改时间，将文件状态索引保存于本地 <code>.forge_cache</code> 数据库中。</li>
+<li><strong>智能增量跳过</strong>：对没有发生代码变更的源文件，利用增量缓存技术瞬时绕过，从而将大型多模块项目的自举编译耗时压缩到毫秒级别！</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="语言基础"><a class="header" href="#语言基础">语言基础</a></h1>
 <p>现在你已经安装了 Toka 并编写了第一个程序，让我们深入了解这门语言的核心概念。</p>
@@ -567,7 +591,7 @@ fn main() -&gt; i32 {
 <p>返回 <code>0</code> 表示成功，非零表示错误。</p>
 <h2 id="多个参数"><a class="header" href="#多个参数">多个参数</a></h2>
 <p>函数可以接受多个不同类型的参数：</p>
-<pre><code class="language-toka">fn greet(name: view_str, age: i32, formal: bool) -&gt; cstring {
+<pre><code class="language-toka">fn greet(name: str, age: i32, formal: bool) -&gt; str {
     if formal {
         return "Good day"
     }
@@ -584,7 +608,7 @@ fn main() -&gt; i32 {
 <p>如果函数不返回任何值，省略 <code>-&gt;</code>：</p>
 <pre><code class="language-toka">import std/io::println
 
-fn log_message(msg: view_str) {
+fn log_message(msg: str) {
     println("{}", msg)
 }
 </code></pre>
@@ -619,11 +643,13 @@ fn check_temp(temp: i32) {
     }
 }
 </code></pre>
-<h2 id="while-循环"><a class="header" href="#while-循环">While 循环</a></h2>
+<h2 id="loop-循环"><a class="header" href="#loop-循环">Loop 循环</a></h2>
+<p>Toka 彻底废除了传统的 <code>while</code> 循环，并将所有的循环语义统一收拢在 <code>loop</code> 关键字下。这极大简化了编译器控制流分析，消除了语法歧义。</p>
+<p>条件循环使用 <code>loop condition {}</code> 语法结构：</p>
 <pre><code class="language-toka">import std/io::println
 
 auto count# = 0
-while count &lt; 5 {
+loop count &lt; 5 {
     println("计数: {}", count)
     count = count + 1
 }
@@ -636,7 +662,7 @@ for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
     println("{}", i)
 }
 </code></pre>
-<p>目前 Toka 暂不支持原生范围区间运算符（如 <code>..</code>）。你可以在数组上进行迭代，或使用 <code>while</code> 实现自定义迭代逻辑。</p>
+<p>目前 Toka 暂不支持原生范围区间运算符（如 <code>..</code>）。你可以在数组上进行迭代，或使用 <code>loop</code> 实现自定义迭代逻辑。</p>
 <h2 id="遍历集合"><a class="header" href="#遍历集合">遍历集合</a></h2>
 <pre><code class="language-toka">import std/io::println
 
@@ -660,7 +686,7 @@ for auto item in items2 {
 <pre><code class="language-toka">import std/io::println
 
 auto iter# = 0
-while iter &lt; 100 {
+loop iter &lt; 100 {
     if iter == 50 {
         break        // 完全退出循环
     }
@@ -674,7 +700,7 @@ while iter &lt; 100 {
 </code></pre>
 <h2 id="match模式匹配"><a class="header" href="#match模式匹配">Match（模式匹配）</a></h2>
 <p>Toka 使用 <code>match</code> 表达式提供直观的模式匹配支持：</p>
-<pre><code class="language-toka">fn describe(value: i32) -&gt; cstring {
+<pre><code class="language-toka">fn describe(value: i32) -&gt; str {
     return match value {
         0 =&gt; pass "零"
         1 =&gt; pass "一"
@@ -687,76 +713,114 @@ while iter &lt; 100 {
 <p><code>_</code> 通配符匹配任意值，作为默认情况使用。</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="字符串"><a class="header" href="#字符串">字符串</a></h1>
-<p>Toka 提供了一套灵活的字符串系统，专为系统编程和文本处理而设计。</p>
-<h2 id="字符串类型"><a class="header" href="#字符串类型">字符串类型</a></h2>
-<p>Toka 定义了多种字符串类型，满足不同的编码需求：</p>
+<p>Toka 1.0 构建了极其严密、高性能的<strong>太极三轨文本与字节流系统</strong>。它将“文本观察视角”与“物理二进制操纵”在类型系统上进行了正交解耦，同时消除了二义性的隐式语境推导，为系统开发提供极致的内存安全与性能。</p>
+<hr>
+<h2 id="-一-字符串与视图类型"><a class="header" href="#-一-字符串与视图类型">🏛️ 一、 字符串与视图类型</a></h2>
+<p>Toka 中的字符串分为拥有堆内存所有权的动态容器，以及零拷贝的借用视图。由于内置于 Prelude 零导入作用域，你<strong>无需任何 <code>import</code> 即可直接使用</strong>这些类型：</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>类型</th><th>描述</th></tr>
+<tr><th style="text-align: left">类型</th><th style="text-align: left">物理内存几何 / LLVM 表达</th><th style="text-align: left">内存所有权</th><th style="text-align: left">描述</th></tr>
 </thead>
 <tbody>
-<tr><td><code>str</code></td><td>字符串切片（类似 Rust 的 <code>&amp;str</code> 或 C++ 的 <code>string_view</code>）— 不可变，借用</td></tr>
-<tr><td><code>String</code></td><td>拥有所有权的可变字符串（默认 UTF-8 编码）</td></tr>
+<tr><td style="text-align: left"><code>str</code></td><td style="text-align: left">胖指针 <code>{ i8* 首地址, i64 长度 }</code></td><td style="text-align: left"><strong>无所有权（借用轨）</strong></td><td style="text-align: left">UTF-8 只读文本视图。不支持 <code>\0</code> 保证。</td></tr>
+<tr><td style="text-align: left"><code>string</code></td><td style="text-align: left">堆容器 <code>{ *#buf, usize, usize }</code></td><td style="text-align: left"><strong>独占所有权（拥有轨）</strong></td><td style="text-align: left">堆上分配的可变 UTF-8 字符串，强制以 <code>\0</code> 封口。</td></tr>
+<tr><td style="text-align: left"><code>bytes</code></td><td style="text-align: left">胖指针 <code>{ i8* 首地址, i64 长度 }</code></td><td style="text-align: left"><strong>无所有权（借用轨）</strong></td><td style="text-align: left">只读二进制字节流视图。</td></tr>
+<tr><td style="text-align: left"><code>cstr</code></td><td style="text-align: left">单指针 <code>i8*</code>（零开销 Shape）</td><td style="text-align: left"><strong>FFI 借用轨</strong></td><td style="text-align: left">C 风格只读单指针，100% 静态保证以 <code>\0</code> 结尾。</td></tr>
 </tbody>
 </table>
 </div>
-<h2 id="字符串字面量"><a class="header" href="#字符串字面量">字符串字面量</a></h2>
-<p>双引号字符串是标准用法：</p>
-<pre><code class="language-toka">auto greeting = "Hello, Toka!"
-auto name = "World"
-</code></pre>
-<h2 id="转义序列"><a class="header" href="#转义序列">转义序列</a></h2>
-<p>Toka 支持字符串字面量中的 <code>\x</code> 转义序列，使得 ANSI 颜色代码的使用变得简洁：</p>
-<pre><code class="language-toka">import std/io::println
-
-auto red = "\x1b[31m"
-auto green = "\x1b[32m"
-auto reset = "\x1b[0m"
-
-println("{}{}成功！{}", green, "构建完成", reset)
-</code></pre>
-<h2 id="字符串插值"><a class="header" href="#字符串插值">字符串插值</a></h2>
-<p>使用 <code>{}</code> 占位符配合 <code>println</code> 实现简洁的格式化：</p>
-<pre><code class="language-toka">import std/io::println
-
-auto name = "Toka"
-auto version = "0.9.7"
-println("欢迎使用 {} 版本 {}！", name, version)
-</code></pre>
-<h2 id="字符串拼接"><a class="header" href="#字符串拼接">字符串拼接</a></h2>
-<p>字符串可以通过 <code>+</code> 进行拼接：</p>
-<pre><code class="language-toka">import std/string::String
-
-auto full# = String::from("你好，")
-full#.push_str("世界！")
-</code></pre>
-<h2 id="格式化与打印"><a class="header" href="#格式化与打印">格式化与打印</a></h2>
-<p>你可以直接在占位符中打印其他基础类型，无需进行显式的手动类型转换：</p>
-<pre><code class="language-toka">import std/io::println
-
-auto n = 42
-println("答案是 {}", n)
-</code></pre>
-<h2 id="字符类型"><a class="header" href="#字符类型">字符类型</a></h2>
+<hr>
+<h2 id="-二-三轨宇宙终极正交转换矩阵"><a class="header" href="#-二-三轨宇宙终极正交转换矩阵">⚖️ 二、 三轨宇宙终极正交转换矩阵</a></h2>
+<p>Toka 恪守**【开销诚实命名法典】**：</p>
+<ul>
+<li><strong><code>as_xxx</code> 家族</strong>：表示<strong>零开销、零分配</strong>的视图借用转换，其借出视图生命周期受编译期严格镇守，死死绑定于宿主。</li>
+<li><strong><code>to_xxx</code> 家族</strong>：表示<strong>涉及物理拷贝或堆分配</strong>的所有权转换，明确昭示所有权与物理分配的分离。</li>
+</ul>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>类型</th><th>描述</th></tr>
+<tr><th style="text-align: left">源类型 $\rightarrow$ 目标类型</th><th style="text-align: left"><code>str</code> (安全胖切片)</th><th style="text-align: left"><code>string</code> (堆所有权)</th><th style="text-align: left"><code>cstr</code> (\0 借用)</th><th style="text-align: left"><code>*char</code> (FFI 裸指针)</th></tr>
 </thead>
 <tbody>
-<tr><td><code>char</code></td><td>单字节字符（<code>i8</code>），C 风格</td></tr>
-<tr><td><code>Char16</code></td><td>UTF-16 码点（<code>u16</code>）</td></tr>
-<tr><td><code>Char32</code></td><td>UTF-32 码点（<code>u32</code>）</td></tr>
-<tr><td><code>Char</code></td><td><code>Char32</code> 的别名，默认的 Unicode 字符</td></tr>
+<tr><td style="text-align: left"><strong><code>"..."</code> 字面量</strong></td><td style="text-align: left">默认 ResolvedType (0开销)</td><td style="text-align: left"><strong><code>.to_string()</code></strong><br>($O(N)$ 堆分配)</td><td style="text-align: left"><strong><code>.as_cstr()</code></strong><br>($O(1)$ 零分配借出)</td><td style="text-align: left">FFI 边界自动退化<br>(0摩擦直入)</td></tr>
+<tr><td style="text-align: left"><strong><code>str</code></strong></td><td style="text-align: left">——</td><td style="text-align: left"><strong><code>.to_string()</code></strong><br>($O(N)$ 堆分配)</td><td style="text-align: left"><strong><code>.to_string().as_cstr()</code></strong><br>($O(N)$ 堆拷贝封口)</td><td style="text-align: left">禁止隐式！<br>显式 <code>.to_string().c_str()</code></td></tr>
+<tr><td style="text-align: left"><strong><code>string</code></strong></td><td style="text-align: left"><strong><code>.as_str()</code></strong><br>($O(1)$ 零分配)</td><td style="text-align: left">——</td><td style="text-align: left"><strong><code>.as_cstr()</code></strong><br>($O(1)$ 零分配)</td><td style="text-align: left"><strong><code>.c_str()</code></strong><br>($O(1)$ 零分配首地址)</td></tr>
+<tr><td style="text-align: left"><strong><code>cstr</code></strong></td><td style="text-align: left"><strong><code>.as_str()</code></strong><br>($O(1)$ 零分配)</td><td style="text-align: left"><strong><code>.to_string()</code></strong><br>($O(N)$ 堆分配)</td><td style="text-align: left">——</td><td style="text-align: left">FFI 边界自动退化<br>(0摩擦直入)</td></tr>
 </tbody>
 </table>
 </div>
-<h2 id="处理字符"><a class="header" href="#处理字符">处理字符</a></h2>
-<pre><code class="language-toka">auto ch: char = 'A'
-auto unicode: u32 = 0x4E16:u32
+<hr>
+<h2 id="-三-核心流转与实战"><a class="header" href="#-三-核心流转与实战">🚀 三、 核心流转与实战</a></h2>
+<h3 id="1-默认的零拷贝字面量"><a class="header" href="#1-默认的零拷贝字面量">1. 默认的零拷贝字面量</a></h3>
+<p>在 Toka 中，常规双引号 <code>"..."</code> 字面量在没有调用碰撞时，默认推导为静态只读的 <code>str</code>：</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() -&gt; i32 {
+    // 默认推导为 str 类型，常驻 .rodata 静态段，100% 静态安全
+    auto greeting: str = "Hello, Toka!"
+    println("Greeting: {}", greeting)
+    return 0
+}
 </code></pre>
-<p>字符串系统在 <code>lib/core/str.tk</code> 和 <code>lib/core/utf8.tk</code> 中定义，用于 UTF-8 处理。</p>
+<h3 id="2-动态-string-构建与拼接"><a class="header" href="#2-动态-string-构建与拼接">2. 动态 string 构建与拼接</a></h3>
+<p><code>string</code> 是独占的动态堆容器。你可以通过 <code>push_str</code> 修改它。</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() -&gt; i32 {
+    // 零导入 prelude 直接调用 string::from
+    auto full# = string::from("你好，")
+    full#.push_str("世界！")
+    
+    println("{}", full.as_str()) // 零开销借出 str 视图打印
+    return 0
+}
+</code></pre>
+<h3 id="3-str-与-bytes-的双轨视角转换"><a class="header" href="#3-str-与-bytes-的双轨视角转换">3. str 与 bytes 的双轨视角转换</a></h3>
+<p><code>str</code> 负责高级文本操作，而 <code>bytes</code> 负责底层的二进制和字节索引：</p>
+<pre><code class="language-toka">import std/io::println
+import core/option::Option
+import core/result::Result
+
+fn main() -&gt; i32 {
+    auto s: str = "Toka 1.0"
+    
+    // 1. O(1) 零开销降级为 bytes 视图
+    auto b = s.bytes()
+    
+    // 2. 边界检查的 O(1) 字节索引
+    auto b0 = b.at(0:usize)
+    if b0.is_some() {
+        println("Byte 0: {}", b0.unwrap() as i64) // 84 ('T')
+    }
+    
+    // 3. 校验并升级回 str
+    auto res = b.try_to_str()
+    if res.is_ok() {
+        auto s_back = res.unwrap()
+        println("Recovered: {}", s_back)
+    }
+    return 0
+}
+</code></pre>
+<hr>
+<h2 id="-四-ffi-物理拷贝隔离带"><a class="header" href="#-四-ffi-物理拷贝隔离带">🛡️ 四、 FFI 物理拷贝隔离带</a></h2>
+<p>由于动态 <code>str</code> 切片并不保证以 <code>\0</code> 结尾，为绝对防范跨越 C-FFI 边界时发生内存越界，<strong><code>str</code> 被严格禁止隐式退化为 <code>cstr</code> 或裸指针</strong>。
+如果动态 <code>str</code> 确实需要跨越 FFI，必须显式调用 <code>to_string()</code> 在堆上创建带有 <code>\0</code> 尾符的临时副本：</p>
+<pre><code class="language-toka">// 声明 FFI 接口
+pub fn puts(s: cstr)
+
+fn main() -&gt; i32 {
+    auto my_str: str = "Hello C-FFI"
+    
+    // 显式声明物理拷贝和 \0 封口以确保安全
+    auto temp_c = my_str.to_string()
+    unsafe {
+        puts(temp_c.as_cstr())
+    }
+    return 0
+}
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="hat-principle帽子原则"><a class="header" href="#hat-principle帽子原则">Hat Principle（帽子原则）</a></h1>
 <p><strong>Hat Principle（帽子原则）</strong> 是 Toka 内存安全模型背后的核心设计哲学。与强制开发者编写繁琐生命周期标注（如 Rust）或依赖运行时垃圾回收器（如 Go 或 Java）的传统方式不同，Toka 引入了称为**“帽子（Hats）”**的直观语法标记，在编译期静态追踪所有权、生命周期与访问权限。</p>
@@ -930,9 +994,8 @@ auto ^p1 = new Point(x = 10, y = 20, z = 0)
 auto ^p2 = ^p1  // 所有权自动转移（移动）至 p2；p1 之后不再有效！
 </code></pre>
 <h3 id="使用-cede-进行显式移动"><a class="header" href="#使用-cede-进行显式移动">使用 <code>cede</code> 进行显式移动</a></h3>
-<p>对于其他普通类型（如自定义 Shape 或 <code>String</code>），默认执行的是拷贝语义。为了显式转移所有权（从而避免拷贝开销），必须使用 <strong><code>cede</code> 关键字</strong>。<code>cede</code> 操作会强制将资源移动到目标，并使原变量立即失效：</p>
-<pre><code class="language-toka">import std/string::String
-auto s1 = String::from("hello")
+<p>对于其他普通类型（如自定义 Shape 或 <code>string</code>），默认执行的是拷贝语义。为了显式转移所有权（从而避免拷贝开销），必须使用 <strong><code>cede</code> 关键字</strong>。<code>cede</code> 操作会强制将资源移动到目标，并使原变量立即失效：</p>
+<pre><code class="language-toka">auto s1 = string::from("hello")
 auto s2 = cede s1 // 显式移动：s1 之后不再有效
 </code></pre>
 <hr>
@@ -1172,21 +1235,20 @@ auto p = pair(1, "world")  // Pair&lt;i32, str&gt;
 <h2 id="option-类型"><a class="header" href="#option-类型">Option 类型</a></h2>
 <p>使用 <code>Option</code> 表示可能存在或不存在的值：</p>
 <pre><code class="language-toka">import core/option::{Option}
-import std/string::String
 import std/io::println
 
-fn find_user(id: i32) -&gt; Option&lt;String&gt; {
+fn find_user(id: i32) -&gt; Option&lt;string&gt; {
     if id == 1 {
-        return Option&lt;String&gt;::Some(String::from("Alice"))
+        return Option&lt;string&gt;::Some(string::from("Alice"))
     }
-    return Option&lt;String&gt;::None
+    return Option&lt;string&gt;::None
 }
 
 fn main() -&gt; i32 {
     auto result = find_user(1)
     match result {
-        auto Option&lt;String&gt;::Some(&amp;name) =&gt; println("找到：{}", name)
-        auto Option&lt;String&gt;::None =&gt; println("未找到用户")
+        auto Option&lt;string&gt;::Some(&amp;name) =&gt; println("找到：{}", name)
+        auto Option&lt;string&gt;::None =&gt; println("未找到用户")
     }
     return 0
 }
@@ -1194,13 +1256,12 @@ fn main() -&gt; i32 {
 <h2 id="result-类型"><a class="header" href="#result-类型">Result 类型</a></h2>
 <p>使用 <code>Result</code> 表示可能成功或失败的操作：</p>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 
-fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
+fn divide(a: f64, b: f64) -&gt; Result&lt;f64, string&gt; {
     if b == 0.0 {
-        return Result&lt;f64, String&gt;::Err(String::from("除数不能为零"))
+        return Result&lt;f64, string&gt;::Err(string::from("除数不能为零"))
     }
-    return Result&lt;f64, String&gt;::Ok(a / b)
+    return Result&lt;f64, string&gt;::Ok(a / b)
 }
 </code></pre>
 <p>Result 类型有两个泛型参数：</p>
@@ -1210,20 +1271,19 @@ fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
 </ul>
 <h2 id="对-result-进行模式匹配"><a class="header" href="#对-result-进行模式匹配">对 Result 进行模式匹配</a></h2>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 import std/io::println
 
-fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
+fn divide(a: f64, b: f64) -&gt; Result&lt;f64, string&gt; {
     if b == 0.0 {
-        return Result&lt;f64, String&gt;::Err(String::from("除数不能为零"))
+        return Result&lt;f64, string&gt;::Err(string::from("除数不能为零"))
     }
-    return Result&lt;f64, String&gt;::Ok(a / b)
+    return Result&lt;f64, string&gt;::Ok(a / b)
 }
 
 fn main() -&gt; i32 {
     match divide(10.0, 2.0) {
-        auto Result&lt;f64, String&gt;::Ok(value) =&gt; println("结果：{}", value)
-        auto Result&lt;f64, String&gt;::Err(&amp;msg) =&gt; println("错误：{}", msg)
+        auto Result&lt;f64, string&gt;::Ok(value) =&gt; println("结果：{}", value)
+        auto Result&lt;f64, string&gt;::Err(&amp;msg) =&gt; println("错误：{}", msg)
     }
     return 0
 }
@@ -1231,24 +1291,23 @@ fn main() -&gt; i32 {
 <h2 id="使用--进行短路传播"><a class="header" href="#使用--进行短路传播">使用 <code>!</code> 进行短路传播</a></h2>
 <p>使用 <code>!</code> 运算符自动传播错误：</p>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 
-fn read_file(path: String) -&gt; Result&lt;String, String&gt; {
-    return Result&lt;String, String&gt;::Ok(path)
+fn read_file(path: string) -&gt; Result&lt;string, string&gt; {
+    return Result&lt;string, string&gt;::Ok(path)
 }
 
-fn parse(content: String) -&gt; Result&lt;String, String&gt; {
-    return Result&lt;String, String&gt;::Ok(content)
+fn parse(content: string) -&gt; Result&lt;string, string&gt; {
+    return Result&lt;string, string&gt;::Ok(content)
 }
 
-fn format_result(parsed: String) -&gt; String {
+fn format_result(parsed: string) -&gt; string {
     return parsed
 }
 
-fn process_file(path: String) -&gt; Result&lt;String, String&gt; {
+fn process_file(path: string) -&gt; Result&lt;string, string&gt; {
     auto content = read_file(path)!  // 出错时提前返回
     auto parsed = parse(content)!    // 同上
-    return Result&lt;String, String&gt;::Ok(format_result(parsed))
+    return Result&lt;string, string&gt;::Ok(format_result(parsed))
 }
 </code></pre>
 <p>这比嵌套的 <code>match</code> 语句要干净得多。</p>
@@ -1259,19 +1318,18 @@ fn process_file(path: String) -&gt; Result&lt;String, String&gt; {
 <h2 id="自定义错误类型"><a class="header" href="#自定义错误类型">自定义错误类型</a></h2>
 <p>你可以定义结构化的错误类型：</p>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 
 pub shape Config()
 
 pub shape ParseError(
     line: i32,
     col: i32,
-    message: String
+    message: string
 )
 
-fn parse_config(text: String) -&gt; Result&lt;Config, ParseError&gt; {
+fn parse_config(text: string) -&gt; Result&lt;Config, ParseError&gt; {
     if text.len() == 0 {
-        return Result&lt;Config, ParseError&gt;::Err(ParseError(line = 0, col = 0, message = String::from("空输入")))
+        return Result&lt;Config, ParseError&gt;::Err(ParseError(line = 0, col = 0, message = string::from("空输入")))
     }
     return Result&lt;Config, ParseError&gt;::Ok(Config())
 }
@@ -1280,7 +1338,7 @@ fn parse_config(text: String) -&gt; Result&lt;Config, ParseError&gt; {
 <h1 id="模式匹配"><a class="header" href="#模式匹配">模式匹配</a></h1>
 <p>模式匹配是 Toka 最富有表现力的特性之一，允许你简洁地解构和匹配值。</p>
 <h2 id="基本-match"><a class="header" href="#基本-match">基本 Match</a></h2>
-<pre><code class="language-toka">fn describe(n: i32) -&gt; cstring {
+<pre><code class="language-toka">fn describe(n: i32) -&gt; str {
     return match n {
         0 =&gt; pass "零"
         1 =&gt; pass "一"
@@ -1308,10 +1366,10 @@ import core/option::Option
 
 fn main() -&gt; i32 {
     auto id = 1
-    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None
+    auto opt: Option&lt;str&gt; = Option&lt;str&gt;::None
     match opt {
-        auto Option&lt;view_str&gt;::Some(&amp;name) =&gt; { println("找到：{}", name) }
-        auto Option&lt;view_str&gt;::None =&gt; { println("未找到用户") }
+        auto Option&lt;str&gt;::Some(&amp;name) =&gt; { println("找到：{}", name) }
+        auto Option&lt;str&gt;::None =&gt; { println("未找到用户") }
     }
     return 0
 }
@@ -1321,10 +1379,10 @@ fn main() -&gt; i32 {
 import core/result::Result
 
 fn main() -&gt; i32 {
-    auto res: Result&lt;f32, view_str&gt; = Result&lt;f32, view_str&gt;::Ok(5.0)
+    auto res: Result&lt;f32, str&gt; = Result&lt;f32, str&gt;::Ok(5.0)
     match res {
-        auto Result&lt;f32, view_str&gt;::Ok(value) =&gt; { println("结果：{}", value) }
-        auto Result&lt;f32, view_str&gt;::Err(&amp;msg) =&gt; { println("错误：{}", msg) }
+        auto Result&lt;f32, str&gt;::Ok(value) =&gt; { println("结果：{}", value) }
+        auto Result&lt;f32, str&gt;::Err(&amp;msg) =&gt; { println("错误：{}", msg) }
     }
     return 0
 }
@@ -1356,7 +1414,7 @@ auto grade = match score {
 }
 </code></pre>
 <h2 id="不支持基于类型的匹配"><a class="header" href="#不支持基于类型的匹配">不支持基于类型的匹配</a></h2>
-<p>Toka 不支持直接对类型进行模式匹配（例如在 <code>match</code> 表达式内部书写 <code>i32 =&gt; ...</code> 或 <code>view_str =&gt; ...</code>）。在分支中若使用不带标准语法的类型名称，将被视为一个新的变量绑定模式（Variable Pattern），这会匹配任意值并遮蔽其他分支，从而导致编译错误或不可达分支。</p>
+<p>Toka 不支持直接对类型进行模式匹配（例如在 <code>match</code> 表达式内部书写 <code>i32 =&gt; ...</code> 或 <code>str =&gt; ...</code>）。在分支中若使用不带标准语法的类型名称，将被视为一个新的变量绑定模式（Variable Pattern），这会匹配任意值并遮蔽其他分支，从而导致编译错误或不可达分支。</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="并发编程"><a class="header" href="#并发编程">并发编程</a></h1>
 <p>Toka 通过任务（task）和消息传递提供轻量级的并发能力，实现高效的并行执行。</p>
@@ -1383,7 +1441,7 @@ fn main() -&gt; i32 {
 </code></pre>
 <h2 id="mpsc-通道"><a class="header" href="#mpsc-通道">MPSC 通道</a></h2>
 <p>使用 MPSC（多生产者，单消费者）通道在任务间通信：</p>
-<pre><code class="language-toka">import std/mpsc::channel
+<pre><code class="language-toka">import std/channel::channel
 import std/thread::thread_spawn
 import std/io::println
 
@@ -1486,14 +1544,14 @@ fn main() -&gt; i32 {
 <tbody>
 <tr><td><code>prelude</code></td><td>自动导入的标准库预导入模块，包含最常用类型</td></tr>
 <tr><td><code>char</code></td><td>Unicode 字符处理与分类</td></tr>
-<tr><td><code>string</code></td><td>UTF-8 编码的动态字符串类型（<code>String</code> / <code>view_str</code>）</td></tr>
+<tr><td><code>string</code></td><td>UTF-8 编码的动态字符串类型与视图（<code>string</code> / <code>str</code>）</td></tr>
 <tr><td><code>vec</code></td><td>动态增长的顺序数组容器（<code>Vec</code>）</td></tr>
 <tr><td><code>deque</code></td><td>基于循环缓冲区的双端队列（<code>VecDeque</code>）</td></tr>
-<tr><td><code>list</code></td><td>双向链表实现（<code>LinkedList</code>）</td></tr>
-<tr><td><code>hash_map</code></td><td>基于哈希表的高性能映射（<code>HashMap</code>）</td></tr>
-<tr><td><code>hash_set</code></td><td>基于哈希表的唯一元素集合（<code>HashSet</code>）</td></tr>
-<tr><td><code>btree_map</code></td><td>基于 B-Tree 的有序键值映射（<code>BTreeMap</code>）</td></tr>
-<tr><td><code>btree_set</code></td><td>基于 B-Tree 的有序唯一集合（<code>BTreeSet</code>）</td></tr>
+<tr><td><code>slab</code></td><td>零拷贝分代插槽分配器（<code>Slab</code> / <code>SlabID</code>）</td></tr>
+<tr><td><code>hashmap</code></td><td>基于哈希表的高性能映射（<code>HashMap</code>）</td></tr>
+<tr><td><code>hashset</code></td><td>基于哈希表的唯一元素集合（<code>HashSet</code>）</td></tr>
+<tr><td><code>btreemap</code></td><td>基于 B-Tree 的有序键值映射（<code>BTreeMap</code>）</td></tr>
+<tr><td><code>btreeset</code></td><td>基于 B-Tree 的有序唯一集合（<code>BTreeSet</code>）</td></tr>
 <tr><td><code>heap</code></td><td>最大堆/最小堆实现的优先队列（<code>BinaryHeap</code>）</td></tr>
 <tr><td><code>io</code></td><td>带缓冲的标准控制台 I/O（<code>stdin</code> / <code>stdout</code> / <code>println</code>）</td></tr>
 <tr><td><code>fs</code></td><td>文件系统读写及目录元数据操作</td></tr>
@@ -1555,40 +1613,37 @@ print("No newline here")       // 打印不换行
 </code></pre>
 <h2 id="读取文件"><a class="header" href="#读取文件">读取文件</a></h2>
 <pre><code class="language-toka">import std/fs
-import std/string::String
 import core/result::Result
 import std/io::IoStringResult
 
-fn read_config(path: String) -&gt; IoStringResult {
+fn read_config(path: string) -&gt; IoStringResult {
     return fs::read_to_string(path)
 }
 </code></pre>
 <h2 id="写入文件"><a class="header" href="#写入文件">写入文件</a></h2>
 <pre><code class="language-toka">import std/fs
-import std/string::String
 import core/result::Result
 
-fn save_data(path: String, data: String) -&gt; Result&lt;bool, String&gt; {
-    return fs::write_string(path, data)
+fn save_data(path: string, data: string) -&gt; Result&lt;bool, string&gt; {
+    return fs::write_string(path, data.as_str())
 }
 </code></pre>
 <h2 id="文件系统操作"><a class="header" href="#文件系统操作">文件系统操作</a></h2>
 <p><code>fs</code> 模块提供标准的文件操作：</p>
 <pre><code class="language-toka">import std/fs
-import std/string::String
 import std/io::println
 import core/option::Option
 
 fn manage_files() {
-    auto path = String::from("output")
+    auto path = string::from("output")
     if fs::exists(path.clone()) {
         fs::remove_dir(path)
     }
     
-    fs::create_dir(String::from("output"))
+    fs::create_dir(string::from("output"))
     
-    auto dir# = fs::read_dir(String::from("."))
-    while true {
+    auto dir# = fs::read_dir(string::from("."))
+    loop {
         auto entry = dir#.next()
         if entry.is_none() { break }
         println("{}", entry.unwrap())
@@ -1598,31 +1653,29 @@ fn manage_files() {
 <h2 id="路径操作"><a class="header" href="#路径操作">路径操作</a></h2>
 <pre><code class="language-toka">import std/io::println
 import std/path
-import std/string::String
 
 fn example() {
-    auto full = path::join(String::from("dir"), String::from("file.txt"))
+    auto full = path::join(string::from("dir"), string::from("file.txt"))
     println("{}", full.c_str())
     
-    auto ext = path::extension(String::from("data.json"))
+    auto ext = path::extension(string::from("data.json"))
     println("{}", ext.c_str())
     
-    auto stem = path::file_stem(String::from("data.json"))
+    auto stem = path::file_stem(string::from("data.json"))
     println("{}", stem.c_str())
 }
 </code></pre>
 <h2 id="环境变量"><a class="header" href="#环境变量">环境变量</a></h2>
 <pre><code class="language-toka">import std/io::println
 import std/env
-import std/string::String
 import core/option::Option
 
 fn example() {
-    auto home_opt = env::var(String::from("HOME"))
-    auto home = home_opt.unwrap_or(String::from("/tmp"))
+    auto home_opt = env::var(string::from("HOME"))
+    auto home = home_opt.unwrap_or(string::from("/tmp"))
     println("Home directory: {}", home)
     
-    env::set_var(String::from("MY_APP_DEBUG"), String::from("true"))
+    env::set_var(string::from("MY_APP_DEBUG"), string::from("true"))
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -1642,7 +1695,7 @@ fn example() {
     println("{}", numbers.at(0))  // 1
     
     auto i# = 0:usize
-    while i &lt; numbers.len() {
+    loop i &lt; numbers.len() {
         println("{}", numbers.at(i))
         i = i + 1:usize
     }
@@ -1650,7 +1703,7 @@ fn example() {
 </code></pre>
 <h2 id="map哈希映射"><a class="header" href="#map哈希映射">Map（哈希映射）</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/hash_map::HashMap
+import std/hashmap::HashMap
 import core/option::Option
 import core/primitives
 
@@ -1668,11 +1721,11 @@ fn example() {
 </code></pre>
 <h2 id="btreemap有序映射"><a class="header" href="#btreemap有序映射">BTreeMap（有序映射）</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/btree_map::BTreeMap
+import std/btreemap::BTreeMap
 import core/primitives
 
 fn example() {
-    auto items# = BTreeMap&lt;view_str, i32&gt;::new()
+    auto items# = BTreeMap&lt;str, i32&gt;::new()
     
     items#.insert("apple", 5)
     items#.insert("banana", 3)
@@ -1683,7 +1736,7 @@ fn example() {
 </code></pre>
 <h2 id="btreeset有序集合"><a class="header" href="#btreeset有序集合">BTreeSet（有序集合）</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/btree_set::BTreeSet
+import std/btreeset::BTreeSet
 import core/primitives
 
 fn example() {
@@ -1702,7 +1755,7 @@ fn example() {
 import std/deque::VecDeque
 
 fn example() {
-    auto queue# = VecDeque&lt;view_str&gt;::new()
+    auto queue# = VecDeque&lt;str&gt;::new()
     
     queue#.push_back("first")
     queue#.push_back("second")
@@ -1712,14 +1765,44 @@ fn example() {
     println("{}", queue.len())
 }
 </code></pre>
-<h2 id="list链表"><a class="header" href="#list链表">List（链表）</a></h2>
-<pre><code class="language-toka">import std/list::LinkedList
+<h2 id="slab分代插槽分配器"><a class="header" href="#slab分代插槽分配器">Slab（分代插槽分配器）</a></h2>
+<p>Toka 彻底剔除了链表以拥抱现代 CPU 的 contiguous 物理内存拓扑模型。作为替代，标准库引入了分代插槽分配器 <code>std/slab::Slab</code>。它在连续的内存空间（Vec）中以插槽（Slot）形式管理对象，支持 $O(1)$ 快速插入、删除与查询，并使用 <code>SlabID</code> 分代（Generation）检查技术，从根本上杜绝了 ABA 悬空指针/失效索引引用的安全隐患。</p>
+<p>Slab 的查询方法（<code>get</code> 与 <code>get_mut</code>）采用了高级的<strong>生命周期依赖声明（<code>&lt;- self</code>）</strong>，返回具有零拷贝特性的 <code>Option&lt;&amp;'T&gt;</code> 和 <code>Option&lt;&amp;#'T&gt;</code> 借用。</p>
+<pre><code class="language-toka">import std/slab::{Slab, SlabID}
+import std/io::{println}
+import core/option::{Option}
 
-fn example() {
-    // std/list::LinkedList 在当前编译器中存在已知 bug
-    // auto items# = LinkedList&lt;i32&gt;::new()
-    // items#.push_front(10)
-    // items#.push_back(20)
+shape Entity (
+    name: string,
+    val: i32
+)
+
+fn main() -&gt; i32 {
+    auto slab# = Slab&lt;Entity&gt;::new()
+
+    // 1. 插入元素，返回含有 index 与 generation 的 SlabID
+    auto id1 = slab#.insert(Entity(name = string::from("alpha"), val = 10))
+    auto id2 = slab#.insert(Entity(name = string::from("beta"), val = 20))
+
+    // 2. 零拷贝安全读取借用视图
+    auto e1_opt = slab.get(id1.clone())
+    if e1_opt.is_some() {
+        auto &amp;e1 = e1_opt.unwrap()
+        println("ID1 val: {}", e1.val as i64) // 10
+    }
+
+    // 3. 删除元素并归还插槽
+    auto removed = slab#.remove(id1.clone())
+
+    // 4. 再次插入元素：Slab 将自动复用刚刚释放的插槽 (Slot 0)
+    // 但分代数（Generation）会自动递增至 2！
+    auto id3 = slab#.insert(Entity(name = string::from("gamma"), val = 30))
+
+    // 5. 此时使用旧的已失效 id1 去获取数据将安全地返回 None，完美拦截 ABA 问题！
+    auto old_opt = slab.get(id1)
+    assert(old_opt.is_none(), "generational ID should prevent ABA stale read")
+
+    return 0
 }
 </code></pre>
 <h2 id="heap优先队列"><a class="header" href="#heap优先队列">Heap（优先队列）</a></h2>
@@ -1740,7 +1823,7 @@ fn example() {
 </code></pre>
 <h2 id="set哈希集合"><a class="header" href="#set哈希集合">Set（哈希集合）</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/hash_set::HashSet
+import std/hashset::HashSet
 import core/primitives
 
 fn example() {
@@ -1759,20 +1842,18 @@ fn example() {
 <p>Toka 的网络模块提供 TCP、UDP 和 HTTP 能力，用于构建网络应用。</p>
 <h2 id="http-客户端"><a class="header" href="#http-客户端">HTTP 客户端</a></h2>
 <p>使用 <code>stdx/net/http</code> 模块发起 HTTP 请求：</p>
-<pre><code class="language-toka">import std/string::String
-import core/result::Result
+<pre><code class="language-toka">import core/result::Result
 
 // 注意：HTTP 客户端正在开发中
-fn fetch(url: String) -&gt; Result&lt;String, String&gt; {
+fn fetch(url: string) -&gt; Result&lt;string, string&gt; {
     // auto response = http::get(url)!
     // return Ok(response.body)
-    return Result&lt;String, String&gt;::Ok(String::from("Response"))
+    return Result&lt;string, string&gt;::Ok(string::from("Response"))
 }
 </code></pre>
 <h2 id="http-服务器"><a class="header" href="#http-服务器">HTTP 服务器</a></h2>
 <p>使用 <code>stdx/net/http</code> 模块构建简单的 HTTP 服务器：</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpResponse, HttpRequest}
-import std/string::String
 
 // 注意：HTTP 服务器通过将 std/net 与 stdx/net/http 集成构建
 fn main() -&gt; i32 {
@@ -1785,7 +1866,6 @@ fn main() -&gt; i32 {
 <h2 id="tcp-连接"><a class="header" href="#tcp-连接">TCP 连接</a></h2>
 <p>使用 <code>net</code> 模块进行原始 TCP 通信：</p>
 <pre><code class="language-toka">import std/net::TcpStream
-import std/string::String
 import std/io::println
 import core/result::Result
 
@@ -1794,11 +1874,11 @@ fn handle_client(stream#: TcpStream) {
     auto *buf_ptr# = &amp;buf[0] as *u8
     auto res = stream#.read(*buf_ptr, 1024:usize)
     match res {
-        auto Result&lt;usize, String&gt;::Ok(n) =&gt; {
+        auto Result&lt;usize, string&gt;::Ok(n) =&gt; {
             println("收到 {} 字节", n)
-            stream#.write_string(String::from("ACK"))
+            stream#.write_string(string::from("ACK"))
         }
-        auto Result&lt;usize, String&gt;::Err(&amp;e) =&gt; {
+        auto Result&lt;usize, string&gt;::Err(&amp;e) =&gt; {
             println("错误")
         }
     }
@@ -1807,7 +1887,6 @@ fn handle_client(stream#: TcpStream) {
 <h2 id="websocket"><a class="header" href="#websocket">WebSocket</a></h2>
 <p>对于实时双向通信，使用 <code>stdx/websocket</code> 模块：</p>
 <pre><code class="language-toka">import std/io::println
-import std/string::String
 
 // 注意：WebSocket 正在开发中
 fn echo_server() {
@@ -1818,18 +1897,17 @@ fn echo_server() {
 </code></pre>
 <h2 id="url-解析"><a class="header" href="#url-解析">URL 解析</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/string::String
 import core/result::Result
 import stdx/net/url::{Url, parse_url}
 
 fn example() {
-    auto url_res = parse_url(String::from("https://api.example.com:8080/data?id=1#top"))
+    auto url_res = parse_url(string::from("https://api.example.com:8080/data?id=1#top"))
     match url_res {
-        auto Result&lt;Url, String&gt;::Ok(&amp;url) =&gt; {
+        auto Result&lt;Url, string&gt;::Ok(&amp;url) =&gt; {
             println("主机：{}", url.host)
-            println("端口：{}", String::from_int(url.port as i32))
+            println("端口：{}", string::from_int(url.port as i32))
         }
-        auto Result&lt;Url, String&gt;::Err(&amp;err) =&gt; {
+        auto Result&lt;Url, string&gt;::Err(&amp;err) =&gt; {
             println("错误：{}", err)
         }
     }
@@ -1840,7 +1918,6 @@ fn example() {
 <p>Toka 提供全面的时间处理和数学函数，适用于科学计算和系统编程。</p>
 <h2 id="获取当前时间"><a class="header" href="#获取当前时间">获取当前时间</a></h2>
 <pre><code class="language-toka">import std/time::{SystemTime}
-import std/string::String
 import std/io::println
 
 fn example() {
@@ -1860,7 +1937,6 @@ fn format_date() {
 </code></pre>
 <h2 id="持续时间和计时器"><a class="header" href="#持续时间和计时器">持续时间和计时器</a></h2>
 <pre><code class="language-toka">import std/time::{Instant}
-import std/string::String
 import std/io::println
 
 fn measure() {
@@ -1874,7 +1950,6 @@ fn measure() {
 </code></pre>
 <h2 id="数学函数"><a class="header" href="#数学函数">数学函数</a></h2>
 <pre><code class="language-toka">import std/math
-import std/string::String
 import std/io::println
 
 fn calculations() {
@@ -1888,8 +1963,7 @@ fn calculations() {
 }
 </code></pre>
 <h2 id="随机数"><a class="header" href="#随机数">随机数</a></h2>
-<pre><code class="language-toka">import std/rand::{Random}
-import std/string::String
+<pre><code class="language-toka">import stdx/rand/rand::{Random}
 import std/io::println
 
 fn gen_random() {
@@ -1922,17 +1996,16 @@ fn dummy_limits() {}
 <h2 id="json-编码"><a class="header" href="#json-编码">JSON 编码</a></h2>
 <p>将数据序列化为 JSON：</p>
 <pre><code class="language-toka">import stdx/serde/json
-import std/string::String
 import std/io::println
 
 pub shape Person(
-    name: String,
+    name: string,
     age: i32,
     active: bool
 )
 
 fn encode() {
-    auto person = Person(name = String::from("Alice"), age = 30, active = true)
+    auto person = Person(name = string::from("Alice"), age = 30, active = true)
     // auto json_str = json::to_json(person)
     // println("{}", json_str)  // {"name":"Alice","age":30,"active":true}
 }
@@ -1940,12 +2013,11 @@ fn encode() {
 <h2 id="json-解码"><a class="header" href="#json-解码">JSON 解码</a></h2>
 <p>将 JSON 解析回 Toka 类型：</p>
 <pre><code class="language-toka">import stdx/serde/json
-import std/string::String
 import std/io::println
 import core/result::Result
 
 pub shape Person(
-    name: String,
+    name: string,
     age: i32,
     active: bool
 )
@@ -1957,12 +2029,11 @@ fn decode() {
 </code></pre>
 <h2 id="base64-编码"><a class="header" href="#base64-编码">Base64 编码</a></h2>
 <pre><code class="language-toka">import stdx/encoding/base64
-import std/string::String
 import std/io::println
 
 fn example() {
-    auto original = String::from("Hello, Toka!")
-    auto encoded = base64::encode_str(original)
+    auto original = string::from("Hello, Toka!")
+    auto encoded = base64::encode_str(original.as_str())
     println("{}", encoded)  // SGVsbG8sIFRva2Eh
     
     // 注意：base64::decode 正在开发中
@@ -1985,16 +2056,15 @@ fn example() {
 <h2 id="自定义序列化"><a class="header" href="#自定义序列化">自定义序列化</a></h2>
 <p>为自定义类型实现 <code>@Serialize</code> trait：</p>
 <pre><code class="language-toka">import stdx/serde/json::{@ToJson}
-import std/string::String
 
-pub shape Person(name: String, age: i32, active: bool)
+pub shape Person(name: string, age: i32, active: bool)
 
 impl Person@ToJson {
-    pub fn write_json(self, buf#: String) -&gt; String {
+    pub fn write_json(self, buf#: string) -&gt; string {
         buf#.push_str("{\"name\":\"")
-        buf#.push_str(self.name.c_str())
+        buf#.push_str(self.name.as_str())
         buf#.push_str("\",\"age\":")
-        buf#.push_str(String::from_int(self.age).c_str())
+        buf#.push_str(string::from_int(self.age).as_str())
         buf#.push_str("}")
         return buf
     }
@@ -2039,22 +2109,21 @@ fn example() {
 <h2 id="文件哈希"><a class="header" href="#文件哈希">文件哈希</a></h2>
 <p>对文件内容进行哈希：</p>
 <pre><code class="language-toka">import std/fs
-import std/string::String
 import stdx/crypto/sha256::Sha256
 import core/result::Result
 
-fn verify_file(path: String) -&gt; Result&lt;bool, String&gt; {
+fn verify_file(path: string) -&gt; Result&lt;bool, string&gt; {
     auto content = fs::read_to_string(path).unwrap()
     auto sha256# = Sha256::new()
-    sha256#.update(content)
+    sha256#.update(content.as_str())
     auto computed = sha256#.finalize_hex()
     
-    return Result&lt;bool, String&gt;::Ok(computed.len() &gt; 0:usize)
+    return Result&lt;bool, string&gt;::Ok(computed.len() &gt; 0:usize)
 }
 </code></pre>
 <h2 id="安全随机数"><a class="header" href="#安全随机数">安全随机数</a></h2>
 <p>用于密码学应用：</p>
-<pre><code class="language-toka">import std/rand::Random
+<pre><code class="language-toka">import stdx/rand/rand::Random
 
 fn generate_key() -&gt; u64 {
     // 伪随机字节（不安全，仅用于演示）
@@ -2119,30 +2188,29 @@ cd my-cli
 <h2 id="定义参数"><a class="header" href="#定义参数">定义参数</a></h2>
 <pre><code class="language-tokalang">import stdx/cli/flag::{Parser, ParsedArgs}
 import std/env
-import std/string::String
 import std/io
 
 fn main() -&gt; i32 {
     // Parser::new 接收程序名称和简短的描述
-    auto parser# = Parser::new(String::from("my-cli"), String::from("一个用 Toka 构建的示例 CLI 工具"))
+    auto parser# = Parser::new(string::from("my-cli"), string::from("一个用 Toka 构建的示例 CLI 工具"))
     
     // 向解析器中添加选项
-    parser#.add_string(String::from("name"), 110:char, String::from("World"), String::from("你的名字"))
-    parser#.add_bool(String::from("verbose"), 118:char, false, String::from("启用详细输出"))
+    parser#.add_string(string::from("name"), 110:char, string::from("World"), string::from("你的名字"))
+    parser#.add_bool(string::from("verbose"), 118:char, false, string::from("启用详细输出"))
 
     auto args = env::args()
     auto res = parser.parse(args)
     match res {
-        auto Result&lt;ParsedArgs, String&gt;::Ok(parsed) =&gt; {
-            auto who = parsed.get_string(String::from("name"))
+        auto Result&lt;ParsedArgs, string&gt;::Ok(parsed) =&gt; {
+            auto who = parsed.get_string(string::from("name"))
             io::println("Hello, %s!", who.c_str())
             
-            if parsed.get_bool(String::from("verbose")) {
+            if parsed.get_bool(string::from("verbose")) {
                 io::println("[Verbose] 正在以调试模式运行")
             }
         }
-        auto Result&lt;ParsedArgs, String&gt;::Err(&amp;err) =&gt; {
-            if err == String::from("help requested") {
+        auto Result&lt;ParsedArgs, string&gt;::Err(&amp;err) =&gt; {
+            if err == string::from("help requested") {
                 parser.print_help()
                 return 0
             }
@@ -2162,10 +2230,10 @@ toka run src/main.tk -- -n Toka -v
 # [Verbose] 正在以调试模式运行
 </code></pre>
 <h2 id="高级参数处理"><a class="header" href="#高级参数处理">高级参数处理</a></h2>
-<p>Toka 目前的 <code>stdx/cli/flag</code> 库提供了基本的选项和标志解析，支持 <code>bool</code>、<code>i64</code>、<code>f64</code> 和 <code>String</code> 等类型。</p>
+<p>Toka 目前的 <code>stdx/cli/flag</code> 库提供了基本的选项和标志解析，支持 <code>bool</code>、<code>i64</code>、<code>f64</code> 和 <code>string</code> 等类型。</p>
 <p>定位参数（Positional arguments）会被自动捕获，并可以通过已解析参数的 <code>positionals()</code> 方法来获取：</p>
 <pre><code class="language-tokalang">auto pos_args = parsed.positionals()
-// pos_args 是一个 Vec&lt;String&gt;，包含所有不匹配任何标志或选项的参数
+// pos_args 是一个 Vec&lt;string&gt;，包含所有不匹配任何标志或选项的参数
 </code></pre>
 <p>对于需要嵌套子命令（如 <code>git status</code> 或 <code>docker run</code>）的复杂命令行界面，你可以手动对 <code>pos_args</code> 进行模式匹配，以将执行分发给不同的解析器配置。</p>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -2176,7 +2244,6 @@ toka run src/main.tk -- -n Toka -v
 <pre><code class="language-toka">import std/io::{println}
 import stdx/net/http::{HttpRequest, HttpResponse, parse_http_request}
 import std/net::{TcpListener, TcpStream, Ipv4Addr, SocketAddrV4}
-import std/string::{String}
 import core/result::{Result}
 
 fn handle_client(stream#: TcpStream) {
@@ -2187,12 +2254,12 @@ fn handle_client(stream#: TcpStream) {
     match read_res {
         auto Result::Ok(n) =&gt; {
             if n &gt; 0:usize {
-                auto req_str = String::from_with_len(&amp;buf[0] as *char, n as i32)
+                auto req_str = string::from_with_len(&amp;buf[0] as *char, n as i32)
                 auto req# = parse_http_request(req_str)
                 
                 auto resp# = HttpResponse::not_found()
-                if req.path.eq(String::from("/")) {
-                    resp = HttpResponse::html(String::from("&lt;h1&gt;Hello, Toka!&lt;/h1&gt;"))
+                if req.path.eq(string::from("/")) {
+                    resp = HttpResponse::html(string::from("&lt;h1&gt;Hello, Toka!&lt;/h1&gt;"))
                 }
                 
                 auto resp_str = resp#.to_string()
@@ -2214,25 +2281,24 @@ fn main() -&gt; i32 {
 <p>你可以使用 <code>stdx/serde/json</code> 中的 <code>@ToJson</code> trait 自动序列化自定义 shape 对象，并以 JSON 响应返回：</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpResponse}
 import stdx/serde/json::{serialize_shape, to_json, @ToJson}
-import std/string::{String}
 
-pub shape Message(text: String, status: String)
+pub shape Message(text: string, status: string)
 
 impl Message@ToJson {
-    pub fn write_json(self, buf#: String) -&gt; String {
+    pub fn write_json(self, buf#: string) -&gt; string {
         return serialize_shape(self, buf)
     }
 }
 
 fn api_status() -&gt; HttpResponse {
     auto msg = Message(
-        text = String::from("服务器正在运行"),
-        status = String::from("ok")
+        text = string::from("服务器正在运行"),
+        status = string::from("ok")
     )
     auto json_body = to_json(msg)
     return HttpResponse(
         status_code = 200,
-        content_type = String::from("application/json"),
+        content_type = string::from("application/json"),
         body = json_body
     )
 }
@@ -2244,17 +2310,16 @@ fn main() -&gt; i32 {
 <h2 id="路由参数"><a class="header" href="#路由参数">路由参数</a></h2>
 <p>你可以轻松地手动匹 URL 路径中的动态部分来提取路由参数：</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpRequest, HttpResponse}
-import std/string::{String}
 
 fn handle_user_route(req: HttpRequest) -&gt; HttpResponse {
     // 匹配动态路径 "/api/users/&lt;id&gt;"
-    if req.path.as_str().starts_with(s"/api/users/") {
+    if req.path.as_str().starts_with("/api/users/") {
         auto user_id = req.path.substr(11, req.path.len() - 11)
-        auto body# = String::from("用户 ID: ")
+        auto body# = string::from("用户 ID: ")
         body#.push_view(user_id)
         return HttpResponse(
             status_code = 200,
-            content_type = String::from("text/plain"),
+            content_type = string::from("text/plain"),
             body = body
         )
     }
@@ -2268,13 +2333,12 @@ fn main() -&gt; i32 {
 <h2 id="中间件"><a class="header" href="#中间件">中间件</a></h2>
 <p>包装你的路由处理器以注入自定义中间件功能，例如请求日志或执行计时：</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpRequest, HttpResponse}
-import std/string::{String}
 import std/io::{println}
 
 fn logger_middleware(req: HttpRequest, next: fn(HttpRequest) -&gt; HttpResponse) -&gt; HttpResponse {
     println("请求路径：{}", req.path)
     auto res = next(req)
-    println("响应状态码：{}", String::from_int(res.status_code))
+    println("响应状态码：{}", string::from_int(res.status_code))
     return res
 }
 
@@ -2285,17 +2349,16 @@ fn main() -&gt; i32 {
 <h2 id="静态文件"><a class="header" href="#静态文件">静态文件</a></h2>
 <p>使用 <code>std/fs</code> 模块动态读取文件来提供本地资源：</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpResponse}
-import std/string::{String}
 import std/fs::{read_to_string}
 import core/result::{Result}
 
-fn serve_static_file(path: String) -&gt; HttpResponse {
+fn serve_static_file(path: string) -&gt; HttpResponse {
     auto file_content = read_to_string(path)
     match file_content {
         auto Result::Ok(&amp;content) =&gt; {
             return HttpResponse(
                 status_code = 200,
-                content_type = String::from("text/html"),
+                content_type = string::from("text/html"),
                 body = content.clone()
             )
         }
@@ -2312,7 +2375,6 @@ fn main() -&gt; i32 {
 <pre><code class="language-toka">import std/io::{println}
 import stdx/net/http::{HttpRequest, HttpResponse, HttpMethod, parse_http_request}
 import std/net::{TcpListener, TcpStream, Ipv4Addr, SocketAddrV4}
-import std/string::{String}
 import core/result::{Result}
 
 fn route_request(req: HttpRequest) -&gt; HttpResponse {
@@ -2322,16 +2384,16 @@ fn route_request(req: HttpRequest) -&gt; HttpResponse {
         _ =&gt; {}
     }
     
-    if is_get &amp;&amp; req.path.eq(String::from("/status")) {
+    if is_get &amp;&amp; req.path.eq(string::from("/status")) {
         return HttpResponse(
             status_code = 200,
-            content_type = String::from("application/json"),
-            body = String::from("{\"status\":\"ok\"}")
+            content_type = string::from("application/json"),
+            body = string::from("{\"status\":\"ok\"}")
         )
     }
     
-    if is_get &amp;&amp; req.path.eq(String::from("/")) {
-        return HttpResponse::html(String::from("&lt;h1&gt;Toka HTTP Server&lt;/h1&gt;"))
+    if is_get &amp;&amp; req.path.eq(string::from("/")) {
+        return HttpResponse::html(string::from("&lt;h1&gt;Toka HTTP Server&lt;/h1&gt;"))
     }
     
     return HttpResponse::not_found()
@@ -2345,7 +2407,7 @@ fn handle_connection(stream#: TcpStream) {
     match read_res {
         auto Result::Ok(n) =&gt; {
             if n &gt; 0:usize {
-                auto req_str = String::from_with_len(&amp;buf[0] as *char, n as i32)
+                auto req_str = string::from_with_len(&amp;buf[0] as *char, n as i32)
                 auto req# = parse_http_request(req_str)
                 auto resp# = route_request(req)
                 auto resp_str = resp#.to_string()
@@ -2378,12 +2440,11 @@ fn main() -&gt; i32 {
 <pre><code class="language-tokalang">import regex::{Regex}
 
 import std/io::println
-import std/string::String
 
 fn example() {
     auto re = Regex::new("hello|world")
     
-    if re.test(String::from("hello world")) {
+    if re.test(string::from("hello world")) {
         println("找到匹配！")
     }
 }
@@ -2409,13 +2470,12 @@ fn example() {
 </div>
 <h2 id="匹配"><a class="header" href="#匹配">匹配</a></h2>
 <pre><code class="language-tokalang">import std/io::println
-import std/string::String
 import core/option::Option
 
 fn example() {
     auto re = Regex::new("\\d+")  // 一个或多个数字
     
-    match re.find(String::from("订单 #42")) {
+    match re.find(string::from("订单 #42")) {
         auto Option::Some(m) =&gt; println("找到：{}", m.text),
         auto Option::None =&gt; println("未匹配")
     }
@@ -2423,11 +2483,10 @@ fn example() {
 </code></pre>
 <h2 id="替换"><a class="header" href="#替换">替换</a></h2>
 <pre><code class="language-tokalang">import std/io::println
-import std/string::String
 
 fn example() {
     auto re = Regex::new("\\s+")
-    auto result = re.replace(String::from("hello    world"), String::from(" "))
+    auto result = re.replace(string::from("hello    world"), string::from(" "))
     println("{}", result)  // "hello world"
 }
 </code></pre>
@@ -2617,7 +2676,7 @@ fn example() {
 <h1 id="常见问题"><a class="header" href="#常见问题">常见问题</a></h1>
 <h2 id="通用问题"><a class="header" href="#通用问题">通用问题</a></h2>
 <p><strong>问：Toka 可以用于生产环境吗？</strong></p>
-<p>Toka 目前处于 beta 阶段（v0.9.7）。适用于个人项目、原型开发和实验。1.0 版本的发布计划将以生产稳定性为核心目标。</p>
+<p>Toka 目前处于 beta 阶段（v0.9.8-03）。适用于个人项目、原型开发和实验。1.0 版本的发布计划将以生产稳定性为核心目标。</p>
 <p><strong>问：Toka 支持哪些平台？</strong></p>
 <p>支持 Linux、macOS 和 Windows。LLVM 后端提供交叉编译能力。</p>
 <p><strong>问：有包管理器吗？</strong></p>
@@ -2683,7 +2742,7 @@ fn example() {
         <script src="book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="theme/toka-5c6a0550.js"></script>
+        <script src="theme/toka-e94ce3a0.js"></script>
 
         <script>
         window.addEventListener('load', function() {

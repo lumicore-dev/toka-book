@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "../searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -242,6 +242,30 @@ import std/time as time_lib
     └── release/
         └── my-project    # Release binary (with --release)
 </code></pre>
+<h2 id="-incremental-builds-with-the-forge-engine"><a class="header" href="#-incremental-builds-with-the-forge-engine">🛠️ Incremental Builds with the Forge Engine</a></h2>
+<p>Starting from Toka v0.9.8-03, the official compiler comes with a high-throughput, parallel, and persistent cache build engine named <strong><code>forge</code></strong>. It reads the project’s dependency topology declared inside a <code>build.tk</code> script, coordinates workers to compile files in parallel, and persists the build provenance locally.</p>
+<h3 id="1-declaring-build-configuration-buildtk"><a class="header" href="#1-declaring-build-configuration-buildtk">1. Declaring Build Configuration <code>build.tk</code></a></h3>
+<p>Create a <code>build.tk</code> file in the root directory of your project, utilizing the standard <code>build</code> toolchain to declare your executable or library:</p>
+<pre><code class="language-toka">import build::{Executable, run_build}
+
+fn main() -&gt; i32 {
+    // Instantiate a build project, Executable::make(binary_name, entry_source)
+    // Since Executable::make is a high-level wrapper around low-level C-FFI, we pass raw FFI pointers.
+    auto proj# = Executable::make("my-project".as_cstr().raw_ptr(), "src/main.tk".as_cstr().raw_ptr())
+    return run_build(proj)
+}
+</code></pre>
+<h3 id="2-running-forge-for-parallel-incremental-builds"><a class="header" href="#2-running-forge-for-parallel-incremental-builds">2. Running Forge for Parallel Incremental Builds</a></h3>
+<p>Execute <code>forge</code> in your terminal:</p>
+<pre><code class="language-bash"># Compile with concurrency, -j specifies worker thread count (defaults to 4)
+forge -j 8
+</code></pre>
+<p>The <code>forge</code> engine will automatically:</p>
+<ul>
+<li>Parse the entry point <code>src/main.tk</code> and map its static dependency DAG recursively.</li>
+<li>Compare source file timestamps and maintain an index database inside <code>.forge_cache</code>.</li>
+<li><strong>Smart Incremental Skip</strong>: Instantly bypass compilation for unchanged files, shrinking multi-module project compilation times down to milliseconds!</li>
+</ul>
 
                     </main>
 
@@ -294,7 +318,7 @@ import std/time as time_lib
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

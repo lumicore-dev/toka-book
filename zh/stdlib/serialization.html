@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-6759e637.js";
+            window.path_to_searchindex_js = "../searchindex-9f61b2c2.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -182,17 +182,16 @@
 <h2 id="json-编码"><a class="header" href="#json-编码">JSON 编码</a></h2>
 <p>将数据序列化为 JSON：</p>
 <pre><code class="language-toka">import stdx/serde/json
-import std/string::String
 import std/io::println
 
 pub shape Person(
-    name: String,
+    name: string,
     age: i32,
     active: bool
 )
 
 fn encode() {
-    auto person = Person(name = String::from("Alice"), age = 30, active = true)
+    auto person = Person(name = string::from("Alice"), age = 30, active = true)
     // auto json_str = json::to_json(person)
     // println("{}", json_str)  // {"name":"Alice","age":30,"active":true}
 }
@@ -200,12 +199,11 @@ fn encode() {
 <h2 id="json-解码"><a class="header" href="#json-解码">JSON 解码</a></h2>
 <p>将 JSON 解析回 Toka 类型：</p>
 <pre><code class="language-toka">import stdx/serde/json
-import std/string::String
 import std/io::println
 import core/result::Result
 
 pub shape Person(
-    name: String,
+    name: string,
     age: i32,
     active: bool
 )
@@ -217,12 +215,11 @@ fn decode() {
 </code></pre>
 <h2 id="base64-编码"><a class="header" href="#base64-编码">Base64 编码</a></h2>
 <pre><code class="language-toka">import stdx/encoding/base64
-import std/string::String
 import std/io::println
 
 fn example() {
-    auto original = String::from("Hello, Toka!")
-    auto encoded = base64::encode_str(original)
+    auto original = string::from("Hello, Toka!")
+    auto encoded = base64::encode_str(original.as_str())
     println("{}", encoded)  // SGVsbG8sIFRva2Eh
     
     // 注意：base64::decode 正在开发中
@@ -245,16 +242,15 @@ fn example() {
 <h2 id="自定义序列化"><a class="header" href="#自定义序列化">自定义序列化</a></h2>
 <p>为自定义类型实现 <code>@Serialize</code> trait：</p>
 <pre><code class="language-toka">import stdx/serde/json::{@ToJson}
-import std/string::String
 
-pub shape Person(name: String, age: i32, active: bool)
+pub shape Person(name: string, age: i32, active: bool)
 
 impl Person@ToJson {
-    pub fn write_json(self, buf#: String) -&gt; String {
+    pub fn write_json(self, buf#: string) -&gt; string {
         buf#.push_str("{\"name\":\"")
-        buf#.push_str(self.name.c_str())
+        buf#.push_str(self.name.as_str())
         buf#.push_str("\",\"age\":")
-        buf#.push_str(String::from_int(self.age).c_str())
+        buf#.push_str(string::from_int(self.age).as_str())
         buf#.push_str("}")
         return buf
     }
@@ -312,7 +308,7 @@ impl Person@ToJson {
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

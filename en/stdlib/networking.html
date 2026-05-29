@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "../searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -181,20 +181,18 @@
 <p>Toka’s networking module provides TCP, UDP, and HTTP capabilities for building networked applications.</p>
 <h2 id="http-client"><a class="header" href="#http-client">HTTP Client</a></h2>
 <p>Make HTTP requests with the <code>stdx/net/http</code> module:</p>
-<pre><code class="language-toka">import std/string::String
-import core/result::Result
+<pre><code class="language-toka">import core/result::Result
 
 // Note: HTTP client is under development
-fn fetch(url: String) -&gt; Result&lt;String, String&gt; {
+fn fetch(url: string) -&gt; Result&lt;string, string&gt; {
     // auto response = http::get(url)!
     // return Ok(response.body)
-    return Result&lt;String, String&gt;::Ok(String::from("Response"))
+    return Result&lt;string, string&gt;::Ok(string::from("Response"))
 }
 </code></pre>
 <h2 id="http-server"><a class="header" href="#http-server">HTTP Server</a></h2>
 <p>Build a simple HTTP server using the <code>stdx/net/http</code> module:</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpResponse, HttpRequest}
-import std/string::String
 
 // Note: HTTP Server is built by integrating std/net with stdx/net/http
 fn main() -&gt; i32 {
@@ -207,7 +205,6 @@ fn main() -&gt; i32 {
 <h2 id="tcp-connections"><a class="header" href="#tcp-connections">TCP Connections</a></h2>
 <p>Use the <code>net</code> module for raw TCP:</p>
 <pre><code class="language-toka">import std/net::TcpStream
-import std/string::String
 import std/io::println
 import core/result::Result
 
@@ -216,11 +213,11 @@ fn handle_client(stream#: TcpStream) {
     auto *buf_ptr# = &amp;buf[0] as *u8
     auto res = stream#.read(*buf_ptr, 1024:usize)
     match res {
-        auto Result&lt;usize, String&gt;::Ok(n) =&gt; {
+        auto Result&lt;usize, string&gt;::Ok(n) =&gt; {
             println("Received {} bytes", n)
-            stream#.write_string(String::from("ACK"))
+            stream#.write_string(string::from("ACK"))
         }
-        auto Result&lt;usize, String&gt;::Err(&amp;e) =&gt; {
+        auto Result&lt;usize, string&gt;::Err(&amp;e) =&gt; {
             println("Error")
         }
     }
@@ -229,7 +226,6 @@ fn handle_client(stream#: TcpStream) {
 <h2 id="websocket"><a class="header" href="#websocket">WebSocket</a></h2>
 <p>For real-time bidirectional communication, use the <code>stdx/websocket</code> module:</p>
 <pre><code class="language-toka">import std/io::println
-import std/string::String
 
 // Note: WebSocket is under development
 fn echo_server() {
@@ -240,18 +236,17 @@ fn echo_server() {
 </code></pre>
 <h2 id="url-parsing"><a class="header" href="#url-parsing">URL Parsing</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/string::String
 import core/result::Result
 import stdx/net/url::{Url, parse_url}
 
 fn example() {
-    auto url_res = parse_url(String::from("https://api.example.com:8080/data?id=1#top"))
+    auto url_res = parse_url(string::from("https://api.example.com:8080/data?id=1#top"))
     match url_res {
-        auto Result&lt;Url, String&gt;::Ok(&amp;url) =&gt; {
+        auto Result&lt;Url, string&gt;::Ok(&amp;url) =&gt; {
             println("Host: {}", url.host)
-            println("Port: {}", String::from_int(url.port as i32))
+            println("Port: {}", string::from_int(url.port as i32))
         }
-        auto Result&lt;Url, String&gt;::Err(&amp;err) =&gt; {
+        auto Result&lt;Url, string&gt;::Err(&amp;err) =&gt; {
             println("Error: {}", err)
         }
     }
@@ -309,7 +304,7 @@ fn example() {
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

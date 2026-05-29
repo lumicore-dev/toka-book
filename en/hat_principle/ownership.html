@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "../searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -228,9 +228,8 @@ auto ^p1 = new Point(x = 10, y = 20, z = 0)
 auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid!
 </code></pre>
 <h3 id="explicit-move-with-cede"><a class="header" href="#explicit-move-with-cede">Explicit Move with <code>cede</code></a></h3>
-<p>For other types (such as custom shapes or <code>String</code>), copy semantics are used by default. To explicitly transfer ownership of such a value (avoiding copies), you must use the <strong><code>cede</code> keyword</strong>. Ceding transfers the resource to the destination and invalidates the source variable:</p>
-<pre><code class="language-toka">import std/string::String
-auto s1 = String::from("hello")
+<p>For other types (such as custom shapes or <code>string</code>), copy semantics are used by default. To explicitly transfer ownership of such a value (avoiding copies), you must use the <strong><code>cede</code> keyword</strong>. Ceding transfers the resource to the destination and invalidates the source variable:</p>
+<pre><code class="language-toka">auto s1 = string::from("hello")
 auto s2 = cede s1 // Explicit move: s1 is invalidated
 </code></pre>
 <hr>
@@ -345,7 +344,7 @@ fn mutable_method_example() {
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

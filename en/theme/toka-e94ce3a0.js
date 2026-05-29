@@ -4,9 +4,9 @@ hljs.registerLanguage('toka', function(hljs) {
     aliases: ['tk'],
     keywords: {
       keyword:
-        'fn auto shape impl import guard cede new unsafe alloc free null none effects return if else while loop for match in break continue as pub async await',
+        'fn auto shape impl import guard cede new unsafe alloc free null none effects return if else loop for match in break continue as pub async await',
       type:
-        'i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 bool char void String Vec Result Option Data Buffer Node Point',
+        'i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 bool char void string str bytes cstr Vec Result Option Data Buffer Node Point',
       literal:
         'true false null none'
     },

@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "../searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -188,30 +188,29 @@ cd my-cli
 <h2 id="defining-arguments"><a class="header" href="#defining-arguments">Defining Arguments</a></h2>
 <pre><code class="language-tokalang">import stdx/cli/flag::{Parser, ParsedArgs}
 import std/env
-import std/string::String
 import std/io
 
 fn main() -&gt; i32 {
     // Parser::new takes the program name and a brief description
-    auto parser# = Parser::new(String::from("my-cli"), String::from("A sample CLI tool built with Toka"))
+    auto parser# = Parser::new(string::from("my-cli"), string::from("A sample CLI tool built with Toka"))
     
     // Add options to the parser
-    parser#.add_string(String::from("name"), 110:char, String::from("World"), String::from("Your name"))
-    parser#.add_bool(String::from("verbose"), 118:char, false, String::from("Enable verbose output"))
+    parser#.add_string(string::from("name"), 110:char, string::from("World"), string::from("Your name"))
+    parser#.add_bool(string::from("verbose"), 118:char, false, string::from("Enable verbose output"))
 
     auto args = env::args()
     auto res = parser.parse(args)
     match res {
-        auto Result&lt;ParsedArgs, String&gt;::Ok(parsed) =&gt; {
-            auto who = parsed.get_string(String::from("name"))
+        auto Result&lt;ParsedArgs, string&gt;::Ok(parsed) =&gt; {
+            auto who = parsed.get_string(string::from("name"))
             io::println("Hello, %s!", who.c_str())
             
-            if parsed.get_bool(String::from("verbose")) {
+            if parsed.get_bool(string::from("verbose")) {
                 io::println("[Verbose] Running with debug output")
             }
         }
-        auto Result&lt;ParsedArgs, String&gt;::Err(&amp;err) =&gt; {
-            if err == String::from("help requested") {
+        auto Result&lt;ParsedArgs, string&gt;::Err(&amp;err) =&gt; {
+            if err == string::from("help requested") {
                 parser.print_help()
                 return 0
             }
@@ -231,10 +230,10 @@ toka run src/main.tk -- -n Toka -v
 # [Verbose] Running with debug output
 </code></pre>
 <h2 id="advanced-argument-handling"><a class="header" href="#advanced-argument-handling">Advanced Argument Handling</a></h2>
-<p>Toka’s current <code>stdx/cli/flag</code> library provides basic options and flags parsing with types like <code>bool</code>, <code>i64</code>, <code>f64</code>, and <code>String</code>.</p>
+<p>Toka’s current <code>stdx/cli/flag</code> library provides basic options and flags parsing with types like <code>bool</code>, <code>i64</code>, <code>f64</code>, and <code>string</code>.</p>
 <p>Positional arguments are captured automatically and can be fetched from the parsed arguments using <code>positionals()</code>:</p>
 <pre><code class="language-tokalang">auto pos_args = parsed.positionals()
-// pos_args is a Vec&lt;String&gt; containing any arguments not matching flags or options
+// pos_args is a Vec&lt;string&gt; containing any arguments not matching flags or options
 </code></pre>
 <p>For complex command-line interfaces requiring nested subcommands (like <code>git status</code> or <code>docker run</code>), you can manually match on <code>pos_args</code> to delegate execution to different parser configurations.</p>
 
@@ -289,7 +288,7 @@ toka run src/main.tk -- -n Toka -v
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

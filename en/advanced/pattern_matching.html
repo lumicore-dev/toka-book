@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "../searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -180,7 +180,7 @@
                         <h1 id="pattern-matching"><a class="header" href="#pattern-matching">Pattern Matching</a></h1>
 <p>Pattern matching is one of Toka’s most expressive features, allowing you to destructure and match values concisely.</p>
 <h2 id="basic-match"><a class="header" href="#basic-match">Basic Match</a></h2>
-<pre><code class="language-toka">fn describe(n: i32) -&gt; cstring {
+<pre><code class="language-toka">fn describe(n: i32) -&gt; str {
     return match n {
         0 =&gt; pass "zero"
         1 =&gt; pass "one"
@@ -208,10 +208,10 @@ import core/option::Option
 
 fn main() -&gt; i32 {
     auto id = 1
-    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None
+    auto opt: Option&lt;str&gt; = Option&lt;str&gt;::None
     match opt {
-        auto Option&lt;view_str&gt;::Some(&amp;name) =&gt; { println("Found: {}", name) }
-        auto Option&lt;view_str&gt;::None =&gt; { println("User not found") }
+        auto Option&lt;str&gt;::Some(&amp;name) =&gt; { println("Found: {}", name) }
+        auto Option&lt;str&gt;::None =&gt; { println("User not found") }
     }
     return 0
 }
@@ -221,10 +221,10 @@ fn main() -&gt; i32 {
 import core/result::Result
 
 fn main() -&gt; i32 {
-    auto res: Result&lt;f32, view_str&gt; = Result&lt;f32, view_str&gt;::Ok(5.0)
+    auto res: Result&lt;f32, str&gt; = Result&lt;f32, str&gt;::Ok(5.0)
     match res {
-        auto Result&lt;f32, view_str&gt;::Ok(value) =&gt; { println("Result: {}", value) }
-        auto Result&lt;f32, view_str&gt;::Err(&amp;msg) =&gt; { println("Error: {}", msg) }
+        auto Result&lt;f32, str&gt;::Ok(value) =&gt; { println("Result: {}", value) }
+        auto Result&lt;f32, str&gt;::Err(&amp;msg) =&gt; { println("Error: {}", msg) }
     }
     return 0
 }
@@ -256,7 +256,7 @@ auto grade = match score {
 }
 </code></pre>
 <h2 id="no-type-based-matching"><a class="header" href="#no-type-based-matching">No Type-Based Matching</a></h2>
-<p>Toka does not support matching directly on types (such as writing <code>i32 =&gt; ...</code> or <code>view_str =&gt; ...</code> inside a <code>match</code> expression). Any type name used in a branch without standard syntax will be treated as a new variable binding pattern (Variable Pattern), which matches any value and shadows other cases, leading to compilation errors or unreachable branches.</p>
+<p>Toka does not support matching directly on types (such as writing <code>i32 =&gt; ...</code> or <code>str =&gt; ...</code> inside a <code>match</code> expression). Any type name used in a branch without standard syntax will be treated as a new variable binding pattern (Variable Pattern), which matches any value and shadows other cases, leading to compilation errors or unreachable branches.</p>
 <pre><code></code></pre>
 
                     </main>
@@ -310,7 +310,7 @@ auto grade = match score {
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

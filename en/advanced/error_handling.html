@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "../searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -182,21 +182,20 @@
 <h2 id="the-option-type"><a class="header" href="#the-option-type">The Option Type</a></h2>
 <p>Use <code>Option</code> for values that may or may not exist:</p>
 <pre><code class="language-toka">import core/option::{Option}
-import std/string::String
 import std/io::println
 
-fn find_user(id: i32) -&gt; Option&lt;String&gt; {
+fn find_user(id: i32) -&gt; Option&lt;string&gt; {
     if id == 1 {
-        return Option&lt;String&gt;::Some(String::from("Alice"))
+        return Option&lt;string&gt;::Some(string::from("Alice"))
     }
-    return Option&lt;String&gt;::None
+    return Option&lt;string&gt;::None
 }
 
 fn main() -&gt; i32 {
     auto result = find_user(1)
     match result {
-        auto Option&lt;String&gt;::Some(&amp;name) =&gt; println("Found: {}", name)
-        auto Option&lt;String&gt;::None =&gt; println("User not found")
+        auto Option&lt;string&gt;::Some(&amp;name) =&gt; println("Found: {}", name)
+        auto Option&lt;string&gt;::None =&gt; println("User not found")
     }
     return 0
 }
@@ -204,13 +203,12 @@ fn main() -&gt; i32 {
 <h2 id="the-result-type"><a class="header" href="#the-result-type">The Result Type</a></h2>
 <p>Use <code>Result</code> for operations that can succeed or fail:</p>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 
-fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
+fn divide(a: f64, b: f64) -&gt; Result&lt;f64, string&gt; {
     if b == 0.0 {
-        return Result&lt;f64, String&gt;::Err(String::from("Division by zero"))
+        return Result&lt;f64, string&gt;::Err(string::from("Division by zero"))
     }
-    return Result&lt;f64, String&gt;::Ok(a / b)
+    return Result&lt;f64, string&gt;::Ok(a / b)
 }
 </code></pre>
 <p>The Result type is generic over two parameters:</p>
@@ -220,20 +218,19 @@ fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
 </ul>
 <h2 id="pattern-matching-on-results"><a class="header" href="#pattern-matching-on-results">Pattern Matching on Results</a></h2>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 import std/io::println
 
-fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
+fn divide(a: f64, b: f64) -&gt; Result&lt;f64, string&gt; {
     if b == 0.0 {
-        return Result&lt;f64, String&gt;::Err(String::from("Division by zero"))
+        return Result&lt;f64, string&gt;::Err(string::from("Division by zero"))
     }
-    return Result&lt;f64, String&gt;::Ok(a / b)
+    return Result&lt;f64, string&gt;::Ok(a / b)
 }
 
 fn main() -&gt; i32 {
     match divide(10.0, 2.0) {
-        auto Result&lt;f64, String&gt;::Ok(value) =&gt; println("Result: {}", value)
-        auto Result&lt;f64, String&gt;::Err(&amp;msg) =&gt; println("Error: {}", msg)
+        auto Result&lt;f64, string&gt;::Ok(value) =&gt; println("Result: {}", value)
+        auto Result&lt;f64, string&gt;::Err(&amp;msg) =&gt; println("Error: {}", msg)
     }
     return 0
 }
@@ -241,24 +238,23 @@ fn main() -&gt; i32 {
 <h2 id="short-circuiting-with-"><a class="header" href="#short-circuiting-with-">Short-Circuiting with <code>!</code></a></h2>
 <p>Use the <code>!</code> operator to propagate errors automatically:</p>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 
-fn read_file(path: String) -&gt; Result&lt;String, String&gt; {
-    return Result&lt;String, String&gt;::Ok(path)
+fn read_file(path: string) -&gt; Result&lt;string, string&gt; {
+    return Result&lt;string, string&gt;::Ok(path)
 }
 
-fn parse(content: String) -&gt; Result&lt;String, String&gt; {
-    return Result&lt;String, String&gt;::Ok(content)
+fn parse(content: string) -&gt; Result&lt;string, string&gt; {
+    return Result&lt;string, string&gt;::Ok(content)
 }
 
-fn format_result(parsed: String) -&gt; String {
+fn format_result(parsed: string) -&gt; string {
     return parsed
 }
 
-fn process_file(path: String) -&gt; Result&lt;String, String&gt; {
+fn process_file(path: string) -&gt; Result&lt;string, string&gt; {
     auto content = read_file(path)!  // Returns early on error
     auto parsed = parse(content)!    // Same here
-    return Result&lt;String, String&gt;::Ok(format_result(parsed))
+    return Result&lt;string, string&gt;::Ok(format_result(parsed))
 }
 </code></pre>
 <p>This is much cleaner than nested <code>match</code> statements.</p>
@@ -269,19 +265,18 @@ fn process_file(path: String) -&gt; Result&lt;String, String&gt; {
 <h2 id="custom-error-types"><a class="header" href="#custom-error-types">Custom Error Types</a></h2>
 <p>You can define structured errors:</p>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 
 pub shape Config()
 
 pub shape ParseError(
     line: i32,
     col: i32,
-    message: String
+    message: string
 )
 
-fn parse_config(text: String) -&gt; Result&lt;Config, ParseError&gt; {
+fn parse_config(text: string) -&gt; Result&lt;Config, ParseError&gt; {
     if text.len() == 0 {
-        return Result&lt;Config, ParseError&gt;::Err(ParseError(line = 0, col = 0, message = String::from("Empty input")))
+        return Result&lt;Config, ParseError&gt;::Err(ParseError(line = 0, col = 0, message = string::from("Empty input")))
     }
     return Result&lt;Config, ParseError&gt;::Ok(Config())
 }
@@ -338,7 +333,7 @@ fn parse_config(text: String) -&gt; Result&lt;Config, ParseError&gt; {
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

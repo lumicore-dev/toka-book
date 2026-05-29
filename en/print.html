@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-a1bbd169.js"></script>
@@ -203,9 +203,9 @@
 <h2 id="language-version-alignment"><a class="header" href="#language-version-alignment">Language Version Alignment</a></h2>
 <p>This book is kept up-to-date with the latest Toka compiler development. The current version of this documentation is aligned with:</p>
 <ul>
-<li><strong>Compiler Version</strong>: <code>v0.9.7</code></li>
-<li><strong>Toka Commit</strong>: <code>b3f8940</code> (Complete termios and prelude audit refactoring, support kebab-case package names and namespace parsing, and enforce hyphen-free variable declarations)</li>
-<li><strong>Tag</strong>: <code>v0.9.7-02</code></li>
+<li><strong>Compiler Version</strong>: <code>v0.9.8</code></li>
+<li><strong>Toka Commit</strong>: <code>aadfd52</code> (Unify three-track string system, abolish while in favor of loop, refactor std with generational Slab allocator, and introduce forge parallel build engine)</li>
+<li><strong>Tag</strong>: <code>v0.9.8-03</code></li>
 </ul>
 <h2 id="a-note-from-the-author"><a class="header" href="#a-note-from-the-author">A Note From the Author</a></h2>
 <p>Toka is a young but ambitious language. This guide was written alongside the language’s development to help early adopters get started. As Toka evolves, this book will evolve with it.</p>
@@ -390,6 +390,30 @@ import std/time as time_lib
     └── release/
         └── my-project    # Release binary (with --release)
 </code></pre>
+<h2 id="-incremental-builds-with-the-forge-engine"><a class="header" href="#-incremental-builds-with-the-forge-engine">🛠️ Incremental Builds with the Forge Engine</a></h2>
+<p>Starting from Toka v0.9.8-03, the official compiler comes with a high-throughput, parallel, and persistent cache build engine named <strong><code>forge</code></strong>. It reads the project’s dependency topology declared inside a <code>build.tk</code> script, coordinates workers to compile files in parallel, and persists the build provenance locally.</p>
+<h3 id="1-declaring-build-configuration-buildtk"><a class="header" href="#1-declaring-build-configuration-buildtk">1. Declaring Build Configuration <code>build.tk</code></a></h3>
+<p>Create a <code>build.tk</code> file in the root directory of your project, utilizing the standard <code>build</code> toolchain to declare your executable or library:</p>
+<pre><code class="language-toka">import build::{Executable, run_build}
+
+fn main() -&gt; i32 {
+    // Instantiate a build project, Executable::make(binary_name, entry_source)
+    // Since Executable::make is a high-level wrapper around low-level C-FFI, we pass raw FFI pointers.
+    auto proj# = Executable::make("my-project".as_cstr().raw_ptr(), "src/main.tk".as_cstr().raw_ptr())
+    return run_build(proj)
+}
+</code></pre>
+<h3 id="2-running-forge-for-parallel-incremental-builds"><a class="header" href="#2-running-forge-for-parallel-incremental-builds">2. Running Forge for Parallel Incremental Builds</a></h3>
+<p>Execute <code>forge</code> in your terminal:</p>
+<pre><code class="language-bash"># Compile with concurrency, -j specifies worker thread count (defaults to 4)
+forge -j 8
+</code></pre>
+<p>The <code>forge</code> engine will automatically:</p>
+<ul>
+<li>Parse the entry point <code>src/main.tk</code> and map its static dependency DAG recursively.</li>
+<li>Compare source file timestamps and maintain an index database inside <code>.forge_cache</code>.</li>
+<li><strong>Smart Incremental Skip</strong>: Instantly bypass compilation for unchanged files, shrinking multi-module project compilation times down to milliseconds!</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="language-basics"><a class="header" href="#language-basics">Language Basics</a></h1>
 <p>Now that you have Toka installed and have written your first program, let’s dive into the core concepts of the language.</p>
@@ -566,7 +590,7 @@ fn main() -&gt; i32 {
 <p>Return <code>0</code> for success, non-zero for errors.</p>
 <h2 id="multiple-parameters"><a class="header" href="#multiple-parameters">Multiple Parameters</a></h2>
 <p>Functions can take multiple parameters of different types:</p>
-<pre><code class="language-toka">fn greet(name: view_str, age: i32, formal: bool) -&gt; cstring {
+<pre><code class="language-toka">fn greet(name: str, age: i32, formal: bool) -&gt; str {
     if formal {
         return "Good day"
     }
@@ -583,7 +607,7 @@ fn main() -&gt; i32 {
 <p>If a function doesn’t return anything, omit <code>-&gt;</code>:</p>
 <pre><code class="language-toka">import std/io::println
 
-fn log_message(msg: view_str) {
+fn log_message(msg: str) {
     println("{}", msg)
 }
 </code></pre>
@@ -618,11 +642,13 @@ fn check_temp(temp: i32) {
     }
 }
 </code></pre>
-<h2 id="while-loops"><a class="header" href="#while-loops">While Loops</a></h2>
+<h2 id="loop-loops"><a class="header" href="#loop-loops">Loop Loops</a></h2>
+<p>Toka completely abolishes traditional <code>while</code> loops, unifying all loop semantics under the <code>loop</code> keyword. This significantly simplifies compiler control flow analysis and eliminates syntactic ambiguity.</p>
+<p>Conditional loops use the <code>loop condition {}</code> syntax structure:</p>
 <pre><code class="language-toka">import std/io::println
 
 auto count# = 0
-while count &lt; 5 {
+loop count &lt; 5 {
     println("Count: {}", count)
     count = count + 1
 }
@@ -635,7 +661,7 @@ for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
     println("{}", i)
 }
 </code></pre>
-<p>Currently, Toka does not support a native range operator (like <code>..</code>). You can iterate over an array of elements or implement custom loops using <code>while</code>.</p>
+<p>Currently, Toka does not support a native range operator (like <code>..</code>). You can iterate over an array of elements or implement custom loops using <code>loop</code>.</p>
 <h2 id="iterating-collections"><a class="header" href="#iterating-collections">Iterating Collections</a></h2>
 <pre><code class="language-toka">import std/io::println
 
@@ -659,7 +685,7 @@ for auto item in items2 {
 <pre><code class="language-toka">import std/io::println
 
 auto iter# = 0
-while iter &lt; 100 {
+loop iter &lt; 100 {
     if iter == 50 {
         break        // Exit the loop completely
     }
@@ -673,7 +699,7 @@ while iter &lt; 100 {
 </code></pre>
 <h2 id="match-pattern-matching"><a class="header" href="#match-pattern-matching">Match (Pattern Matching)</a></h2>
 <p>Toka provides intuitive pattern matching with the <code>match</code> expression:</p>
-<pre><code class="language-toka">fn describe(value: i32) -&gt; cstring {
+<pre><code class="language-toka">fn describe(value: i32) -&gt; str {
     return match value {
         0 =&gt; pass "zero"
         1 =&gt; pass "one"
@@ -686,76 +712,114 @@ while iter &lt; 100 {
 <p>The <code>_</code> wildcard matches any value, serving as the default case.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="strings"><a class="header" href="#strings">Strings</a></h1>
-<p>Toka provides a flexible string system designed for both systems programming and text processing.</p>
-<h2 id="string-types"><a class="header" href="#string-types">String Types</a></h2>
-<p>Toka defines several string types for different encoding needs:</p>
+<p>Toka 1.0 implements a highly rigorous, high-performance <strong>Three-Track Text &amp; Byte-Stream System</strong>. It orthogonally decouples “textual observation” from “physical binary manipulation” in the type system. Simultaneously, it eliminates ambiguous implicit context inference, providing developers with maximum memory safety and speed.</p>
+<hr>
+<h2 id="-1-string-and-view-types"><a class="header" href="#-1-string-and-view-types">🏛️ 1. String and View Types</a></h2>
+<p>Strings in Toka are split into owned heap-allocated containers and zero-copy borrowed views. Built into the Prelude’s zero-import scope, you can <strong>directly use these types without any <code>import</code></strong>:</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>Type</th><th>Description</th></tr>
+<tr><th style="text-align: left">Type</th><th style="text-align: left">Physical Geometry / LLVM Representation</th><th style="text-align: left">Memory Ownership</th><th style="text-align: left">Description</th></tr>
 </thead>
 <tbody>
-<tr><td><code>str</code></td><td>String slice (like Rust <code>&amp;str</code> or C++ <code>string_view</code>) — immutable, borrowed</td></tr>
-<tr><td><code>String</code></td><td>Owned mutable string (UTF-8 by default, defined in <code>std/string::String</code>)</td></tr>
+<tr><td style="text-align: left"><code>str</code></td><td style="text-align: left">Fat pointer <code>{ i8* head, i64 len }</code></td><td style="text-align: left"><strong>No Ownership (Borrowed)</strong></td><td style="text-align: left">UTF-8 read-only text view. No <code>\0</code> termination guarantee.</td></tr>
+<tr><td style="text-align: left"><code>string</code></td><td style="text-align: left">Heap container <code>{ *#buf, usize, usize }</code></td><td style="text-align: left"><strong>Exclusive Ownership (Owned)</strong></td><td style="text-align: left">Heap-allocated mutable UTF-8 string, strictly terminated with <code>\0</code>.</td></tr>
+<tr><td style="text-align: left"><code>bytes</code></td><td style="text-align: left">Fat pointer <code>{ i8* head, i64 len }</code></td><td style="text-align: left"><strong>No Ownership (Borrowed)</strong></td><td style="text-align: left">Read-only binary byte-stream view.</td></tr>
+<tr><td style="text-align: left"><code>cstr</code></td><td style="text-align: left">Single pointer <code>i8*</code> (Zero-cost Shape)</td><td style="text-align: left"><strong>FFI Borrowed</strong></td><td style="text-align: left">C-style read-only single pointer, 100% statically guaranteed to be <code>\0</code>-terminated.</td></tr>
 </tbody>
 </table>
 </div>
-<h2 id="string-literals"><a class="header" href="#string-literals">String Literals</a></h2>
-<p>Double-quoted strings are the standard:</p>
-<pre><code class="language-toka">auto greeting = "Hello, Toka!"
-auto name = "World"
-</code></pre>
-<h2 id="escape-sequences"><a class="header" href="#escape-sequences">Escape Sequences</a></h2>
-<p>Toka supports <code>\x</code> escape sequences in string literals, making ANSI color codes clean:</p>
-<pre><code class="language-toka">import std/io::println
-
-auto red = "\x1b[31m"
-auto green = "\x1b[32m"
-auto reset = "\x1b[0m"
-
-println("{}{}Success!{}", green, "Build complete", reset)
-</code></pre>
-<h2 id="string-interpolation"><a class="header" href="#string-interpolation">String Interpolation</a></h2>
-<p>Use <code>{}</code> placeholders with <code>println</code> for clean formatting:</p>
-<pre><code class="language-toka">import std/io::println
-
-auto name = "Toka"
-auto version = "0.9.7"
-println("Welcome to {} version {}!", name, version)
-</code></pre>
-<h2 id="string-concatenation"><a class="header" href="#string-concatenation">String Concatenation</a></h2>
-<p>Strings can be concatenated with <code>+</code>:</p>
-<pre><code class="language-toka">import std/string::String
-
-auto full# = String::from("Hello, ")
-full#.push_str("World!")
-</code></pre>
-<h2 id="formatting-and-printing"><a class="header" href="#formatting-and-printing">Formatting and Printing</a></h2>
-<p>You can print other types easily using placeholders without manual conversion:</p>
-<pre><code class="language-toka">import std/io::println
-
-auto n = 42
-println("The answer is {}", n)
-</code></pre>
-<h2 id="character-types"><a class="header" href="#character-types">Character Types</a></h2>
+<hr>
+<h2 id="-2-the-orthogonal-conversion-matrix"><a class="header" href="#-2-the-orthogonal-conversion-matrix">⚖️ 2. The Orthogonal Conversion Matrix</a></h2>
+<p>Toka strictly adheres to the <strong>“Honest Overhead Naming Code”</strong>:</p>
+<ul>
+<li><strong><code>as_xxx</code> family</strong>: Represents <strong>zero-overhead, zero-allocation</strong> view borrowing. The borrowed view’s lifetime is strictly guarded at compile time, bound tightly to its host.</li>
+<li><strong><code>to_xxx</code> family</strong>: Represents <strong>conversions involving physical copies or heap allocations</strong>, explicitly declaring the separation of ownership and physical memory operations.</li>
+</ul>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>Type</th><th>Description</th></tr>
+<tr><th style="text-align: left">Source $\rightarrow$ Target</th><th style="text-align: left"><code>str</code> (Safe Fat Slice)</th><th style="text-align: left"><code>string</code> (Heap Owned)</th><th style="text-align: left"><code>cstr</code> (\0 Borrowed)</th><th style="text-align: left"><code>*char</code> (FFI Raw Ptr)</th></tr>
 </thead>
 <tbody>
-<tr><td><code>char</code></td><td>Single byte character (<code>i8</code>), C-style</td></tr>
-<tr><td><code>Char16</code></td><td>UTF-16 code point (<code>u16</code>)</td></tr>
-<tr><td><code>Char32</code></td><td>UTF-32 code point (<code>u32</code>)</td></tr>
-<tr><td><code>Char</code></td><td>Alias for <code>Char32</code>, the default Unicode character</td></tr>
+<tr><td style="text-align: left"><strong><code>"..."</code> Literal</strong></td><td style="text-align: left">Default ResolvedType (0-cost)</td><td style="text-align: left"><strong><code>.to_string()</code></strong><br>($O(N)$ heap alloc)</td><td style="text-align: left"><strong><code>.as_cstr()</code></strong><br>($O(1)$ zero-alloc)</td><td style="text-align: left">FFI boundary decay<br>(0 friction)</td></tr>
+<tr><td style="text-align: left"><strong><code>str</code></strong></td><td style="text-align: left">——</td><td style="text-align: left"><strong><code>.to_string()</code></strong><br>($O(N)$ heap alloc)</td><td style="text-align: left"><strong><code>.to_string().as_cstr()</code></strong><br>($O(N)$ heap copy)</td><td style="text-align: left">Implicit banned!<br>Use <code>.to_string().c_str()</code></td></tr>
+<tr><td style="text-align: left"><strong><code>string</code></strong></td><td style="text-align: left"><strong><code>.as_str()</code></strong><br>($O(1)$ zero-alloc)</td><td style="text-align: left">——</td><td style="text-align: left"><strong><code>.as_cstr()</code></strong><br>($O(1)$ zero-alloc)</td><td style="text-align: left"><strong><code>.c_str()</code></strong><br>($O(1)$ address borrow)</td></tr>
+<tr><td style="text-align: left"><strong><code>cstr</code></strong></td><td style="text-align: left"><strong><code>.as_str()</code></strong><br>($O(1)$ zero-alloc)</td><td style="text-align: left"><strong><code>.to_string()</code></strong><br>($O(N)$ heap alloc)</td><td style="text-align: left">——</td><td style="text-align: left">FFI boundary decay<br>(0 friction)</td></tr>
 </tbody>
 </table>
 </div>
-<h2 id="working-with-characters"><a class="header" href="#working-with-characters">Working with Characters</a></h2>
-<pre><code class="language-toka">auto ch: char = 'A'
-auto unicode: u32 = 0x4E16:u32
+<hr>
+<h2 id="-3-core-operations--examples"><a class="header" href="#-3-core-operations--examples">🚀 3. Core Operations &amp; Examples</a></h2>
+<h3 id="1-default-zero-copy-literals"><a class="header" href="#1-default-zero-copy-literals">1. Default Zero-Copy Literals</a></h3>
+<p>In Toka, regular double-quoted <code>"..."</code> string literals are resolved as static, read-only <code>str</code> views by default:</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() -&gt; i32 {
+    // Resolved as str by default, resident in .rodata, 100% statically safe
+    auto greeting: str = "Hello, Toka!"
+    println("Greeting: {}", greeting)
+    return 0
+}
 </code></pre>
-<p>The string system is defined in <code>lib/core/str.tk</code> and <code>lib/core/utf8.tk</code> for UTF-8 handling.</p>
+<h3 id="2-dynamic-string--concatenation"><a class="header" href="#2-dynamic-string--concatenation">2. Dynamic string &amp; Concatenation</a></h3>
+<p><code>string</code> is an exclusive heap container. You can mutate it dynamically using <code>push_str</code>.</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() -&gt; i32 {
+    // zero-import prelude allows direct call to string::from
+    auto full# = string::from("Hello, ")
+    full#.push_str("World!")
+    
+    println("{}", full.as_str()) // Zero-overhead str view borrow
+    return 0
+}
+</code></pre>
+<h3 id="3-dual-track-conversion-between-str-and-bytes"><a class="header" href="#3-dual-track-conversion-between-str-and-bytes">3. Dual-Track Conversion between str and bytes</a></h3>
+<p>Use <code>str</code> for high-level text operations, and <code>bytes</code> for low-level binary data and byte-based indexing:</p>
+<pre><code class="language-toka">import std/io::println
+import core/option::Option
+import core/result::Result
+
+fn main() -&gt; i32 {
+    auto s: str = "Toka 1.0"
+    
+    // 1. O(1) zero-cost downgrade to bytes view
+    auto b = s.bytes()
+    
+    // 2. Bound-checked O(1) byte indexing
+    auto b0 = b.at(0:usize)
+    if b0.is_some() {
+        println("Byte 0: {}", b0.unwrap() as i64) // 84 ('T')
+    }
+    
+    // 3. Validate and upgrade back to str
+    auto res = b.try_to_str()
+    if res.is_ok() {
+        auto s_back = res.unwrap()
+        println("Recovered: {}", s_back)
+    }
+    return 0
+}
+</code></pre>
+<hr>
+<h2 id="-4-ffi-physical-copy-isolation"><a class="header" href="#-4-ffi-physical-copy-isolation">🛡️ 4. FFI Physical Copy Isolation</a></h2>
+<p>Because dynamic <code>str</code> slices do not guarantee a <code>\0</code> terminator, <strong><code>str</code> is strictly prohibited from implicitly decaying to a <code>cstr</code> or raw pointer</strong>.
+If a dynamic <code>str</code> must cross the FFI boundary, you must explicitly call <code>to_string()</code> to create a <code>\0</code>-terminated copy on the heap:</p>
+<pre><code class="language-toka">// Declare FFI interface
+pub fn puts(s: cstr)
+
+fn main() -&gt; i32 {
+    auto my_str: str = "Hello C-FFI"
+    
+    // Explicitly declare physical copy and \0 sealing for absolute safety
+    auto temp_c = my_str.to_string()
+    unsafe {
+        puts(temp_c.as_cstr())
+    }
+    return 0
+}
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="the-hat-principle"><a class="header" href="#the-hat-principle">The Hat Principle</a></h1>
 <p>The <strong>Hat Principle</strong> is the foundational design philosophy behind Toka’s memory safety model. Rather than forcing developers to write complex lifetime annotations (as in Rust) or relying on a runtime Garbage Collector (as in Go or Java), Toka introduces visible syntactic tokens called <strong>“Hats”</strong> to track ownership, resource lifetimes, and access permissions at compile time.</p>
@@ -929,9 +993,8 @@ auto ^p1 = new Point(x = 10, y = 20, z = 0)
 auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid!
 </code></pre>
 <h3 id="explicit-move-with-cede"><a class="header" href="#explicit-move-with-cede">Explicit Move with <code>cede</code></a></h3>
-<p>For other types (such as custom shapes or <code>String</code>), copy semantics are used by default. To explicitly transfer ownership of such a value (avoiding copies), you must use the <strong><code>cede</code> keyword</strong>. Ceding transfers the resource to the destination and invalidates the source variable:</p>
-<pre><code class="language-toka">import std/string::String
-auto s1 = String::from("hello")
+<p>For other types (such as custom shapes or <code>string</code>), copy semantics are used by default. To explicitly transfer ownership of such a value (avoiding copies), you must use the <strong><code>cede</code> keyword</strong>. Ceding transfers the resource to the destination and invalidates the source variable:</p>
+<pre><code class="language-toka">auto s1 = string::from("hello")
 auto s2 = cede s1 // Explicit move: s1 is invalidated
 </code></pre>
 <hr>
@@ -1175,21 +1238,20 @@ auto p = pair(1, "world")  // Pair&lt;i32, str&gt;
 <h2 id="the-option-type"><a class="header" href="#the-option-type">The Option Type</a></h2>
 <p>Use <code>Option</code> for values that may or may not exist:</p>
 <pre><code class="language-toka">import core/option::{Option}
-import std/string::String
 import std/io::println
 
-fn find_user(id: i32) -&gt; Option&lt;String&gt; {
+fn find_user(id: i32) -&gt; Option&lt;string&gt; {
     if id == 1 {
-        return Option&lt;String&gt;::Some(String::from("Alice"))
+        return Option&lt;string&gt;::Some(string::from("Alice"))
     }
-    return Option&lt;String&gt;::None
+    return Option&lt;string&gt;::None
 }
 
 fn main() -&gt; i32 {
     auto result = find_user(1)
     match result {
-        auto Option&lt;String&gt;::Some(&amp;name) =&gt; println("Found: {}", name)
-        auto Option&lt;String&gt;::None =&gt; println("User not found")
+        auto Option&lt;string&gt;::Some(&amp;name) =&gt; println("Found: {}", name)
+        auto Option&lt;string&gt;::None =&gt; println("User not found")
     }
     return 0
 }
@@ -1197,13 +1259,12 @@ fn main() -&gt; i32 {
 <h2 id="the-result-type"><a class="header" href="#the-result-type">The Result Type</a></h2>
 <p>Use <code>Result</code> for operations that can succeed or fail:</p>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 
-fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
+fn divide(a: f64, b: f64) -&gt; Result&lt;f64, string&gt; {
     if b == 0.0 {
-        return Result&lt;f64, String&gt;::Err(String::from("Division by zero"))
+        return Result&lt;f64, string&gt;::Err(string::from("Division by zero"))
     }
-    return Result&lt;f64, String&gt;::Ok(a / b)
+    return Result&lt;f64, string&gt;::Ok(a / b)
 }
 </code></pre>
 <p>The Result type is generic over two parameters:</p>
@@ -1213,20 +1274,19 @@ fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
 </ul>
 <h2 id="pattern-matching-on-results"><a class="header" href="#pattern-matching-on-results">Pattern Matching on Results</a></h2>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 import std/io::println
 
-fn divide(a: f64, b: f64) -&gt; Result&lt;f64, String&gt; {
+fn divide(a: f64, b: f64) -&gt; Result&lt;f64, string&gt; {
     if b == 0.0 {
-        return Result&lt;f64, String&gt;::Err(String::from("Division by zero"))
+        return Result&lt;f64, string&gt;::Err(string::from("Division by zero"))
     }
-    return Result&lt;f64, String&gt;::Ok(a / b)
+    return Result&lt;f64, string&gt;::Ok(a / b)
 }
 
 fn main() -&gt; i32 {
     match divide(10.0, 2.0) {
-        auto Result&lt;f64, String&gt;::Ok(value) =&gt; println("Result: {}", value)
-        auto Result&lt;f64, String&gt;::Err(&amp;msg) =&gt; println("Error: {}", msg)
+        auto Result&lt;f64, string&gt;::Ok(value) =&gt; println("Result: {}", value)
+        auto Result&lt;f64, string&gt;::Err(&amp;msg) =&gt; println("Error: {}", msg)
     }
     return 0
 }
@@ -1234,24 +1294,23 @@ fn main() -&gt; i32 {
 <h2 id="short-circuiting-with-"><a class="header" href="#short-circuiting-with-">Short-Circuiting with <code>!</code></a></h2>
 <p>Use the <code>!</code> operator to propagate errors automatically:</p>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 
-fn read_file(path: String) -&gt; Result&lt;String, String&gt; {
-    return Result&lt;String, String&gt;::Ok(path)
+fn read_file(path: string) -&gt; Result&lt;string, string&gt; {
+    return Result&lt;string, string&gt;::Ok(path)
 }
 
-fn parse(content: String) -&gt; Result&lt;String, String&gt; {
-    return Result&lt;String, String&gt;::Ok(content)
+fn parse(content: string) -&gt; Result&lt;string, string&gt; {
+    return Result&lt;string, string&gt;::Ok(content)
 }
 
-fn format_result(parsed: String) -&gt; String {
+fn format_result(parsed: string) -&gt; string {
     return parsed
 }
 
-fn process_file(path: String) -&gt; Result&lt;String, String&gt; {
+fn process_file(path: string) -&gt; Result&lt;string, string&gt; {
     auto content = read_file(path)!  // Returns early on error
     auto parsed = parse(content)!    // Same here
-    return Result&lt;String, String&gt;::Ok(format_result(parsed))
+    return Result&lt;string, string&gt;::Ok(format_result(parsed))
 }
 </code></pre>
 <p>This is much cleaner than nested <code>match</code> statements.</p>
@@ -1262,19 +1321,18 @@ fn process_file(path: String) -&gt; Result&lt;String, String&gt; {
 <h2 id="custom-error-types"><a class="header" href="#custom-error-types">Custom Error Types</a></h2>
 <p>You can define structured errors:</p>
 <pre><code class="language-toka">import core/result::{Result}
-import std/string::String
 
 pub shape Config()
 
 pub shape ParseError(
     line: i32,
     col: i32,
-    message: String
+    message: string
 )
 
-fn parse_config(text: String) -&gt; Result&lt;Config, ParseError&gt; {
+fn parse_config(text: string) -&gt; Result&lt;Config, ParseError&gt; {
     if text.len() == 0 {
-        return Result&lt;Config, ParseError&gt;::Err(ParseError(line = 0, col = 0, message = String::from("Empty input")))
+        return Result&lt;Config, ParseError&gt;::Err(ParseError(line = 0, col = 0, message = string::from("Empty input")))
     }
     return Result&lt;Config, ParseError&gt;::Ok(Config())
 }
@@ -1283,7 +1341,7 @@ fn parse_config(text: String) -&gt; Result&lt;Config, ParseError&gt; {
 <h1 id="pattern-matching"><a class="header" href="#pattern-matching">Pattern Matching</a></h1>
 <p>Pattern matching is one of Toka’s most expressive features, allowing you to destructure and match values concisely.</p>
 <h2 id="basic-match"><a class="header" href="#basic-match">Basic Match</a></h2>
-<pre><code class="language-toka">fn describe(n: i32) -&gt; cstring {
+<pre><code class="language-toka">fn describe(n: i32) -&gt; str {
     return match n {
         0 =&gt; pass "zero"
         1 =&gt; pass "one"
@@ -1311,10 +1369,10 @@ import core/option::Option
 
 fn main() -&gt; i32 {
     auto id = 1
-    auto opt: Option&lt;view_str&gt; = Option&lt;view_str&gt;::None
+    auto opt: Option&lt;str&gt; = Option&lt;str&gt;::None
     match opt {
-        auto Option&lt;view_str&gt;::Some(&amp;name) =&gt; { println("Found: {}", name) }
-        auto Option&lt;view_str&gt;::None =&gt; { println("User not found") }
+        auto Option&lt;str&gt;::Some(&amp;name) =&gt; { println("Found: {}", name) }
+        auto Option&lt;str&gt;::None =&gt; { println("User not found") }
     }
     return 0
 }
@@ -1324,10 +1382,10 @@ fn main() -&gt; i32 {
 import core/result::Result
 
 fn main() -&gt; i32 {
-    auto res: Result&lt;f32, view_str&gt; = Result&lt;f32, view_str&gt;::Ok(5.0)
+    auto res: Result&lt;f32, str&gt; = Result&lt;f32, str&gt;::Ok(5.0)
     match res {
-        auto Result&lt;f32, view_str&gt;::Ok(value) =&gt; { println("Result: {}", value) }
-        auto Result&lt;f32, view_str&gt;::Err(&amp;msg) =&gt; { println("Error: {}", msg) }
+        auto Result&lt;f32, str&gt;::Ok(value) =&gt; { println("Result: {}", value) }
+        auto Result&lt;f32, str&gt;::Err(&amp;msg) =&gt; { println("Error: {}", msg) }
     }
     return 0
 }
@@ -1359,7 +1417,7 @@ auto grade = match score {
 }
 </code></pre>
 <h2 id="no-type-based-matching"><a class="header" href="#no-type-based-matching">No Type-Based Matching</a></h2>
-<p>Toka does not support matching directly on types (such as writing <code>i32 =&gt; ...</code> or <code>view_str =&gt; ...</code> inside a <code>match</code> expression). Any type name used in a branch without standard syntax will be treated as a new variable binding pattern (Variable Pattern), which matches any value and shadows other cases, leading to compilation errors or unreachable branches.</p>
+<p>Toka does not support matching directly on types (such as writing <code>i32 =&gt; ...</code> or <code>str =&gt; ...</code> inside a <code>match</code> expression). Any type name used in a branch without standard syntax will be treated as a new variable binding pattern (Variable Pattern), which matches any value and shadows other cases, leading to compilation errors or unreachable branches.</p>
 <pre><code></code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="concurrency"><a class="header" href="#concurrency">Concurrency</a></h1>
@@ -1387,7 +1445,7 @@ fn main() -&gt; i32 {
 </code></pre>
 <h2 id="mpsc-channels"><a class="header" href="#mpsc-channels">MPSC Channels</a></h2>
 <p>Communicate between tasks using MPSC (Multi-Producer, Single-Consumer) channels:</p>
-<pre><code class="language-toka">import std/mpsc::channel
+<pre><code class="language-toka">import std/channel::channel
 import std/thread::thread_spawn
 import std/io::println
 
@@ -1490,14 +1548,14 @@ fn main() -&gt; i32 {
 <tbody>
 <tr><td><code>prelude</code></td><td>Auto-imported standard prelude containing the most common types</td></tr>
 <tr><td><code>char</code></td><td>Unicode character handling and classification</td></tr>
-<tr><td><code>string</code></td><td>UTF-8 dynamic dynamic string types (<code>String</code> / <code>view_str</code>)</td></tr>
+<tr><td><code>string</code></td><td>UTF-8 dynamic string type and views (<code>string</code> / <code>str</code>)</td></tr>
 <tr><td><code>vec</code></td><td>Dynamically growing sequential array container (<code>Vec</code>)</td></tr>
 <tr><td><code>deque</code></td><td>Double-ended queue based on ring buffers (<code>VecDeque</code>)</td></tr>
-<tr><td><code>list</code></td><td>Doubly-linked list implementation (<code>LinkedList</code>)</td></tr>
-<tr><td><code>hash_map</code></td><td>High-performance hash table based map (<code>HashMap</code>)</td></tr>
-<tr><td><code>hash_set</code></td><td>Hash table based unique element collection (<code>HashSet</code>)</td></tr>
-<tr><td><code>btree_map</code></td><td>B-Tree based ordered key-value map (<code>BTreeMap</code>)</td></tr>
-<tr><td><code>btree_set</code></td><td>B-Tree based ordered unique set (<code>BTreeSet</code>)</td></tr>
+<tr><td><code>slab</code></td><td>Zero-copy generational slab allocator (<code>Slab</code> / <code>SlabID</code>)</td></tr>
+<tr><td><code>hashmap</code></td><td>High-performance hash table based map (<code>HashMap</code>)</td></tr>
+<tr><td><code>hashset</code></td><td>Hash table based unique element collection (<code>HashSet</code>)</td></tr>
+<tr><td><code>btreemap</code></td><td>B-Tree based ordered key-value map (<code>BTreeMap</code>)</td></tr>
+<tr><td><code>btreeset</code></td><td>B-Tree based ordered unique set (<code>BTreeSet</code>)</td></tr>
 <tr><td><code>heap</code></td><td>Priority queue implemented with max/min binary heap (<code>BinaryHeap</code>)</td></tr>
 <tr><td><code>io</code></td><td>Buffered standard console I/O (<code>stdin</code> / <code>stdout</code> / <code>println</code>)</td></tr>
 <tr><td><code>fs</code></td><td>File system read/write and directory metadata operations</td></tr>
@@ -1559,40 +1617,37 @@ print("No newline here")       // Prints without trailing newline
 </code></pre>
 <h2 id="reading-files"><a class="header" href="#reading-files">Reading Files</a></h2>
 <pre><code class="language-toka">import std/fs
-import std/string::String
 import core/result::Result
 import std/io::IoStringResult
 
-fn read_config(path: String) -&gt; IoStringResult {
+fn read_config(path: string) -&gt; IoStringResult {
     return fs::read_to_string(path)
 }
 </code></pre>
 <h2 id="writing-files"><a class="header" href="#writing-files">Writing Files</a></h2>
 <pre><code class="language-toka">import std/fs
-import std/string::String
 import core/result::Result
 
-fn save_data(path: String, data: String) -&gt; Result&lt;bool, String&gt; {
-    return fs::write_string(path, data)
+fn save_data(path: string, data: string) -&gt; Result&lt;bool, string&gt; {
+    return fs::write_string(path, data.as_str())
 }
 </code></pre>
 <h2 id="file-system-operations"><a class="header" href="#file-system-operations">File System Operations</a></h2>
 <p>The <code>fs</code> module provides standard file operations:</p>
 <pre><code class="language-toka">import std/fs
-import std/string::String
 import std/io::println
 import core/option::Option
 
 fn manage_files() {
-    auto path = String::from("output")
+    auto path = string::from("output")
     if fs::exists(path.clone()) {
         fs::remove_dir(path)
     }
     
-    fs::create_dir(String::from("output"))
+    fs::create_dir(string::from("output"))
     
-    auto dir# = fs::read_dir(String::from("."))
-    while true {
+    auto dir# = fs::read_dir(string::from("."))
+    loop {
         auto entry = dir#.next()
         if entry.is_none() { break }
         println("{}", entry.unwrap())
@@ -1602,31 +1657,29 @@ fn manage_files() {
 <h2 id="working-with-paths"><a class="header" href="#working-with-paths">Working with Paths</a></h2>
 <pre><code class="language-toka">import std/io::println
 import std/path
-import std/string::String
 
 fn example() {
-    auto full = path::join(String::from("dir"), String::from("file.txt"))
+    auto full = path::join(string::from("dir"), string::from("file.txt"))
     println("{}", full.c_str())
     
-    auto ext = path::extension(String::from("data.json"))
+    auto ext = path::extension(string::from("data.json"))
     println("{}", ext.c_str())
     
-    auto stem = path::file_stem(String::from("data.json"))
+    auto stem = path::file_stem(string::from("data.json"))
     println("{}", stem.c_str())
 }
 </code></pre>
 <h2 id="environment-variables"><a class="header" href="#environment-variables">Environment Variables</a></h2>
 <pre><code class="language-toka">import std/io::println
 import std/env
-import std/string::String
 import core/option::Option
 
 fn example() {
-    auto home_opt = env::var(String::from("HOME"))
-    auto home = home_opt.unwrap_or(String::from("/tmp"))
+    auto home_opt = env::var(string::from("HOME"))
+    auto home = home_opt.unwrap_or(string::from("/tmp"))
     println("Home directory: {}", home)
     
-    env::set_var(String::from("MY_APP_DEBUG"), String::from("true"))
+    env::set_var(string::from("MY_APP_DEBUG"), string::from("true"))
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -1646,7 +1699,7 @@ fn example() {
     println("{}", numbers.at(0))  // 1
     
     auto i# = 0:usize
-    while i &lt; numbers.len() {
+    loop i &lt; numbers.len() {
         println("{}", numbers.at(i))
         i = i + 1:usize
     }
@@ -1654,7 +1707,7 @@ fn example() {
 </code></pre>
 <h2 id="map-hash-map"><a class="header" href="#map-hash-map">Map (Hash Map)</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/hash_map::HashMap
+import std/hashmap::HashMap
 import core/option::Option
 import core/primitives
 
@@ -1672,11 +1725,11 @@ fn example() {
 </code></pre>
 <h2 id="btreemap-ordered-map"><a class="header" href="#btreemap-ordered-map">BTreeMap (Ordered Map)</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/btree_map::BTreeMap
+import std/btreemap::BTreeMap
 import core/primitives
 
 fn example() {
-    auto items# = BTreeMap&lt;view_str, i32&gt;::new()
+    auto items# = BTreeMap&lt;str, i32&gt;::new()
     
     items#.insert("apple", 5)
     items#.insert("banana", 3)
@@ -1687,7 +1740,7 @@ fn example() {
 </code></pre>
 <h2 id="btreeset-ordered-set"><a class="header" href="#btreeset-ordered-set">BTreeSet (Ordered Set)</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/btree_set::BTreeSet
+import std/btreeset::BTreeSet
 import core/primitives
 
 fn example() {
@@ -1706,7 +1759,7 @@ fn example() {
 import std/deque::VecDeque
 
 fn example() {
-    auto queue# = VecDeque&lt;view_str&gt;::new()
+    auto queue# = VecDeque&lt;str&gt;::new()
     
     queue#.push_back("first")
     queue#.push_back("second")
@@ -1716,14 +1769,44 @@ fn example() {
     println("{}", queue.len())
 }
 </code></pre>
-<h2 id="list-linked-list"><a class="header" href="#list-linked-list">List (Linked List)</a></h2>
-<pre><code class="language-toka">import std/list::LinkedList
+<h2 id="slab-generational-slab-allocator"><a class="header" href="#slab-generational-slab-allocator">Slab (Generational Slab Allocator)</a></h2>
+<p>Toka completely abolishes linked lists to embrace the contiguous physical memory topology of modern CPUs. Instead, the standard library introduces the generational slab allocator <code>std/slab::Slab</code>. It manages objects as slots inside a contiguous memory buffer (<code>Vec</code>), supporting rapid $O(1)$ insertion, removal, and retrieval. It employs a <code>SlabID</code> generational check technique to fully eliminate the risk of ABA problems or stale index lookups.</p>
+<p>The Slab’s lookup methods (<code>get</code> and <code>get_mut</code>) implement advanced <strong>lifetime dependency declarations (<code>&lt;- self</code>)</strong>, returning zero-copy <code>Option&lt;&amp;'T&gt;</code> and <code>Option&lt;&amp;#'T&gt;</code> borrows.</p>
+<pre><code class="language-toka">import std/slab::{Slab, SlabID}
+import std/io::{println}
+import core/option::{Option}
 
-fn example() {
-    // std/list::LinkedList has a known bug in the current compiler.
-    // auto items# = LinkedList&lt;i32&gt;::new()
-    // items#.push_front(10)
-    // items#.push_back(20)
+shape Entity (
+    name: string,
+    val: i32
+)
+
+fn main() -&gt; i32 {
+    auto slab# = Slab&lt;Entity&gt;::new()
+
+    // 1. Insert elements, returning a SlabID containing both index and generation
+    auto id1 = slab#.insert(Entity(name = string::from("alpha"), val = 10))
+    auto id2 = slab#.insert(Entity(name = string::from("beta"), val = 20))
+
+    // 2. Retrieve zero-copy borrowed views safely
+    auto e1_opt = slab.get(id1.clone())
+    if e1_opt.is_some() {
+        auto &amp;e1 = e1_opt.unwrap()
+        println("ID1 val: {}", e1.val as i64) // 10
+    }
+
+    // 3. Remove an element and reclaim its slot
+    auto removed = slab#.remove(id1.clone())
+
+    // 4. Insert another element: Slab automatically reuses Slot 0!
+    // However, the generation counter automatically increments to 2!
+    auto id3 = slab#.insert(Entity(name = string::from("gamma"), val = 30))
+
+    // 5. Querying with the stale id1 now safely returns None, preventing ABA reads!
+    auto old_opt = slab.get(id1)
+    assert(old_opt.is_none(), "generational ID should prevent ABA stale read")
+
+    return 0
 }
 </code></pre>
 <h2 id="heap-priority-queue"><a class="header" href="#heap-priority-queue">Heap (Priority Queue)</a></h2>
@@ -1744,7 +1827,7 @@ fn example() {
 </code></pre>
 <h2 id="set"><a class="header" href="#set">Set</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/hash_set::HashSet
+import std/hashset::HashSet
 import core/primitives
 
 fn example() {
@@ -1763,20 +1846,18 @@ fn example() {
 <p>Toka’s networking module provides TCP, UDP, and HTTP capabilities for building networked applications.</p>
 <h2 id="http-client"><a class="header" href="#http-client">HTTP Client</a></h2>
 <p>Make HTTP requests with the <code>stdx/net/http</code> module:</p>
-<pre><code class="language-toka">import std/string::String
-import core/result::Result
+<pre><code class="language-toka">import core/result::Result
 
 // Note: HTTP client is under development
-fn fetch(url: String) -&gt; Result&lt;String, String&gt; {
+fn fetch(url: string) -&gt; Result&lt;string, string&gt; {
     // auto response = http::get(url)!
     // return Ok(response.body)
-    return Result&lt;String, String&gt;::Ok(String::from("Response"))
+    return Result&lt;string, string&gt;::Ok(string::from("Response"))
 }
 </code></pre>
 <h2 id="http-server"><a class="header" href="#http-server">HTTP Server</a></h2>
 <p>Build a simple HTTP server using the <code>stdx/net/http</code> module:</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpResponse, HttpRequest}
-import std/string::String
 
 // Note: HTTP Server is built by integrating std/net with stdx/net/http
 fn main() -&gt; i32 {
@@ -1789,7 +1870,6 @@ fn main() -&gt; i32 {
 <h2 id="tcp-connections"><a class="header" href="#tcp-connections">TCP Connections</a></h2>
 <p>Use the <code>net</code> module for raw TCP:</p>
 <pre><code class="language-toka">import std/net::TcpStream
-import std/string::String
 import std/io::println
 import core/result::Result
 
@@ -1798,11 +1878,11 @@ fn handle_client(stream#: TcpStream) {
     auto *buf_ptr# = &amp;buf[0] as *u8
     auto res = stream#.read(*buf_ptr, 1024:usize)
     match res {
-        auto Result&lt;usize, String&gt;::Ok(n) =&gt; {
+        auto Result&lt;usize, string&gt;::Ok(n) =&gt; {
             println("Received {} bytes", n)
-            stream#.write_string(String::from("ACK"))
+            stream#.write_string(string::from("ACK"))
         }
-        auto Result&lt;usize, String&gt;::Err(&amp;e) =&gt; {
+        auto Result&lt;usize, string&gt;::Err(&amp;e) =&gt; {
             println("Error")
         }
     }
@@ -1811,7 +1891,6 @@ fn handle_client(stream#: TcpStream) {
 <h2 id="websocket"><a class="header" href="#websocket">WebSocket</a></h2>
 <p>For real-time bidirectional communication, use the <code>stdx/websocket</code> module:</p>
 <pre><code class="language-toka">import std/io::println
-import std/string::String
 
 // Note: WebSocket is under development
 fn echo_server() {
@@ -1822,18 +1901,17 @@ fn echo_server() {
 </code></pre>
 <h2 id="url-parsing"><a class="header" href="#url-parsing">URL Parsing</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/string::String
 import core/result::Result
 import stdx/net/url::{Url, parse_url}
 
 fn example() {
-    auto url_res = parse_url(String::from("https://api.example.com:8080/data?id=1#top"))
+    auto url_res = parse_url(string::from("https://api.example.com:8080/data?id=1#top"))
     match url_res {
-        auto Result&lt;Url, String&gt;::Ok(&amp;url) =&gt; {
+        auto Result&lt;Url, string&gt;::Ok(&amp;url) =&gt; {
             println("Host: {}", url.host)
-            println("Port: {}", String::from_int(url.port as i32))
+            println("Port: {}", string::from_int(url.port as i32))
         }
-        auto Result&lt;Url, String&gt;::Err(&amp;err) =&gt; {
+        auto Result&lt;Url, string&gt;::Err(&amp;err) =&gt; {
             println("Error: {}", err)
         }
     }
@@ -1844,7 +1922,6 @@ fn example() {
 <p>Toka provides comprehensive time handling and mathematical functions for scientific and systems programming.</p>
 <h2 id="getting-current-time"><a class="header" href="#getting-current-time">Getting Current Time</a></h2>
 <pre><code class="language-toka">import std/time::{SystemTime}
-import std/string::String
 import std/io::println
 
 fn example() {
@@ -1864,7 +1941,6 @@ fn format_date() {
 </code></pre>
 <h2 id="durations-and-timers"><a class="header" href="#durations-and-timers">Durations and Timers</a></h2>
 <pre><code class="language-toka">import std/time::{Instant}
-import std/string::String
 import std/io::println
 
 fn measure() {
@@ -1878,7 +1954,6 @@ fn measure() {
 </code></pre>
 <h2 id="math-functions"><a class="header" href="#math-functions">Math Functions</a></h2>
 <pre><code class="language-toka">import std/math
-import std/string::String
 import std/io::println
 
 fn calculations() {
@@ -1892,8 +1967,7 @@ fn calculations() {
 }
 </code></pre>
 <h2 id="random-numbers"><a class="header" href="#random-numbers">Random Numbers</a></h2>
-<pre><code class="language-toka">import std/rand::{Random}
-import std/string::String
+<pre><code class="language-toka">import stdx/rand/rand::{Random}
 import std/io::println
 
 fn gen_random() {
@@ -1926,17 +2000,16 @@ fn dummy_limits() {}
 <h2 id="json-encoding"><a class="header" href="#json-encoding">JSON Encoding</a></h2>
 <p>Serialize data to JSON:</p>
 <pre><code class="language-toka">import stdx/serde/json
-import std/string::String
 import std/io::println
 
 pub shape Person(
-    name: String,
+    name: string,
     age: i32,
     active: bool
 )
 
 fn encode() {
-    auto person = Person(name = String::from("Alice"), age = 30, active = true)
+    auto person = Person(name = string::from("Alice"), age = 30, active = true)
     // auto json_str = json::to_json(person)
     // println("{}", json_str)  // {"name":"Alice","age":30,"active":true}
 }
@@ -1944,12 +2017,11 @@ fn encode() {
 <h2 id="json-decoding"><a class="header" href="#json-decoding">JSON Decoding</a></h2>
 <p>Parse JSON back into Toka types:</p>
 <pre><code class="language-toka">import stdx/serde/json
-import std/string::String
 import std/io::println
 import core/result::Result
 
 pub shape Person(
-    name: String,
+    name: string,
     age: i32,
     active: bool
 )
@@ -1961,12 +2033,11 @@ fn decode() {
 </code></pre>
 <h2 id="base64-encoding"><a class="header" href="#base64-encoding">Base64 Encoding</a></h2>
 <pre><code class="language-toka">import stdx/encoding/base64
-import std/string::String
 import std/io::println
 
 fn example() {
-    auto original = String::from("Hello, Toka!")
-    auto encoded = base64::encode_str(original)
+    auto original = string::from("Hello, Toka!")
+    auto encoded = base64::encode_str(original.as_str())
     println("{}", encoded)  // SGVsbG8sIFRva2Eh
     
     // Note: base64::decode is under development
@@ -1989,16 +2060,15 @@ fn example() {
 <h2 id="custom-serialization"><a class="header" href="#custom-serialization">Custom Serialization</a></h2>
 <p>Implement the <code>@Serialize</code> trait for custom types:</p>
 <pre><code class="language-toka">import stdx/serde/json::{@ToJson}
-import std/string::String
 
-pub shape Person(name: String, age: i32, active: bool)
+pub shape Person(name: string, age: i32, active: bool)
 
 impl Person@ToJson {
-    pub fn write_json(self, buf#: String) -&gt; String {
+    pub fn write_json(self, buf#: string) -&gt; string {
         buf#.push_str("{\"name\":\"")
-        buf#.push_str(self.name.c_str())
+        buf#.push_str(self.name.as_str())
         buf#.push_str("\",\"age\":")
-        buf#.push_str(String::from_int(self.age).c_str())
+        buf#.push_str(string::from_int(self.age).as_str())
         buf#.push_str("}")
         return buf
     }
@@ -2043,22 +2113,21 @@ fn example() {
 <h2 id="file-hashing"><a class="header" href="#file-hashing">File Hashing</a></h2>
 <p>Hash the contents of a file:</p>
 <pre><code class="language-toka">import std/fs
-import std/string::String
 import stdx/crypto/sha256::Sha256
 import core/result::Result
 
-fn verify_file(path: String) -&gt; Result&lt;bool, String&gt; {
+fn verify_file(path: string) -&gt; Result&lt;bool, string&gt; {
     auto content = fs::read_to_string(path).unwrap()
     auto sha256# = Sha256::new()
-    sha256#.update(content)
+    sha256#.update(content.as_str())
     auto computed = sha256#.finalize_hex()
     
-    return Result&lt;bool, String&gt;::Ok(computed.len() &gt; 0:usize)
+    return Result&lt;bool, string&gt;::Ok(computed.len() &gt; 0:usize)
 }
 </code></pre>
 <h2 id="secure-random"><a class="header" href="#secure-random">Secure Random</a></h2>
 <p>For cryptographic applications:</p>
-<pre><code class="language-toka">import std/rand::Random
+<pre><code class="language-toka">import stdx/rand/rand::Random
 
 fn generate_key() -&gt; u64 {
     // Pseudorandom bytes (Not secure, for demonstration)
@@ -2123,30 +2192,29 @@ cd my-cli
 <h2 id="defining-arguments"><a class="header" href="#defining-arguments">Defining Arguments</a></h2>
 <pre><code class="language-tokalang">import stdx/cli/flag::{Parser, ParsedArgs}
 import std/env
-import std/string::String
 import std/io
 
 fn main() -&gt; i32 {
     // Parser::new takes the program name and a brief description
-    auto parser# = Parser::new(String::from("my-cli"), String::from("A sample CLI tool built with Toka"))
+    auto parser# = Parser::new(string::from("my-cli"), string::from("A sample CLI tool built with Toka"))
     
     // Add options to the parser
-    parser#.add_string(String::from("name"), 110:char, String::from("World"), String::from("Your name"))
-    parser#.add_bool(String::from("verbose"), 118:char, false, String::from("Enable verbose output"))
+    parser#.add_string(string::from("name"), 110:char, string::from("World"), string::from("Your name"))
+    parser#.add_bool(string::from("verbose"), 118:char, false, string::from("Enable verbose output"))
 
     auto args = env::args()
     auto res = parser.parse(args)
     match res {
-        auto Result&lt;ParsedArgs, String&gt;::Ok(parsed) =&gt; {
-            auto who = parsed.get_string(String::from("name"))
+        auto Result&lt;ParsedArgs, string&gt;::Ok(parsed) =&gt; {
+            auto who = parsed.get_string(string::from("name"))
             io::println("Hello, %s!", who.c_str())
             
-            if parsed.get_bool(String::from("verbose")) {
+            if parsed.get_bool(string::from("verbose")) {
                 io::println("[Verbose] Running with debug output")
             }
         }
-        auto Result&lt;ParsedArgs, String&gt;::Err(&amp;err) =&gt; {
-            if err == String::from("help requested") {
+        auto Result&lt;ParsedArgs, string&gt;::Err(&amp;err) =&gt; {
+            if err == string::from("help requested") {
                 parser.print_help()
                 return 0
             }
@@ -2166,10 +2234,10 @@ toka run src/main.tk -- -n Toka -v
 # [Verbose] Running with debug output
 </code></pre>
 <h2 id="advanced-argument-handling"><a class="header" href="#advanced-argument-handling">Advanced Argument Handling</a></h2>
-<p>Toka’s current <code>stdx/cli/flag</code> library provides basic options and flags parsing with types like <code>bool</code>, <code>i64</code>, <code>f64</code>, and <code>String</code>.</p>
+<p>Toka’s current <code>stdx/cli/flag</code> library provides basic options and flags parsing with types like <code>bool</code>, <code>i64</code>, <code>f64</code>, and <code>string</code>.</p>
 <p>Positional arguments are captured automatically and can be fetched from the parsed arguments using <code>positionals()</code>:</p>
 <pre><code class="language-tokalang">auto pos_args = parsed.positionals()
-// pos_args is a Vec&lt;String&gt; containing any arguments not matching flags or options
+// pos_args is a Vec&lt;string&gt; containing any arguments not matching flags or options
 </code></pre>
 <p>For complex command-line interfaces requiring nested subcommands (like <code>git status</code> or <code>docker run</code>), you can manually match on <code>pos_args</code> to delegate execution to different parser configurations.</p>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -2180,7 +2248,6 @@ toka run src/main.tk -- -n Toka -v
 <pre><code class="language-toka">import std/io::{println}
 import stdx/net/http::{HttpRequest, HttpResponse, parse_http_request}
 import std/net::{TcpListener, TcpStream, Ipv4Addr, SocketAddrV4}
-import std/string::{String}
 import core/result::{Result}
 
 fn handle_client(stream#: TcpStream) {
@@ -2191,12 +2258,12 @@ fn handle_client(stream#: TcpStream) {
     match read_res {
         auto Result::Ok(n) =&gt; {
             if n &gt; 0:usize {
-                auto req_str = String::from_with_len(&amp;buf[0] as *char, n as i32)
+                auto req_str = string::from_with_len(&amp;buf[0] as *char, n as i32)
                 auto req# = parse_http_request(req_str)
                 
                 auto resp# = HttpResponse::not_found()
-                if req.path.eq(String::from("/")) {
-                    resp = HttpResponse::html(String::from("&lt;h1&gt;Hello, Toka!&lt;/h1&gt;"))
+                if req.path.eq(string::from("/")) {
+                    resp = HttpResponse::html(string::from("&lt;h1&gt;Hello, Toka!&lt;/h1&gt;"))
                 }
                 
                 auto resp_str = resp#.to_string()
@@ -2218,25 +2285,24 @@ fn main() -&gt; i32 {
 <p>You can use the <code>@ToJson</code> trait from <code>stdx/serde/json</code> to automatically serialize custom shape objects and return them as JSON responses:</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpResponse}
 import stdx/serde/json::{serialize_shape, to_json, @ToJson}
-import std/string::{String}
 
-pub shape Message(text: String, status: String)
+pub shape Message(text: string, status: string)
 
 impl Message@ToJson {
-    pub fn write_json(self, buf#: String) -&gt; String {
+    pub fn write_json(self, buf#: string) -&gt; string {
         return serialize_shape(self, buf)
     }
 }
 
 fn api_status() -&gt; HttpResponse {
     auto msg = Message(
-        text = String::from("Server is running"),
-        status = String::from("ok")
+        text = string::from("Server is running"),
+        status = string::from("ok")
     )
     auto json_body = to_json(msg)
     return HttpResponse(
         status_code = 200,
-        content_type = String::from("application/json"),
+        content_type = string::from("application/json"),
         body = json_body
     )
 }
@@ -2248,17 +2314,16 @@ fn main() -&gt; i32 {
 <h2 id="route-parameters"><a class="header" href="#route-parameters">Route Parameters</a></h2>
 <p>You can easily match dynamic parts of a URL path to extract route parameters manually:</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpRequest, HttpResponse}
-import std/string::{String}
 
 fn handle_user_route(req: HttpRequest) -&gt; HttpResponse {
     // Match dynamic path "/api/users/&lt;id&gt;"
-    if req.path.as_str().starts_with(s"/api/users/") {
+    if req.path.as_str().starts_with("/api/users/") {
         auto user_id = req.path.substr(11, req.path.len() - 11)
-        auto body# = String::from("User ID: ")
+        auto body# = string::from("User ID: ")
         body#.push_view(user_id)
         return HttpResponse(
             status_code = 200,
-            content_type = String::from("text/plain"),
+            content_type = string::from("text/plain"),
             body = body
         )
     }
@@ -2272,13 +2337,12 @@ fn main() -&gt; i32 {
 <h2 id="middleware"><a class="header" href="#middleware">Middleware</a></h2>
 <p>Wrap your routing handlers to inject custom middleware functionality, such as request logging or execution timing:</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpRequest, HttpResponse}
-import std/string::{String}
 import std/io::{println}
 
 fn logger_middleware(req: HttpRequest, next: fn(HttpRequest) -&gt; HttpResponse) -&gt; HttpResponse {
     println("Request Path: {}", req.path)
     auto res = next(req)
-    println("Response Status: {}", String::from_int(res.status_code))
+    println("Response Status: {}", string::from_int(res.status_code))
     return res
 }
 
@@ -2289,17 +2353,16 @@ fn main() -&gt; i32 {
 <h2 id="static-files"><a class="header" href="#static-files">Static Files</a></h2>
 <p>Serve local assets by reading files dynamically using the <code>std/fs</code> module:</p>
 <pre><code class="language-toka">import stdx/net/http::{HttpResponse}
-import std/string::{String}
 import std/fs::{read_to_string}
 import core/result::{Result}
 
-fn serve_static_file(path: String) -&gt; HttpResponse {
+fn serve_static_file(path: string) -&gt; HttpResponse {
     auto file_content = read_to_string(path)
     match file_content {
         auto Result::Ok(&amp;content) =&gt; {
             return HttpResponse(
                 status_code = 200,
-                content_type = String::from("text/html"),
+                content_type = string::from("text/html"),
                 body = content.clone()
             )
         }
@@ -2316,7 +2379,6 @@ fn main() -&gt; i32 {
 <pre><code class="language-toka">import std/io::{println}
 import stdx/net/http::{HttpRequest, HttpResponse, HttpMethod, parse_http_request}
 import std/net::{TcpListener, TcpStream, Ipv4Addr, SocketAddrV4}
-import std/string::{String}
 import core/result::{Result}
 
 fn route_request(req: HttpRequest) -&gt; HttpResponse {
@@ -2326,16 +2388,16 @@ fn route_request(req: HttpRequest) -&gt; HttpResponse {
         _ =&gt; {}
     }
     
-    if is_get &amp;&amp; req.path.eq(String::from("/status")) {
+    if is_get &amp;&amp; req.path.eq(string::from("/status")) {
         return HttpResponse(
             status_code = 200,
-            content_type = String::from("application/json"),
-            body = String::from("{\"status\":\"ok\"}")
+            content_type = string::from("application/json"),
+            body = string::from("{\"status\":\"ok\"}")
         )
     }
     
-    if is_get &amp;&amp; req.path.eq(String::from("/")) {
-        return HttpResponse::html(String::from("&lt;h1&gt;Toka HTTP Server&lt;/h1&gt;"))
+    if is_get &amp;&amp; req.path.eq(string::from("/")) {
+        return HttpResponse::html(string::from("&lt;h1&gt;Toka HTTP Server&lt;/h1&gt;"))
     }
     
     return HttpResponse::not_found()
@@ -2349,7 +2411,7 @@ fn handle_connection(stream#: TcpStream) {
     match read_res {
         auto Result::Ok(n) =&gt; {
             if n &gt; 0:usize {
-                auto req_str = String::from_with_len(&amp;buf[0] as *char, n as i32)
+                auto req_str = string::from_with_len(&amp;buf[0] as *char, n as i32)
                 auto req# = parse_http_request(req_str)
                 auto resp# = route_request(req)
                 auto resp_str = resp#.to_string()
@@ -2382,12 +2444,11 @@ fn main() -&gt; i32 {
 <pre><code class="language-tokalang">import regex::{Regex}
 
 import std/io::println
-import std/string::String
 
 fn example() {
     auto re = Regex::new("hello|world")
     
-    if re.test(String::from("hello world")) {
+    if re.test(string::from("hello world")) {
         println("Match found!")
     }
 }
@@ -2413,13 +2474,12 @@ fn example() {
 </div>
 <h2 id="matching"><a class="header" href="#matching">Matching</a></h2>
 <pre><code class="language-tokalang">import std/io::println
-import std/string::String
 import core/option::Option
 
 fn example() {
     auto re = Regex::new("\\d+")  // One or more digits
     
-    match re.find(String::from("Order #42")) {
+    match re.find(string::from("Order #42")) {
         auto Option::Some(m) =&gt; println("Found: {}", m.text),
         auto Option::None =&gt; println("No match")
     }
@@ -2427,11 +2487,10 @@ fn example() {
 </code></pre>
 <h2 id="replacing"><a class="header" href="#replacing">Replacing</a></h2>
 <pre><code class="language-tokalang">import std/io::println
-import std/string::String
 
 fn example() {
     auto re = Regex::new("\\s+")
-    auto result = re.replace(String::from("hello    world"), String::from(" "))
+    auto result = re.replace(string::from("hello    world"), string::from(" "))
     println("{}", result)  // "hello world"
 }
 </code></pre>
@@ -2621,7 +2680,7 @@ Programming is an art of practice, and Toka is rapidly evolving. If you encounte
 <h1 id="frequently-asked-questions"><a class="header" href="#frequently-asked-questions">Frequently Asked Questions</a></h1>
 <h2 id="general"><a class="header" href="#general">General</a></h2>
 <p><strong>Q: Is Toka production-ready?</strong></p>
-<p>Toka is currently in beta (v0.9.7). It’s suitable for personal projects, prototyping, and experimentation. The 1.0 release is planned with a focus on production stability.</p>
+<p>Toka is currently in beta (v0.9.8-03). It’s suitable for personal projects, prototyping, and experimentation. The 1.0 release is planned with a focus on production stability.</p>
 <p><strong>Q: What platforms does Toka support?</strong></p>
 <p>Linux, macOS, and Windows are supported. The LLVM backend provides cross-compilation capabilities.</p>
 <p><strong>Q: Is there a package manager?</strong></p>
@@ -2687,7 +2746,7 @@ Programming is an art of practice, and Toka is rapidly evolving. If you encounte
         <script src="book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="theme/toka-5c6a0550.js"></script>
+        <script src="theme/toka-e94ce3a0.js"></script>
 
         <script>
         window.addEventListener('load', function() {

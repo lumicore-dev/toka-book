@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "../searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -215,22 +215,21 @@ fn example() {
 <h2 id="file-hashing"><a class="header" href="#file-hashing">File Hashing</a></h2>
 <p>Hash the contents of a file:</p>
 <pre><code class="language-toka">import std/fs
-import std/string::String
 import stdx/crypto/sha256::Sha256
 import core/result::Result
 
-fn verify_file(path: String) -&gt; Result&lt;bool, String&gt; {
+fn verify_file(path: string) -&gt; Result&lt;bool, string&gt; {
     auto content = fs::read_to_string(path).unwrap()
     auto sha256# = Sha256::new()
-    sha256#.update(content)
+    sha256#.update(content.as_str())
     auto computed = sha256#.finalize_hex()
     
-    return Result&lt;bool, String&gt;::Ok(computed.len() &gt; 0:usize)
+    return Result&lt;bool, string&gt;::Ok(computed.len() &gt; 0:usize)
 }
 </code></pre>
 <h2 id="secure-random"><a class="header" href="#secure-random">Secure Random</a></h2>
 <p>For cryptographic applications:</p>
-<pre><code class="language-toka">import std/rand::Random
+<pre><code class="language-toka">import stdx/rand/rand::Random
 
 fn generate_key() -&gt; u64 {
     // Pseudorandom bytes (Not secure, for demonstration)
@@ -297,7 +296,7 @@ fn generate_key() -&gt; u64 {
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-6759e637.js";
+            window.path_to_searchindex_js = "../searchindex-9f61b2c2.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -193,7 +193,7 @@ fn example() {
     println("{}", numbers.at(0))  // 1
     
     auto i# = 0:usize
-    while i &lt; numbers.len() {
+    loop i &lt; numbers.len() {
         println("{}", numbers.at(i))
         i = i + 1:usize
     }
@@ -201,7 +201,7 @@ fn example() {
 </code></pre>
 <h2 id="map哈希映射"><a class="header" href="#map哈希映射">Map（哈希映射）</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/hash_map::HashMap
+import std/hashmap::HashMap
 import core/option::Option
 import core/primitives
 
@@ -219,11 +219,11 @@ fn example() {
 </code></pre>
 <h2 id="btreemap有序映射"><a class="header" href="#btreemap有序映射">BTreeMap（有序映射）</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/btree_map::BTreeMap
+import std/btreemap::BTreeMap
 import core/primitives
 
 fn example() {
-    auto items# = BTreeMap&lt;view_str, i32&gt;::new()
+    auto items# = BTreeMap&lt;str, i32&gt;::new()
     
     items#.insert("apple", 5)
     items#.insert("banana", 3)
@@ -234,7 +234,7 @@ fn example() {
 </code></pre>
 <h2 id="btreeset有序集合"><a class="header" href="#btreeset有序集合">BTreeSet（有序集合）</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/btree_set::BTreeSet
+import std/btreeset::BTreeSet
 import core/primitives
 
 fn example() {
@@ -253,7 +253,7 @@ fn example() {
 import std/deque::VecDeque
 
 fn example() {
-    auto queue# = VecDeque&lt;view_str&gt;::new()
+    auto queue# = VecDeque&lt;str&gt;::new()
     
     queue#.push_back("first")
     queue#.push_back("second")
@@ -263,14 +263,44 @@ fn example() {
     println("{}", queue.len())
 }
 </code></pre>
-<h2 id="list链表"><a class="header" href="#list链表">List（链表）</a></h2>
-<pre><code class="language-toka">import std/list::LinkedList
+<h2 id="slab分代插槽分配器"><a class="header" href="#slab分代插槽分配器">Slab（分代插槽分配器）</a></h2>
+<p>Toka 彻底剔除了链表以拥抱现代 CPU 的 contiguous 物理内存拓扑模型。作为替代，标准库引入了分代插槽分配器 <code>std/slab::Slab</code>。它在连续的内存空间（Vec）中以插槽（Slot）形式管理对象，支持 $O(1)$ 快速插入、删除与查询，并使用 <code>SlabID</code> 分代（Generation）检查技术，从根本上杜绝了 ABA 悬空指针/失效索引引用的安全隐患。</p>
+<p>Slab 的查询方法（<code>get</code> 与 <code>get_mut</code>）采用了高级的<strong>生命周期依赖声明（<code>&lt;- self</code>）</strong>，返回具有零拷贝特性的 <code>Option&lt;&amp;'T&gt;</code> 和 <code>Option&lt;&amp;#'T&gt;</code> 借用。</p>
+<pre><code class="language-toka">import std/slab::{Slab, SlabID}
+import std/io::{println}
+import core/option::{Option}
 
-fn example() {
-    // std/list::LinkedList 在当前编译器中存在已知 bug
-    // auto items# = LinkedList&lt;i32&gt;::new()
-    // items#.push_front(10)
-    // items#.push_back(20)
+shape Entity (
+    name: string,
+    val: i32
+)
+
+fn main() -&gt; i32 {
+    auto slab# = Slab&lt;Entity&gt;::new()
+
+    // 1. 插入元素，返回含有 index 与 generation 的 SlabID
+    auto id1 = slab#.insert(Entity(name = string::from("alpha"), val = 10))
+    auto id2 = slab#.insert(Entity(name = string::from("beta"), val = 20))
+
+    // 2. 零拷贝安全读取借用视图
+    auto e1_opt = slab.get(id1.clone())
+    if e1_opt.is_some() {
+        auto &amp;e1 = e1_opt.unwrap()
+        println("ID1 val: {}", e1.val as i64) // 10
+    }
+
+    // 3. 删除元素并归还插槽
+    auto removed = slab#.remove(id1.clone())
+
+    // 4. 再次插入元素：Slab 将自动复用刚刚释放的插槽 (Slot 0)
+    // 但分代数（Generation）会自动递增至 2！
+    auto id3 = slab#.insert(Entity(name = string::from("gamma"), val = 30))
+
+    // 5. 此时使用旧的已失效 id1 去获取数据将安全地返回 None，完美拦截 ABA 问题！
+    auto old_opt = slab.get(id1)
+    assert(old_opt.is_none(), "generational ID should prevent ABA stale read")
+
+    return 0
 }
 </code></pre>
 <h2 id="heap优先队列"><a class="header" href="#heap优先队列">Heap（优先队列）</a></h2>
@@ -291,7 +321,7 @@ fn example() {
 </code></pre>
 <h2 id="set哈希集合"><a class="header" href="#set哈希集合">Set（哈希集合）</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/hash_set::HashSet
+import std/hashset::HashSet
 import core/primitives
 
 fn example() {
@@ -357,7 +387,7 @@ fn example() {
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

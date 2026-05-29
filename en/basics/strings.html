@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "../searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -178,76 +178,114 @@
                 <div id="mdbook-content" class="content">
                     <main>
                         <h1 id="strings"><a class="header" href="#strings">Strings</a></h1>
-<p>Toka provides a flexible string system designed for both systems programming and text processing.</p>
-<h2 id="string-types"><a class="header" href="#string-types">String Types</a></h2>
-<p>Toka defines several string types for different encoding needs:</p>
+<p>Toka 1.0 implements a highly rigorous, high-performance <strong>Three-Track Text &amp; Byte-Stream System</strong>. It orthogonally decouples “textual observation” from “physical binary manipulation” in the type system. Simultaneously, it eliminates ambiguous implicit context inference, providing developers with maximum memory safety and speed.</p>
+<hr>
+<h2 id="-1-string-and-view-types"><a class="header" href="#-1-string-and-view-types">🏛️ 1. String and View Types</a></h2>
+<p>Strings in Toka are split into owned heap-allocated containers and zero-copy borrowed views. Built into the Prelude’s zero-import scope, you can <strong>directly use these types without any <code>import</code></strong>:</p>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>Type</th><th>Description</th></tr>
+<tr><th style="text-align: left">Type</th><th style="text-align: left">Physical Geometry / LLVM Representation</th><th style="text-align: left">Memory Ownership</th><th style="text-align: left">Description</th></tr>
 </thead>
 <tbody>
-<tr><td><code>str</code></td><td>String slice (like Rust <code>&amp;str</code> or C++ <code>string_view</code>) — immutable, borrowed</td></tr>
-<tr><td><code>String</code></td><td>Owned mutable string (UTF-8 by default, defined in <code>std/string::String</code>)</td></tr>
+<tr><td style="text-align: left"><code>str</code></td><td style="text-align: left">Fat pointer <code>{ i8* head, i64 len }</code></td><td style="text-align: left"><strong>No Ownership (Borrowed)</strong></td><td style="text-align: left">UTF-8 read-only text view. No <code>\0</code> termination guarantee.</td></tr>
+<tr><td style="text-align: left"><code>string</code></td><td style="text-align: left">Heap container <code>{ *#buf, usize, usize }</code></td><td style="text-align: left"><strong>Exclusive Ownership (Owned)</strong></td><td style="text-align: left">Heap-allocated mutable UTF-8 string, strictly terminated with <code>\0</code>.</td></tr>
+<tr><td style="text-align: left"><code>bytes</code></td><td style="text-align: left">Fat pointer <code>{ i8* head, i64 len }</code></td><td style="text-align: left"><strong>No Ownership (Borrowed)</strong></td><td style="text-align: left">Read-only binary byte-stream view.</td></tr>
+<tr><td style="text-align: left"><code>cstr</code></td><td style="text-align: left">Single pointer <code>i8*</code> (Zero-cost Shape)</td><td style="text-align: left"><strong>FFI Borrowed</strong></td><td style="text-align: left">C-style read-only single pointer, 100% statically guaranteed to be <code>\0</code>-terminated.</td></tr>
 </tbody>
 </table>
 </div>
-<h2 id="string-literals"><a class="header" href="#string-literals">String Literals</a></h2>
-<p>Double-quoted strings are the standard:</p>
-<pre><code class="language-toka">auto greeting = "Hello, Toka!"
-auto name = "World"
-</code></pre>
-<h2 id="escape-sequences"><a class="header" href="#escape-sequences">Escape Sequences</a></h2>
-<p>Toka supports <code>\x</code> escape sequences in string literals, making ANSI color codes clean:</p>
-<pre><code class="language-toka">import std/io::println
-
-auto red = "\x1b[31m"
-auto green = "\x1b[32m"
-auto reset = "\x1b[0m"
-
-println("{}{}Success!{}", green, "Build complete", reset)
-</code></pre>
-<h2 id="string-interpolation"><a class="header" href="#string-interpolation">String Interpolation</a></h2>
-<p>Use <code>{}</code> placeholders with <code>println</code> for clean formatting:</p>
-<pre><code class="language-toka">import std/io::println
-
-auto name = "Toka"
-auto version = "0.9.7"
-println("Welcome to {} version {}!", name, version)
-</code></pre>
-<h2 id="string-concatenation"><a class="header" href="#string-concatenation">String Concatenation</a></h2>
-<p>Strings can be concatenated with <code>+</code>:</p>
-<pre><code class="language-toka">import std/string::String
-
-auto full# = String::from("Hello, ")
-full#.push_str("World!")
-</code></pre>
-<h2 id="formatting-and-printing"><a class="header" href="#formatting-and-printing">Formatting and Printing</a></h2>
-<p>You can print other types easily using placeholders without manual conversion:</p>
-<pre><code class="language-toka">import std/io::println
-
-auto n = 42
-println("The answer is {}", n)
-</code></pre>
-<h2 id="character-types"><a class="header" href="#character-types">Character Types</a></h2>
+<hr>
+<h2 id="-2-the-orthogonal-conversion-matrix"><a class="header" href="#-2-the-orthogonal-conversion-matrix">⚖️ 2. The Orthogonal Conversion Matrix</a></h2>
+<p>Toka strictly adheres to the <strong>“Honest Overhead Naming Code”</strong>:</p>
+<ul>
+<li><strong><code>as_xxx</code> family</strong>: Represents <strong>zero-overhead, zero-allocation</strong> view borrowing. The borrowed view’s lifetime is strictly guarded at compile time, bound tightly to its host.</li>
+<li><strong><code>to_xxx</code> family</strong>: Represents <strong>conversions involving physical copies or heap allocations</strong>, explicitly declaring the separation of ownership and physical memory operations.</li>
+</ul>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>Type</th><th>Description</th></tr>
+<tr><th style="text-align: left">Source $\rightarrow$ Target</th><th style="text-align: left"><code>str</code> (Safe Fat Slice)</th><th style="text-align: left"><code>string</code> (Heap Owned)</th><th style="text-align: left"><code>cstr</code> (\0 Borrowed)</th><th style="text-align: left"><code>*char</code> (FFI Raw Ptr)</th></tr>
 </thead>
 <tbody>
-<tr><td><code>char</code></td><td>Single byte character (<code>i8</code>), C-style</td></tr>
-<tr><td><code>Char16</code></td><td>UTF-16 code point (<code>u16</code>)</td></tr>
-<tr><td><code>Char32</code></td><td>UTF-32 code point (<code>u32</code>)</td></tr>
-<tr><td><code>Char</code></td><td>Alias for <code>Char32</code>, the default Unicode character</td></tr>
+<tr><td style="text-align: left"><strong><code>"..."</code> Literal</strong></td><td style="text-align: left">Default ResolvedType (0-cost)</td><td style="text-align: left"><strong><code>.to_string()</code></strong><br>($O(N)$ heap alloc)</td><td style="text-align: left"><strong><code>.as_cstr()</code></strong><br>($O(1)$ zero-alloc)</td><td style="text-align: left">FFI boundary decay<br>(0 friction)</td></tr>
+<tr><td style="text-align: left"><strong><code>str</code></strong></td><td style="text-align: left">——</td><td style="text-align: left"><strong><code>.to_string()</code></strong><br>($O(N)$ heap alloc)</td><td style="text-align: left"><strong><code>.to_string().as_cstr()</code></strong><br>($O(N)$ heap copy)</td><td style="text-align: left">Implicit banned!<br>Use <code>.to_string().c_str()</code></td></tr>
+<tr><td style="text-align: left"><strong><code>string</code></strong></td><td style="text-align: left"><strong><code>.as_str()</code></strong><br>($O(1)$ zero-alloc)</td><td style="text-align: left">——</td><td style="text-align: left"><strong><code>.as_cstr()</code></strong><br>($O(1)$ zero-alloc)</td><td style="text-align: left"><strong><code>.c_str()</code></strong><br>($O(1)$ address borrow)</td></tr>
+<tr><td style="text-align: left"><strong><code>cstr</code></strong></td><td style="text-align: left"><strong><code>.as_str()</code></strong><br>($O(1)$ zero-alloc)</td><td style="text-align: left"><strong><code>.to_string()</code></strong><br>($O(N)$ heap alloc)</td><td style="text-align: left">——</td><td style="text-align: left">FFI boundary decay<br>(0 friction)</td></tr>
 </tbody>
 </table>
 </div>
-<h2 id="working-with-characters"><a class="header" href="#working-with-characters">Working with Characters</a></h2>
-<pre><code class="language-toka">auto ch: char = 'A'
-auto unicode: u32 = 0x4E16:u32
+<hr>
+<h2 id="-3-core-operations--examples"><a class="header" href="#-3-core-operations--examples">🚀 3. Core Operations &amp; Examples</a></h2>
+<h3 id="1-default-zero-copy-literals"><a class="header" href="#1-default-zero-copy-literals">1. Default Zero-Copy Literals</a></h3>
+<p>In Toka, regular double-quoted <code>"..."</code> string literals are resolved as static, read-only <code>str</code> views by default:</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() -&gt; i32 {
+    // Resolved as str by default, resident in .rodata, 100% statically safe
+    auto greeting: str = "Hello, Toka!"
+    println("Greeting: {}", greeting)
+    return 0
+}
 </code></pre>
-<p>The string system is defined in <code>lib/core/str.tk</code> and <code>lib/core/utf8.tk</code> for UTF-8 handling.</p>
+<h3 id="2-dynamic-string--concatenation"><a class="header" href="#2-dynamic-string--concatenation">2. Dynamic string &amp; Concatenation</a></h3>
+<p><code>string</code> is an exclusive heap container. You can mutate it dynamically using <code>push_str</code>.</p>
+<pre><code class="language-toka">import std/io::println
+
+fn main() -&gt; i32 {
+    // zero-import prelude allows direct call to string::from
+    auto full# = string::from("Hello, ")
+    full#.push_str("World!")
+    
+    println("{}", full.as_str()) // Zero-overhead str view borrow
+    return 0
+}
+</code></pre>
+<h3 id="3-dual-track-conversion-between-str-and-bytes"><a class="header" href="#3-dual-track-conversion-between-str-and-bytes">3. Dual-Track Conversion between str and bytes</a></h3>
+<p>Use <code>str</code> for high-level text operations, and <code>bytes</code> for low-level binary data and byte-based indexing:</p>
+<pre><code class="language-toka">import std/io::println
+import core/option::Option
+import core/result::Result
+
+fn main() -&gt; i32 {
+    auto s: str = "Toka 1.0"
+    
+    // 1. O(1) zero-cost downgrade to bytes view
+    auto b = s.bytes()
+    
+    // 2. Bound-checked O(1) byte indexing
+    auto b0 = b.at(0:usize)
+    if b0.is_some() {
+        println("Byte 0: {}", b0.unwrap() as i64) // 84 ('T')
+    }
+    
+    // 3. Validate and upgrade back to str
+    auto res = b.try_to_str()
+    if res.is_ok() {
+        auto s_back = res.unwrap()
+        println("Recovered: {}", s_back)
+    }
+    return 0
+}
+</code></pre>
+<hr>
+<h2 id="-4-ffi-physical-copy-isolation"><a class="header" href="#-4-ffi-physical-copy-isolation">🛡️ 4. FFI Physical Copy Isolation</a></h2>
+<p>Because dynamic <code>str</code> slices do not guarantee a <code>\0</code> terminator, <strong><code>str</code> is strictly prohibited from implicitly decaying to a <code>cstr</code> or raw pointer</strong>.
+If a dynamic <code>str</code> must cross the FFI boundary, you must explicitly call <code>to_string()</code> to create a <code>\0</code>-terminated copy on the heap:</p>
+<pre><code class="language-toka">// Declare FFI interface
+pub fn puts(s: cstr)
+
+fn main() -&gt; i32 {
+    auto my_str: str = "Hello C-FFI"
+    
+    // Explicitly declare physical copy and \0 sealing for absolute safety
+    auto temp_c = my_str.to_string()
+    unsafe {
+        puts(temp_c.as_cstr())
+    }
+    return 0
+}
+</code></pre>
 
                     </main>
 
@@ -300,7 +338,7 @@ auto unicode: u32 = 0x4E16:u32
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

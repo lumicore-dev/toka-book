@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-6759e637.js";
+            window.path_to_searchindex_js = "../searchindex-9f61b2c2.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-34655f65.js"></script>
@@ -242,6 +242,30 @@ import std/time as time_lib
     └── release/
         └── my-project    # 发布版二进制（添加 --release 参数）
 </code></pre>
+<h2 id="-增量构建与-forge-引擎"><a class="header" href="#-增量构建与-forge-引擎">🛠️ 增量构建与 Forge 引擎</a></h2>
+<p>自 Toka v0.9.8-03 起，官方引入了高吞吐量、并行的增量构建引擎 <strong><code>forge</code></strong>。它通过解析项目根目录下的 <code>build.tk</code> 拓扑依赖声明，实现多模块的并行增量编译，并将构建状态持久化存储于本地。</p>
+<h3 id="1-声明构建配置-buildtk"><a class="header" href="#1-声明构建配置-buildtk">1. 声明构建配置 <code>build.tk</code></a></h3>
+<p>在项目的根目录下创建一个 <code>build.tk</code> 文件，使用内置的 <code>build</code> 工具链来定义你的可执行文件或库：</p>
+<pre><code class="language-toka">import build::{Executable, run_build}
+
+fn main() -&gt; i32 {
+    // 实例化一个构建工程，Executable::make(二进制名称, 入口源文件)
+    // 由于 Executable::make 底层是对 C-FFI 的高层封装，我们需要显式传递 FFI 裸指针。
+    auto proj# = Executable::make("my-project".as_cstr().raw_ptr(), "src/main.tk".as_cstr().raw_ptr())
+    return run_build(proj)
+}
+</code></pre>
+<h3 id="2-使用-forge-开启增量并发构建"><a class="header" href="#2-使用-forge-开启增量并发构建">2. 使用 Forge 开启增量并发构建</a></h3>
+<p>在终端中执行：</p>
+<pre><code class="language-bash"># 开启并行构建，-j 指定并发线程数（默认为 4）
+forge -j 8
+</code></pre>
+<p><code>forge</code> 引擎将自动：</p>
+<ul>
+<li>扫描并解析 <code>src/main.tk</code> 及其所有 <code>import</code> 子模块的静态依赖拓扑 DAG。</li>
+<li>比对源文件的最新修改时间，将文件状态索引保存于本地 <code>.forge_cache</code> 数据库中。</li>
+<li><strong>智能增量跳过</strong>：对没有发生代码变更的源文件，利用增量缓存技术瞬时绕过，从而将大型多模块项目的自举编译耗时压缩到毫秒级别！</li>
+</ul>
 
                     </main>
 
@@ -294,7 +318,7 @@ import std/time as time_lib
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "../searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -193,7 +193,7 @@ fn example() {
     println("{}", numbers.at(0))  // 1
     
     auto i# = 0:usize
-    while i &lt; numbers.len() {
+    loop i &lt; numbers.len() {
         println("{}", numbers.at(i))
         i = i + 1:usize
     }
@@ -201,7 +201,7 @@ fn example() {
 </code></pre>
 <h2 id="map-hash-map"><a class="header" href="#map-hash-map">Map (Hash Map)</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/hash_map::HashMap
+import std/hashmap::HashMap
 import core/option::Option
 import core/primitives
 
@@ -219,11 +219,11 @@ fn example() {
 </code></pre>
 <h2 id="btreemap-ordered-map"><a class="header" href="#btreemap-ordered-map">BTreeMap (Ordered Map)</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/btree_map::BTreeMap
+import std/btreemap::BTreeMap
 import core/primitives
 
 fn example() {
-    auto items# = BTreeMap&lt;view_str, i32&gt;::new()
+    auto items# = BTreeMap&lt;str, i32&gt;::new()
     
     items#.insert("apple", 5)
     items#.insert("banana", 3)
@@ -234,7 +234,7 @@ fn example() {
 </code></pre>
 <h2 id="btreeset-ordered-set"><a class="header" href="#btreeset-ordered-set">BTreeSet (Ordered Set)</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/btree_set::BTreeSet
+import std/btreeset::BTreeSet
 import core/primitives
 
 fn example() {
@@ -253,7 +253,7 @@ fn example() {
 import std/deque::VecDeque
 
 fn example() {
-    auto queue# = VecDeque&lt;view_str&gt;::new()
+    auto queue# = VecDeque&lt;str&gt;::new()
     
     queue#.push_back("first")
     queue#.push_back("second")
@@ -263,14 +263,44 @@ fn example() {
     println("{}", queue.len())
 }
 </code></pre>
-<h2 id="list-linked-list"><a class="header" href="#list-linked-list">List (Linked List)</a></h2>
-<pre><code class="language-toka">import std/list::LinkedList
+<h2 id="slab-generational-slab-allocator"><a class="header" href="#slab-generational-slab-allocator">Slab (Generational Slab Allocator)</a></h2>
+<p>Toka completely abolishes linked lists to embrace the contiguous physical memory topology of modern CPUs. Instead, the standard library introduces the generational slab allocator <code>std/slab::Slab</code>. It manages objects as slots inside a contiguous memory buffer (<code>Vec</code>), supporting rapid $O(1)$ insertion, removal, and retrieval. It employs a <code>SlabID</code> generational check technique to fully eliminate the risk of ABA problems or stale index lookups.</p>
+<p>The Slab’s lookup methods (<code>get</code> and <code>get_mut</code>) implement advanced <strong>lifetime dependency declarations (<code>&lt;- self</code>)</strong>, returning zero-copy <code>Option&lt;&amp;'T&gt;</code> and <code>Option&lt;&amp;#'T&gt;</code> borrows.</p>
+<pre><code class="language-toka">import std/slab::{Slab, SlabID}
+import std/io::{println}
+import core/option::{Option}
 
-fn example() {
-    // std/list::LinkedList has a known bug in the current compiler.
-    // auto items# = LinkedList&lt;i32&gt;::new()
-    // items#.push_front(10)
-    // items#.push_back(20)
+shape Entity (
+    name: string,
+    val: i32
+)
+
+fn main() -&gt; i32 {
+    auto slab# = Slab&lt;Entity&gt;::new()
+
+    // 1. Insert elements, returning a SlabID containing both index and generation
+    auto id1 = slab#.insert(Entity(name = string::from("alpha"), val = 10))
+    auto id2 = slab#.insert(Entity(name = string::from("beta"), val = 20))
+
+    // 2. Retrieve zero-copy borrowed views safely
+    auto e1_opt = slab.get(id1.clone())
+    if e1_opt.is_some() {
+        auto &amp;e1 = e1_opt.unwrap()
+        println("ID1 val: {}", e1.val as i64) // 10
+    }
+
+    // 3. Remove an element and reclaim its slot
+    auto removed = slab#.remove(id1.clone())
+
+    // 4. Insert another element: Slab automatically reuses Slot 0!
+    // However, the generation counter automatically increments to 2!
+    auto id3 = slab#.insert(Entity(name = string::from("gamma"), val = 30))
+
+    // 5. Querying with the stale id1 now safely returns None, preventing ABA reads!
+    auto old_opt = slab.get(id1)
+    assert(old_opt.is_none(), "generational ID should prevent ABA stale read")
+
+    return 0
 }
 </code></pre>
 <h2 id="heap-priority-queue"><a class="header" href="#heap-priority-queue">Heap (Priority Queue)</a></h2>
@@ -291,7 +321,7 @@ fn example() {
 </code></pre>
 <h2 id="set"><a class="header" href="#set">Set</a></h2>
 <pre><code class="language-toka">import std/io::println
-import std/hash_set::HashSet
+import std/hashset::HashSet
 import core/primitives
 
 fn example() {
@@ -357,7 +387,7 @@ fn example() {
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 

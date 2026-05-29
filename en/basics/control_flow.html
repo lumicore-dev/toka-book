@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-8869fb6f.js";
+            window.path_to_searchindex_js = "../searchindex-e3a43758.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-a1bbd169.js"></script>
@@ -192,11 +192,13 @@ fn check_temp(temp: i32) {
     }
 }
 </code></pre>
-<h2 id="while-loops"><a class="header" href="#while-loops">While Loops</a></h2>
+<h2 id="loop-loops"><a class="header" href="#loop-loops">Loop Loops</a></h2>
+<p>Toka completely abolishes traditional <code>while</code> loops, unifying all loop semantics under the <code>loop</code> keyword. This significantly simplifies compiler control flow analysis and eliminates syntactic ambiguity.</p>
+<p>Conditional loops use the <code>loop condition {}</code> syntax structure:</p>
 <pre><code class="language-toka">import std/io::println
 
 auto count# = 0
-while count &lt; 5 {
+loop count &lt; 5 {
     println("Count: {}", count)
     count = count + 1
 }
@@ -209,7 +211,7 @@ for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
     println("{}", i)
 }
 </code></pre>
-<p>Currently, Toka does not support a native range operator (like <code>..</code>). You can iterate over an array of elements or implement custom loops using <code>while</code>.</p>
+<p>Currently, Toka does not support a native range operator (like <code>..</code>). You can iterate over an array of elements or implement custom loops using <code>loop</code>.</p>
 <h2 id="iterating-collections"><a class="header" href="#iterating-collections">Iterating Collections</a></h2>
 <pre><code class="language-toka">import std/io::println
 
@@ -233,7 +235,7 @@ for auto item in items2 {
 <pre><code class="language-toka">import std/io::println
 
 auto iter# = 0
-while iter &lt; 100 {
+loop iter &lt; 100 {
     if iter == 50 {
         break        // Exit the loop completely
     }
@@ -247,7 +249,7 @@ while iter &lt; 100 {
 </code></pre>
 <h2 id="match-pattern-matching"><a class="header" href="#match-pattern-matching">Match (Pattern Matching)</a></h2>
 <p>Toka provides intuitive pattern matching with the <code>match</code> expression:</p>
-<pre><code class="language-toka">fn describe(value: i32) -&gt; cstring {
+<pre><code class="language-toka">fn describe(value: i32) -&gt; str {
     return match value {
         0 =&gt; pass "zero"
         1 =&gt; pass "one"
@@ -310,7 +312,7 @@ while iter &lt; 100 {
         <script src="../book-c22b7243.js"></script>
 
         <!-- Custom JS scripts -->
-        <script src="../theme/toka-5c6a0550.js"></script>
+        <script src="../theme/toka-e94ce3a0.js"></script>
 
 
 
