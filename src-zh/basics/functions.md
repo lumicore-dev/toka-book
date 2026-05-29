@@ -35,7 +35,7 @@ fn main() -> i32 {
 函数可以接受多个不同类型的参数：
 
 ```toka
-fn greet(name: view_str, age: i32, formal: bool) -> cstring {
+fn greet(name: str, age: i32, formal: bool) -> str {
     if formal {
         return "Good day"
     }
@@ -60,7 +60,7 @@ fn increment(x#: i32) {
 ```toka
 import std/io::println
 
-fn log_message(msg: view_str) {
+fn log_message(msg: str) {
     println("{}", msg)
 }
 ```

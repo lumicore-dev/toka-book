@@ -18,13 +18,17 @@ fn check_temp(temp: i32) {
 }
 ```
 
-## While Loops
+## Loop Loops
+
+Toka completely abolishes traditional `while` loops, unifying all loop semantics under the `loop` keyword. This significantly simplifies compiler control flow analysis and eliminates syntactic ambiguity.
+
+Conditional loops use the `loop condition {}` syntax structure:
 
 ```toka
 import std/io::println
 
 auto count# = 0
-while count < 5 {
+loop count < 5 {
     println("Count: {}", count)
     count = count + 1
 }
@@ -42,7 +46,7 @@ for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
 }
 ```
 
-Currently, Toka does not support a native range operator (like `..`). You can iterate over an array of elements or implement custom loops using `while`.
+Currently, Toka does not support a native range operator (like `..`). You can iterate over an array of elements or implement custom loops using `loop`.
 
 ## Iterating Collections
 
@@ -76,7 +80,7 @@ Control loop flow with standard keywords:
 import std/io::println
 
 auto iter# = 0
-while iter < 100 {
+loop iter < 100 {
     if iter == 50 {
         break        // Exit the loop completely
     }
@@ -94,7 +98,7 @@ while iter < 100 {
 Toka provides intuitive pattern matching with the `match` expression:
 
 ```toka
-fn describe(value: i32) -> cstring {
+fn describe(value: i32) -> str {
     return match value {
         0 => pass "zero"
         1 => pass "one"

@@ -92,3 +92,37 @@ my-project/
     └── release/
         └── my-project    # 发布版二进制（添加 --release 参数）
 ```
+
+## 🛠️ 增量构建与 Forge 引擎
+
+自 Toka v0.9.8-03 起，官方引入了高吞吐量、并行的增量构建引擎 **`forge`**。它通过解析项目根目录下的 `build.tk` 拓扑依赖声明，实现多模块的并行增量编译，并将构建状态持久化存储于本地。
+
+### 1. 声明构建配置 `build.tk`
+
+在项目的根目录下创建一个 `build.tk` 文件，使用内置的 `build` 工具链来定义你的可执行文件或库：
+
+```toka
+import build::{Executable, run_build}
+
+fn main() -> i32 {
+    // 实例化一个构建工程，Executable::make(二进制名称, 入口源文件)
+    // 由于 Executable::make 底层是对 C-FFI 的高层封装，我们需要显式传递 FFI 裸指针。
+    auto proj# = Executable::make("my-project".as_cstr().raw_ptr(), "src/main.tk".as_cstr().raw_ptr())
+    return run_build(proj)
+}
+```
+
+### 2. 使用 Forge 开启增量并发构建
+
+在终端中执行：
+
+```bash
+# 开启并行构建，-j 指定并发线程数（默认为 4）
+forge -j 8
+```
+
+`forge` 引擎将自动：
+* 扫描并解析 `src/main.tk` 及其所有 `import` 子模块的静态依赖拓扑 DAG。
+* 比对源文件的最新修改时间，将文件状态索引保存于本地 `.forge_cache` 数据库中。
+* **智能增量跳过**：对没有发生代码变更的源文件，利用增量缓存技术瞬时绕过，从而将大型多模块项目的自举编译耗时压缩到毫秒级别！
+

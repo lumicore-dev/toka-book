@@ -53,10 +53,9 @@ auto ^p2 = ^p1  // Ownership transfers (moves) to p2; p1 is no longer valid!
 ```
 
 ### Explicit Move with `cede`
-For other types (such as custom shapes or `String`), copy semantics are used by default. To explicitly transfer ownership of such a value (avoiding copies), you must use the **`cede` keyword**. Ceding transfers the resource to the destination and invalidates the source variable:
+For other types (such as custom shapes or `string`), copy semantics are used by default. To explicitly transfer ownership of such a value (avoiding copies), you must use the **`cede` keyword**. Ceding transfers the resource to the destination and invalidates the source variable:
 ```toka
-import std/string::String
-auto s1 = String::from("hello")
+auto s1 = string::from("hello")
 auto s2 = cede s1 // Explicit move: s1 is invalidated
 ```
 

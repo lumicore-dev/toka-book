@@ -30,9 +30,9 @@ Toka 由 [YiZhonghua](https://github.com/zhyi-dp) 创建。官方语言仓库位
 ## 语言版本对齐
 
 本书会随 Toka 编译器的开发保持更新。当前文档版本对齐：
-- **编译器版本**：`v0.9.7`
-- **Toka Commit**：`b3f8940`（完成 termios 与 prelude 审计重构，支持 kebab-case 包名和命名空间解析，并强制禁止连字符变量声明）
-- **Tag**：`v0.9.7-02`
+- **编译器版本**：`v0.9.8`
+- **Toka Commit**：`aadfd52`（完成太极三轨文本体系、废除 while 统一为 loop、标准分代 Slab 分配器重构以及 forge 并行增量构建引擎）
+- **Tag**：`v0.9.8-03`
 
 ## 作者的话
 

@@ -18,30 +18,29 @@ Since `stdx/cli/flag` is a standard library extension in Toka, you do not need t
 ```tokalang
 import stdx/cli/flag::{Parser, ParsedArgs}
 import std/env
-import std/string::String
 import std/io
 
 fn main() -> i32 {
     // Parser::new takes the program name and a brief description
-    auto parser# = Parser::new(String::from("my-cli"), String::from("A sample CLI tool built with Toka"))
+    auto parser# = Parser::new(string::from("my-cli"), string::from("A sample CLI tool built with Toka"))
     
     // Add options to the parser
-    parser#.add_string(String::from("name"), 110:char, String::from("World"), String::from("Your name"))
-    parser#.add_bool(String::from("verbose"), 118:char, false, String::from("Enable verbose output"))
+    parser#.add_string(string::from("name"), 110:char, string::from("World"), string::from("Your name"))
+    parser#.add_bool(string::from("verbose"), 118:char, false, string::from("Enable verbose output"))
 
     auto args = env::args()
     auto res = parser.parse(args)
     match res {
-        auto Result<ParsedArgs, String>::Ok(parsed) => {
-            auto who = parsed.get_string(String::from("name"))
+        auto Result<ParsedArgs, string>::Ok(parsed) => {
+            auto who = parsed.get_string(string::from("name"))
             io::println("Hello, %s!", who.c_str())
             
-            if parsed.get_bool(String::from("verbose")) {
+            if parsed.get_bool(string::from("verbose")) {
                 io::println("[Verbose] Running with debug output")
             }
         }
-        auto Result<ParsedArgs, String>::Err(&err) => {
-            if err == String::from("help requested") {
+        auto Result<ParsedArgs, string>::Err(&err) => {
+            if err == string::from("help requested") {
                 parser.print_help()
                 return 0
             }
@@ -66,13 +65,13 @@ toka run src/main.tk -- -n Toka -v
 
 ## Advanced Argument Handling
 
-Toka's current `stdx/cli/flag` library provides basic options and flags parsing with types like `bool`, `i64`, `f64`, and `String`. 
+Toka's current `stdx/cli/flag` library provides basic options and flags parsing with types like `bool`, `i64`, `f64`, and `string`. 
 
 Positional arguments are captured automatically and can be fetched from the parsed arguments using `positionals()`:
 
 ```tokalang
 auto pos_args = parsed.positionals()
-// pos_args is a Vec<String> containing any arguments not matching flags or options
+// pos_args is a Vec<string> containing any arguments not matching flags or options
 ```
 
 For complex command-line interfaces requiring nested subcommands (like `git status` or `docker run`), you can manually match on `pos_args` to delegate execution to different parser configurations.

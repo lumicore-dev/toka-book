@@ -15,11 +15,10 @@ print("No newline here")       // 打印不换行
 
 ```toka
 import std/fs
-import std/string::String
 import core/result::Result
 import std/io::IoStringResult
 
-fn read_config(path: String) -> IoStringResult {
+fn read_config(path: string) -> IoStringResult {
     return fs::read_to_string(path)
 }
 ```
@@ -28,11 +27,10 @@ fn read_config(path: String) -> IoStringResult {
 
 ```toka
 import std/fs
-import std/string::String
 import core/result::Result
 
-fn save_data(path: String, data: String) -> Result<bool, String> {
-    return fs::write_string(path, data)
+fn save_data(path: string, data: string) -> Result<bool, string> {
+    return fs::write_string(path, data.as_str())
 }
 ```
 
@@ -42,20 +40,19 @@ fn save_data(path: String, data: String) -> Result<bool, String> {
 
 ```toka
 import std/fs
-import std/string::String
 import std/io::println
 import core/option::Option
 
 fn manage_files() {
-    auto path = String::from("output")
+    auto path = string::from("output")
     if fs::exists(path.clone()) {
         fs::remove_dir(path)
     }
     
-    fs::create_dir(String::from("output"))
+    fs::create_dir(string::from("output"))
     
-    auto dir# = fs::read_dir(String::from("."))
-    while true {
+    auto dir# = fs::read_dir(string::from("."))
+    loop {
         auto entry = dir#.next()
         if entry.is_none() { break }
         println("{}", entry.unwrap())
@@ -68,16 +65,15 @@ fn manage_files() {
 ```toka
 import std/io::println
 import std/path
-import std/string::String
 
 fn example() {
-    auto full = path::join(String::from("dir"), String::from("file.txt"))
+    auto full = path::join(string::from("dir"), string::from("file.txt"))
     println("{}", full.c_str())
     
-    auto ext = path::extension(String::from("data.json"))
+    auto ext = path::extension(string::from("data.json"))
     println("{}", ext.c_str())
     
-    auto stem = path::file_stem(String::from("data.json"))
+    auto stem = path::file_stem(string::from("data.json"))
     println("{}", stem.c_str())
 }
 ```
@@ -87,14 +83,13 @@ fn example() {
 ```toka
 import std/io::println
 import std/env
-import std/string::String
 import core/option::Option
 
 fn example() {
-    auto home_opt = env::var(String::from("HOME"))
-    auto home = home_opt.unwrap_or(String::from("/tmp"))
+    auto home_opt = env::var(string::from("HOME"))
+    auto home = home_opt.unwrap_or(string::from("/tmp"))
     println("Home directory: {}", home)
     
-    env::set_var(String::from("MY_APP_DEBUG"), String::from("true"))
+    env::set_var(string::from("MY_APP_DEBUG"), string::from("true"))
 }
 ```

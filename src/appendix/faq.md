@@ -4,7 +4,7 @@
 
 **Q: Is Toka production-ready?**
 
-Toka is currently in beta (v0.9.7). It's suitable for personal projects, prototyping, and experimentation. The 1.0 release is planned with a focus on production stability.
+Toka is currently in beta (v0.9.8-03). It's suitable for personal projects, prototyping, and experimentation. The 1.0 release is planned with a focus on production stability.
 
 **Q: What platforms does Toka support?**
 

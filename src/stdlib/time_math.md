@@ -6,7 +6,6 @@ Toka provides comprehensive time handling and mathematical functions for scienti
 
 ```toka
 import std/time::{SystemTime}
-import std/string::String
 import std/io::println
 
 fn example() {
@@ -32,7 +31,6 @@ fn format_date() {
 
 ```toka
 import std/time::{Instant}
-import std/string::String
 import std/io::println
 
 fn measure() {
@@ -49,7 +47,6 @@ fn measure() {
 
 ```toka
 import std/math
-import std/string::String
 import std/io::println
 
 fn calculations() {
@@ -66,8 +63,7 @@ fn calculations() {
 ## Random Numbers
 
 ```toka
-import std/rand::{Random}
-import std/string::String
+import stdx/rand/rand::{Random}
 import std/io::println
 
 fn gen_random() {

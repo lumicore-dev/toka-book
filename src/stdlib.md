@@ -40,14 +40,14 @@ Ready-to-use standard modules for application development:
 |--------|-------------|
 | `prelude` | Auto-imported standard prelude containing the most common types |
 | `char` | Unicode character handling and classification |
-| `string` | UTF-8 dynamic dynamic string types (`String` / `view_str`) |
+| `string` | UTF-8 dynamic string type and views (`string` / `str`) |
 | `vec` | Dynamically growing sequential array container (`Vec`) |
 | `deque` | Double-ended queue based on ring buffers (`VecDeque`) |
-| `list` | Doubly-linked list implementation (`LinkedList`) |
-| `hash_map` | High-performance hash table based map (`HashMap`) |
-| `hash_set` | Hash table based unique element collection (`HashSet`) |
-| `btree_map` | B-Tree based ordered key-value map (`BTreeMap`) |
-| `btree_set` | B-Tree based ordered unique set (`BTreeSet`) |
+| `slab` | Zero-copy generational slab allocator (`Slab` / `SlabID`) |
+| `hashmap` | High-performance hash table based map (`HashMap`) |
+| `hashset` | Hash table based unique element collection (`HashSet`) |
+| `btreemap` | B-Tree based ordered key-value map (`BTreeMap`) |
+| `btreeset` | B-Tree based ordered unique set (`BTreeSet`) |
 | `heap` | Priority queue implemented with max/min binary heap (`BinaryHeap`) |
 | `io` | Buffered standard console I/O (`stdin` / `stdout` / `println`) |
 | `fs` | File system read/write and directory metadata operations |

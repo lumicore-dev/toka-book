@@ -18,13 +18,17 @@ fn check_temp(temp: i32) {
 }
 ```
 
-## While 循环
+## Loop 循环
+
+Toka 彻底废除了传统的 `while` 循环，并将所有的循环语义统一收拢在 `loop` 关键字下。这极大简化了编译器控制流分析，消除了语法歧义。
+
+条件循环使用 `loop condition {}` 语法结构：
 
 ```toka
 import std/io::println
 
 auto count# = 0
-while count < 5 {
+loop count < 5 {
     println("计数: {}", count)
     count = count + 1
 }
@@ -42,7 +46,7 @@ for auto i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
 }
 ```
 
-目前 Toka 暂不支持原生范围区间运算符（如 `..`）。你可以在数组上进行迭代，或使用 `while` 实现自定义迭代逻辑。
+目前 Toka 暂不支持原生范围区间运算符（如 `..`）。你可以在数组上进行迭代，或使用 `loop` 实现自定义迭代逻辑。
 
 ## 遍历集合
 
@@ -76,7 +80,7 @@ for auto item in items2 {
 import std/io::println
 
 auto iter# = 0
-while iter < 100 {
+loop iter < 100 {
     if iter == 50 {
         break        // 完全退出循环
     }
@@ -94,7 +98,7 @@ while iter < 100 {
 Toka 使用 `match` 表达式提供直观的模式匹配支持：
 
 ```toka
-fn describe(value: i32) -> cstring {
+fn describe(value: i32) -> str {
     return match value {
         0 => pass "零"
         1 => pass "一"

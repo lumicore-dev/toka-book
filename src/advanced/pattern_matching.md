@@ -5,7 +5,7 @@ Pattern matching is one of Toka's most expressive features, allowing you to dest
 ## Basic Match
 
 ```toka
-fn describe(n: i32) -> cstring {
+fn describe(n: i32) -> str {
     return match n {
         0 => pass "zero"
         1 => pass "one"
@@ -42,10 +42,10 @@ import core/option::Option
 
 fn main() -> i32 {
     auto id = 1
-    auto opt: Option<view_str> = Option<view_str>::None
+    auto opt: Option<str> = Option<str>::None
     match opt {
-        auto Option<view_str>::Some(&name) => { println("Found: {}", name) }
-        auto Option<view_str>::None => { println("User not found") }
+        auto Option<str>::Some(&name) => { println("Found: {}", name) }
+        auto Option<str>::None => { println("User not found") }
     }
     return 0
 }
@@ -58,10 +58,10 @@ import std/io::println
 import core/result::Result
 
 fn main() -> i32 {
-    auto res: Result<f32, view_str> = Result<f32, view_str>::Ok(5.0)
+    auto res: Result<f32, str> = Result<f32, str>::Ok(5.0)
     match res {
-        auto Result<f32, view_str>::Ok(value) => { println("Result: {}", value) }
-        auto Result<f32, view_str>::Err(&msg) => { println("Error: {}", msg) }
+        auto Result<f32, str>::Ok(value) => { println("Result: {}", value) }
+        auto Result<f32, str>::Err(&msg) => { println("Error: {}", msg) }
     }
     return 0
 }
@@ -103,5 +103,5 @@ auto grade = match score {
 
 ## No Type-Based Matching
 
-Toka does not support matching directly on types (such as writing `i32 => ...` or `view_str => ...` inside a `match` expression). Any type name used in a branch without standard syntax will be treated as a new variable binding pattern (Variable Pattern), which matches any value and shadows other cases, leading to compilation errors or unreachable branches.
+Toka does not support matching directly on types (such as writing `i32 => ...` or `str => ...` inside a `match` expression). Any type name used in a branch without standard syntax will be treated as a new variable binding pattern (Variable Pattern), which matches any value and shadows other cases, leading to compilation errors or unreachable branches.
 ```

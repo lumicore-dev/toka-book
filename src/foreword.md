@@ -30,9 +30,9 @@ If you're an experienced developer, feel free to jump to specific topics using t
 ## Language Version Alignment
 
 This book is kept up-to-date with the latest Toka compiler development. The current version of this documentation is aligned with:
-- **Compiler Version**: `v0.9.7`
-- **Toka Commit**: `b3f8940` (Complete termios and prelude audit refactoring, support kebab-case package names and namespace parsing, and enforce hyphen-free variable declarations)
-- **Tag**: `v0.9.7-02`
+- **Compiler Version**: `v0.9.8`
+- **Toka Commit**: `aadfd52` (Unify three-track string system, abolish while in favor of loop, refactor std with generational Slab allocator, and introduce forge parallel build engine)
+- **Tag**: `v0.9.8-03`
 
 ## A Note From the Author
 

@@ -101,7 +101,7 @@ jobs:
                 <div class="lang-tag">简体中文</div>
               </a>
             </div>
-            <footer>Built with mdBook &middot; Toka v0.9.7</footer>
+            <footer>Built with mdBook &middot; Toka v0.9.8-03</footer>
           </body>
           </html>
           HTMLEOF

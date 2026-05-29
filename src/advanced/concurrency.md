@@ -32,7 +32,7 @@ fn main() -> i32 {
 Communicate between tasks using MPSC (Multi-Producer, Single-Consumer) channels:
 
 ```toka
-import std/mpsc::channel
+import std/channel::channel
 import std/thread::thread_spawn
 import std/io::println
 

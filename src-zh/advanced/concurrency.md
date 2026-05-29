@@ -32,7 +32,7 @@ fn main() -> i32 {
 使用 MPSC（多生产者，单消费者）通道在任务间通信：
 
 ```toka
-import std/mpsc::channel
+import std/channel::channel
 import std/thread::thread_spawn
 import std/io::println
 

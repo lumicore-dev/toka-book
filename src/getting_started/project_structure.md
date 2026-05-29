@@ -93,3 +93,37 @@ my-project/
     └── release/
         └── my-project    # Release binary (with --release)
 ```
+
+## 🛠️ Incremental Builds with the Forge Engine
+
+Starting from Toka v0.9.8-03, the official compiler comes with a high-throughput, parallel, and persistent cache build engine named **`forge`**. It reads the project's dependency topology declared inside a `build.tk` script, coordinates workers to compile files in parallel, and persists the build provenance locally.
+
+### 1. Declaring Build Configuration `build.tk`
+
+Create a `build.tk` file in the root directory of your project, utilizing the standard `build` toolchain to declare your executable or library:
+
+```toka
+import build::{Executable, run_build}
+
+fn main() -> i32 {
+    // Instantiate a build project, Executable::make(binary_name, entry_source)
+    // Since Executable::make is a high-level wrapper around low-level C-FFI, we pass raw FFI pointers.
+    auto proj# = Executable::make("my-project".as_cstr().raw_ptr(), "src/main.tk".as_cstr().raw_ptr())
+    return run_build(proj)
+}
+```
+
+### 2. Running Forge for Parallel Incremental Builds
+
+Execute `forge` in your terminal:
+
+```bash
+# Compile with concurrency, -j specifies worker thread count (defaults to 4)
+forge -j 8
+```
+
+The `forge` engine will automatically:
+* Parse the entry point `src/main.tk` and map its static dependency DAG recursively.
+* Compare source file timestamps and maintain an index database inside `.forge_cache`.
+* **Smart Incremental Skip**: Instantly bypass compilation for unchanged files, shrinking multi-module project compilation times down to milliseconds!
+

@@ -40,14 +40,14 @@ Toka 的标准库提供了全面的模块集，满足日常编程任务的需求
 |------|------|
 | `prelude` | 自动导入的标准库预导入模块，包含最常用类型 |
 | `char` | Unicode 字符处理与分类 |
-| `string` | UTF-8 编码的动态字符串类型（`String` / `view_str`） |
+| `string` | UTF-8 编码的动态字符串类型与视图（`string` / `str`） |
 | `vec` | 动态增长的顺序数组容器（`Vec`） |
 | `deque` | 基于循环缓冲区的双端队列（`VecDeque`） |
-| `list` | 双向链表实现（`LinkedList`） |
-| `hash_map` | 基于哈希表的高性能映射（`HashMap`） |
-| `hash_set` | 基于哈希表的唯一元素集合（`HashSet`） |
-| `btree_map` | 基于 B-Tree 的有序键值映射（`BTreeMap`） |
-| `btree_set` | 基于 B-Tree 的有序唯一集合（`BTreeSet`） |
+| `slab` | 零拷贝分代插槽分配器（`Slab` / `SlabID`） |
+| `hashmap` | 基于哈希表的高性能映射（`HashMap`） |
+| `hashset` | 基于哈希表的唯一元素集合（`HashSet`） |
+| `btreemap` | 基于 B-Tree 的有序键值映射（`BTreeMap`） |
+| `btreeset` | 基于 B-Tree 的有序唯一集合（`BTreeSet`） |
 | `heap` | 最大堆/最小堆实现的优先队列（`BinaryHeap`） |
 | `io` | 带缓冲的标准控制台 I/O（`stdin` / `stdout` / `println`） |
 | `fs` | 文件系统读写及目录元数据操作 |

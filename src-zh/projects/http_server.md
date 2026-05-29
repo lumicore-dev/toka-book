@@ -10,7 +10,6 @@ Toka 的 HTTP 引擎位于 `stdx/net/http` 中。你可以通过绑定 `std/net`
 import std/io::{println}
 import stdx/net/http::{HttpRequest, HttpResponse, parse_http_request}
 import std/net::{TcpListener, TcpStream, Ipv4Addr, SocketAddrV4}
-import std/string::{String}
 import core/result::{Result}
 
 fn handle_client(stream#: TcpStream) {
@@ -21,12 +20,12 @@ fn handle_client(stream#: TcpStream) {
     match read_res {
         auto Result::Ok(n) => {
             if n > 0:usize {
-                auto req_str = String::from_with_len(&buf[0] as *char, n as i32)
+                auto req_str = string::from_with_len(&buf[0] as *char, n as i32)
                 auto req# = parse_http_request(req_str)
                 
                 auto resp# = HttpResponse::not_found()
-                if req.path.eq(String::from("/")) {
-                    resp = HttpResponse::html(String::from("<h1>Hello, Toka!</h1>"))
+                if req.path.eq(string::from("/")) {
+                    resp = HttpResponse::html(string::from("<h1>Hello, Toka!</h1>"))
                 }
                 
                 auto resp_str = resp#.to_string()
@@ -52,25 +51,24 @@ fn main() -> i32 {
 ```toka
 import stdx/net/http::{HttpResponse}
 import stdx/serde/json::{serialize_shape, to_json, @ToJson}
-import std/string::{String}
 
-pub shape Message(text: String, status: String)
+pub shape Message(text: string, status: string)
 
 impl Message@ToJson {
-    pub fn write_json(self, buf#: String) -> String {
+    pub fn write_json(self, buf#: string) -> string {
         return serialize_shape(self, buf)
     }
 }
 
 fn api_status() -> HttpResponse {
     auto msg = Message(
-        text = String::from("服务器正在运行"),
-        status = String::from("ok")
+        text = string::from("服务器正在运行"),
+        status = string::from("ok")
     )
     auto json_body = to_json(msg)
     return HttpResponse(
         status_code = 200,
-        content_type = String::from("application/json"),
+        content_type = string::from("application/json"),
         body = json_body
     )
 }
@@ -86,17 +84,16 @@ fn main() -> i32 {
 
 ```toka
 import stdx/net/http::{HttpRequest, HttpResponse}
-import std/string::{String}
 
 fn handle_user_route(req: HttpRequest) -> HttpResponse {
     // 匹配动态路径 "/api/users/<id>"
-    if req.path.as_str().starts_with(s"/api/users/") {
+    if req.path.as_str().starts_with("/api/users/") {
         auto user_id = req.path.substr(11, req.path.len() - 11)
-        auto body# = String::from("用户 ID: ")
+        auto body# = string::from("用户 ID: ")
         body#.push_view(user_id)
         return HttpResponse(
             status_code = 200,
-            content_type = String::from("text/plain"),
+            content_type = string::from("text/plain"),
             body = body
         )
     }
@@ -114,13 +111,12 @@ fn main() -> i32 {
 
 ```toka
 import stdx/net/http::{HttpRequest, HttpResponse}
-import std/string::{String}
 import std/io::{println}
 
 fn logger_middleware(req: HttpRequest, next: fn(HttpRequest) -> HttpResponse) -> HttpResponse {
     println("请求路径：{}", req.path)
     auto res = next(req)
-    println("响应状态码：{}", String::from_int(res.status_code))
+    println("响应状态码：{}", string::from_int(res.status_code))
     return res
 }
 
@@ -135,17 +131,16 @@ fn main() -> i32 {
 
 ```toka
 import stdx/net/http::{HttpResponse}
-import std/string::{String}
 import std/fs::{read_to_string}
 import core/result::{Result}
 
-fn serve_static_file(path: String) -> HttpResponse {
+fn serve_static_file(path: string) -> HttpResponse {
     auto file_content = read_to_string(path)
     match file_content {
         auto Result::Ok(&content) => {
             return HttpResponse(
                 status_code = 200,
-                content_type = String::from("text/html"),
+                content_type = string::from("text/html"),
                 body = content.clone()
             )
         }
@@ -166,7 +161,6 @@ fn main() -> i32 {
 import std/io::{println}
 import stdx/net/http::{HttpRequest, HttpResponse, HttpMethod, parse_http_request}
 import std/net::{TcpListener, TcpStream, Ipv4Addr, SocketAddrV4}
-import std/string::{String}
 import core/result::{Result}
 
 fn route_request(req: HttpRequest) -> HttpResponse {
@@ -176,16 +170,16 @@ fn route_request(req: HttpRequest) -> HttpResponse {
         _ => {}
     }
     
-    if is_get && req.path.eq(String::from("/status")) {
+    if is_get && req.path.eq(string::from("/status")) {
         return HttpResponse(
             status_code = 200,
-            content_type = String::from("application/json"),
-            body = String::from("{\"status\":\"ok\"}")
+            content_type = string::from("application/json"),
+            body = string::from("{\"status\":\"ok\"}")
         )
     }
     
-    if is_get && req.path.eq(String::from("/")) {
-        return HttpResponse::html(String::from("<h1>Toka HTTP Server</h1>"))
+    if is_get && req.path.eq(string::from("/")) {
+        return HttpResponse::html(string::from("<h1>Toka HTTP Server</h1>"))
     }
     
     return HttpResponse::not_found()
@@ -199,7 +193,7 @@ fn handle_connection(stream#: TcpStream) {
     match read_res {
         auto Result::Ok(n) => {
             if n > 0:usize {
-                auto req_str = String::from_with_len(&buf[0] as *char, n as i32)
+                auto req_str = string::from_with_len(&buf[0] as *char, n as i32)
                 auto req# = parse_http_request(req_str)
                 auto resp# = route_request(req)
                 auto resp_str = resp#.to_string()

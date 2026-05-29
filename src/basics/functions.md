@@ -35,7 +35,7 @@ Return `0` for success, non-zero for errors.
 Functions can take multiple parameters of different types:
 
 ```toka
-fn greet(name: view_str, age: i32, formal: bool) -> cstring {
+fn greet(name: str, age: i32, formal: bool) -> str {
     if formal {
         return "Good day"
     }
@@ -60,7 +60,7 @@ If a function doesn't return anything, omit `->`:
 ```toka
 import std/io::println
 
-fn log_message(msg: view_str) {
+fn log_message(msg: str) {
     println("{}", msg)
 }
 ```

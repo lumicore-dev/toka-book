@@ -50,17 +50,16 @@ Hash the contents of a file:
 
 ```toka
 import std/fs
-import std/string::String
 import stdx/crypto/sha256::Sha256
 import core/result::Result
 
-fn verify_file(path: String) -> Result<bool, String> {
+fn verify_file(path: string) -> Result<bool, string> {
     auto content = fs::read_to_string(path).unwrap()
     auto sha256# = Sha256::new()
-    sha256#.update(content)
+    sha256#.update(content.as_str())
     auto computed = sha256#.finalize_hex()
     
-    return Result<bool, String>::Ok(computed.len() > 0:usize)
+    return Result<bool, string>::Ok(computed.len() > 0:usize)
 }
 ```
 
@@ -69,7 +68,7 @@ fn verify_file(path: String) -> Result<bool, String> {
 For cryptographic applications:
 
 ```toka
-import std/rand::Random
+import stdx/rand/rand::Random
 
 fn generate_key() -> u64 {
     // Pseudorandom bytes (Not secure, for demonstration)

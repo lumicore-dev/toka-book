@@ -16,12 +16,11 @@ A Thompson NFA compiles a regex pattern into a state machine that can match stri
 import regex::{Regex}
 
 import std/io::println
-import std/string::String
 
 fn example() {
     auto re = Regex::new("hello|world")
     
-    if re.test(String::from("hello world")) {
+    if re.test(string::from("hello world")) {
         println("Match found!")
     }
 }
@@ -46,13 +45,12 @@ The engine supports standard regex patterns:
 
 ```tokalang
 import std/io::println
-import std/string::String
 import core/option::Option
 
 fn example() {
     auto re = Regex::new("\\d+")  // One or more digits
     
-    match re.find(String::from("Order #42")) {
+    match re.find(string::from("Order #42")) {
         auto Option::Some(m) => println("Found: {}", m.text),
         auto Option::None => println("No match")
     }
@@ -63,11 +61,10 @@ fn example() {
 
 ```tokalang
 import std/io::println
-import std/string::String
 
 fn example() {
     auto re = Regex::new("\\s+")
-    auto result = re.replace(String::from("hello    world"), String::from(" "))
+    auto result = re.replace(string::from("hello    world"), string::from(" "))
     println("{}", result)  // "hello world"
 }
 ```
