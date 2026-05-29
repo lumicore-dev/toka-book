@@ -4,5 +4,5 @@ authors = ["lumicore-dev"]
 language = "zh"
 
 [output.html]
-git-repository-url = "https://github.com/tokalang/toka"
+git-repository-url = "https://github.com/lumicore-dev/toka-book"
 additional-js = ["theme/toka.js"]
